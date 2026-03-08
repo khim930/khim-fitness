@@ -1,27 +1,196 @@
 import { useState, useEffect } from "react";
 
+const SPORT_FONT = "'Bebas Neue', 'Impact', sans-serif";
+const BODY_FONT  = "Georgia, 'Times New Roman', serif";
+
+// Inject Google Fonts + global CSS animations once
+const injectStyles = () => {
+  if (document.getElementById("khimfit-styles")) return;
+  const el = document.createElement("style");
+  el.id = "khimfit-styles";
+  el.textContent = `
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;800&display=swap');
+    @keyframes dropFill  { from{transform:scaleY(0);opacity:0} to{transform:scaleY(1);opacity:1} }
+    @keyframes pulse     { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+    @keyframes slideUp   { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
+    @keyframes streakPop { 0%{transform:scale(1)} 40%{transform:scale(1.3)} 100%{transform:scale(1)} }
+    @keyframes spin      { to{transform:rotate(360deg)} }
+
+    /* ── Stick figure body parts ── */
+    @keyframes ex-pulse { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+    @keyframes ex-bounce {
+      0%,100%{ transform:translateY(0) }
+      30%    { transform:translateY(-18px) }
+      60%    { transform:translateY(-8px) }
+    }
+    @keyframes ex-arms-star {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(60deg) }
+    }
+    @keyframes ex-legs-star {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(30deg) }
+    }
+    @keyframes ex-squat {
+      0%,100%{ transform:translateY(0) scaleY(1) }
+      50%    { transform:translateY(12px) scaleY(0.8) }
+    }
+    @keyframes ex-pushup {
+      0%,100%{ transform:translateY(0) }
+      50%    { transform:translateY(8px) }
+    }
+    @keyframes ex-run {
+      0%,100%{ transform:rotate(-15deg) }
+      50%    { transform:rotate(15deg) }
+    }
+    @keyframes ex-lunge {
+      0%,100%{ transform:translateX(0) scaleY(1) }
+      50%    { transform:translateX(10px) scaleY(0.85) }
+    }
+    @keyframes ex-plank {
+      0%,100%{ transform:scaleX(1) }
+      50%    { transform:scaleX(1.04) }
+    }
+    @keyframes ex-crunch {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(-30deg) }
+    }
+    @keyframes ex-bridge {
+      0%,100%{ transform:translateY(0) }
+      50%    { transform:translateY(-12px) }
+    }
+    @keyframes ex-raise {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(-70deg) }
+    }
+    @keyframes ex-curl {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(-80deg) }
+    }
+    @keyframes ex-row {
+      0%,100%{ transform:translateX(0) }
+      50%    { transform:translateX(-10px) }
+    }
+    @keyframes ex-press {
+      0%,100%{ transform:translateY(0) }
+      50%    { transform:translateY(-14px) }
+    }
+    @keyframes ex-skip {
+      0%,100%{ transform:translateY(0) }
+      40%    { transform:translateY(-14px) }
+    }
+    @keyframes ex-twist {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(35deg) }
+    }
+    @keyframes ex-flutter {
+      0%,100%{ transform:rotate(10deg) }
+      50%    { transform:rotate(-10deg) }
+    }
+    @keyframes ex-jog {
+      0%,100%{ transform:translateX(0) rotate(0deg) }
+      50%    { transform:translateX(4px) rotate(5deg) }
+    }
+    @keyframes ex-hinge {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(45deg) }
+    }
+    @keyframes ex-dip {
+      0%,100%{ transform:translateY(0) }
+      50%    { transform:translateY(12px) }
+    }
+    @keyframes ex-pullup {
+      0%,100%{ transform:translateY(0) }
+      50%    { transform:translateY(-14px) }
+    }
+    @keyframes ex-extend {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(-90deg) }
+    }
+    @keyframes ex-fly {
+      0%,100%{ transform:rotate(60deg) }
+      50%    { transform:rotate(10deg) }
+    }
+    @keyframes ex-walk {
+      0%,100%{ transform:translateX(0) }
+      50%    { transform:translateX(6px) }
+    }
+    @keyframes ex-cycle {
+      0%    { transform:rotate(0deg) }
+      100%  { transform:rotate(360deg) }
+    }
+    @keyframes ex-arm-fwd  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-40deg)} }
+    @keyframes ex-arm-back  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(40deg)} }
+    @keyframes ex-knee-up   { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-35deg)} }
+    @keyframes ex-knee-dn   { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(35deg)} }
+    @keyframes ex-shin-up   { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-30deg)} }
+    @keyframes ex-shin-dn   { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(30deg)} }
+    @keyframes ex-arms-out  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-50deg)} }
+    @keyframes ex-legs-out  { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(25deg)} }
+    @keyframes ex-rope      { 0%,100%{transform:scaleY(0.6) translateY(8px)} 50%{transform:scaleY(1) translateY(0)} }
+    @keyframes ex-legrise   { 0%,100%{transform:rotate(0deg)}  50%{transform:rotate(-70deg)} }
+    @keyframes ex-climb     { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-12px)} }
+    @keyframes ex-jumpup    { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-20px)} }
+    @keyframes ex-situp {
+      0%,100%{ transform:rotate(0deg) }
+      50%    { transform:rotate(-50deg) }
+    }
+
+    .water-drop { transform-origin:bottom; animation:dropFill 0.35s cubic-bezier(.34,1.56,.64,1) both; }
+    .stat-tile:hover { transform:translateY(-2px); transition:transform 0.2s ease; }
+    .water-btn:hover { transform:scale(1.06); }
+    .water-btn:active{ transform:scale(0.94); }
+    .water-btn { transition: all 0.15s cubic-bezier(.34,1.56,.64,1); }
+    .bento-card { animation: slideUp 0.4s ease both; }
+  `;
+  document.head.appendChild(el);
+};
+
 /* ─── Meal Data ──────────────────────────────────────────────────────────── */
 const GHANAIAN_MEALS = [
-  { id:1,  name:"Tom Brown Porridge",        category:"Breakfast", calories:180, protein:6,  carbs:35, fat:3,  emoji:"🌾", description:"Roasted corn & groundnut porridge - traditional morning fuel",            benefits:["Slow release energy","Gut friendly","Low fat"],       color:"#a0522d" },
-  { id:2,  name:"Koose (Bean Cakes)",         category:"Breakfast", calories:210, protein:9,  carbs:28, fat:8,  emoji:"🫓", description:"Deep-fried black-eyed pea fritters - beloved Ghanaian street snack",    benefits:["Plant protein","Quick energy","Portable"],            color:"#d4a017" },
-  { id:3,  name:"Hausa Koko & Koose",         category:"Breakfast", calories:260, protein:8,  carbs:42, fat:7,  emoji:"🍵", description:"Spiced millet porridge paired with crispy bean cakes",                   benefits:["Iron rich","Warming","Balanced carbs"],               color:"#b8600a" },
-  { id:4,  name:"Boiled Yam & Egg Stew",      category:"Breakfast", calories:320, protein:14, carbs:44, fat:9,  emoji:"🥚", description:"Hearty boiled yam slices with spiced tomato egg sauce",                 benefits:["High protein","Sustaining","Vitamin B12"],            color:"#c4860a" },
-  { id:5,  name:"Jollof Rice",                category:"Lunch",     calories:420, protein:12, carbs:68, fat:11, emoji:"🍚", description:"Smoky tomato-based one-pot rice - Ghana's most celebrated dish",         benefits:["High energy","Lycopene rich","Iron source"],          color:"#e05c2a" },
-  { id:6,  name:"Waakye",                     category:"Lunch",     calories:380, protein:14, carbs:62, fat:8,  emoji:"🫘", description:"Rice & beans cooked with sorghum leaves - a street-food classic",       benefits:["Complete protein","High fibre","Low glycaemic"],      color:"#8b4513" },
-  { id:7,  name:"Banku & Tilapia",            category:"Lunch",     calories:510, protein:38, carbs:52, fat:14, emoji:"🐟", description:"Fermented corn & cassava dumpling with grilled whole tilapia",          benefits:["High protein","Omega-3","Probiotic"],                 color:"#1a7a4a" },
-  { id:8,  name:"Ampesi & Palava Sauce",      category:"Lunch",     calories:340, protein:11, carbs:55, fat:10, emoji:"🍠", description:"Boiled yam & plantain with rich leafy cocoyam sauce",                   benefits:["Complex carbs","Potassium rich","Filling"],           color:"#c4860a" },
-  { id:9,  name:"Rice & Stew",                category:"Lunch",     calories:390, protein:15, carbs:60, fat:12, emoji:"🍛", description:"White rice with rich Ghanaian tomato-based chicken stew",               benefits:["Balanced macros","Protein rich","Comforting"],        color:"#cc4e1a" },
-  { id:10, name:"Kenkey & Fried Fish",        category:"Lunch",     calories:480, protein:32, carbs:58, fat:13, emoji:"🌽", description:"Fermented corn dumpling with crispy fried fish and pepper sauce",        benefits:["High protein","Probiotic","Omega-3"],                 color:"#e09020" },
-  { id:11, name:"Fufu & Light Soup",          category:"Dinner",    calories:460, protein:24, carbs:62, fat:12, emoji:"🍲", description:"Pounded cassava & plantain in a light spiced chicken soup",              benefits:["High energy","Digestive aid","Protein rich"],         color:"#2d7a5a" },
-  { id:12, name:"Omotuo & Groundnut Soup",    category:"Dinner",    calories:460, protein:22, carbs:58, fat:16, emoji:"🥜", description:"Soft rice balls in deep rich groundnut soup with chicken",               benefits:["Healthy fats","High protein","Energy dense"],         color:"#b5541e" },
-  { id:13, name:"Kontomire Stew & Rice",      category:"Dinner",    calories:350, protein:18, carbs:48, fat:14, emoji:"🥬", description:"Cocoyam leaves stewed with smoked fish & palm oil over rice",            benefits:["Very high iron","Vitamin A","Antioxidants"],          color:"#2d6a2d" },
-  { id:14, name:"Egusi Soup & Fufu",          category:"Dinner",    calories:520, protein:28, carbs:54, fat:22, emoji:"🌿", description:"Ground melon-seed soup with leafy greens, fish & beef",                  benefits:["Protein packed","Zinc rich","Filling"],               color:"#5a7a2a" },
-  { id:15, name:"Palm Nut Soup & Rice",       category:"Dinner",    calories:490, protein:26, carbs:52, fat:20, emoji:"🫙", description:"Velvety palm nut soup with chicken and crabs - festive favourite",      benefits:["Vitamin E","Beta-carotene","Iron"],                   color:"#c04020" },
-  { id:16, name:"Abunabun (Garden Egg Stew)", category:"Dinner",    calories:280, protein:12, carbs:30, fat:14, emoji:"🍆", description:"Roasted garden egg stew with smoked fish and tomatoes",                  benefits:["Low calorie","Antioxidants","Fibre rich"],            color:"#6a3a8a" },
-  { id:17, name:"Tuo Zaafi & Ayoyo",          category:"Dinner",    calories:410, protein:16, carbs:66, fat:9,  emoji:"🌾", description:"Northern Ghana staple - thick millet porridge with jute leaf soup",     benefits:["Iron rich","High fibre","Traditional"],               color:"#3a6a3a" },
-  { id:18, name:"Chicken Peanut Stew",        category:"Dinner",    calories:440, protein:34, carbs:28, fat:22, emoji:"🍗", description:"Slow-simmered chicken in a thick aromatic groundnut sauce",              benefits:["High protein","Healthy fats","Vitamin B6"],           color:"#b5700a" },
-  { id:19, name:"Kelewele",                   category:"Snack",     calories:190, protein:2,  carbs:38, fat:6,  emoji:"🍌", description:"Spiced fried plantain cubes - a sweet and fiery street-food treat",     benefits:["Quick energy","Potassium","Antioxidants"],            color:"#e0a020" },
-  { id:20, name:"Roasted Groundnuts",         category:"Snack",     calories:170, protein:8,  carbs:10, fat:12, emoji:"🥜", description:"Salted roasted peanuts - the most popular Ghanaian on-the-go snack",   benefits:["Healthy fats","Plant protein","Satisfying"],          color:"#a06020" },
+  // BREAKFAST
+  { id:1,  name:"Oats & Banana",             category:"Breakfast", calories:290, protein:9,  carbs:52, fat:5,  emoji:"🥣", description:"Rolled oats cooked with milk, topped with banana slices and a drizzle of honey", benefits:["Slow release energy","High fibre","Heart healthy"], color:"#a0522d" },
+  { id:2,  name:"Boiled Eggs & Bread",        category:"Breakfast", calories:310, protein:18, carbs:32, fat:11, emoji:"🥚", description:"Two boiled eggs served with sliced whole wheat or white bread", benefits:["High protein","Quick to make","Affordable"], color:"#d4a017" },
+  { id:3,  name:"Fried Egg & Rice",           category:"Breakfast", calories:380, protein:14, carbs:52, fat:12, emoji:"🍳", description:"Pan-fried egg served over steamed white rice - a simple filling morning meal", benefits:["Protein packed","Energising","Budget friendly"], color:"#b8600a" },
+  { id:4,  name:"Bread & Peanut Butter",      category:"Breakfast", calories:340, protein:12, carbs:38, fat:16, emoji:"🍞", description:"Sliced bread spread generously with peanut butter - easy and filling", benefits:["Healthy fats","Plant protein","Quick prep"], color:"#c4860a" },
+  { id:5,  name:"Corn Porridge (Koko)",       category:"Breakfast", calories:200, protein:5,  carbs:40, fat:3,  emoji:"🌽", description:"Smooth fermented corn porridge, often sweetened with sugar or honey", benefits:["Easy on stomach","Low fat","Warming"], color:"#e09020" },
+  { id:6,  name:"Pancakes & Egg",             category:"Breakfast", calories:350, protein:13, carbs:44, fat:12, emoji:"🥞", description:"Simple flour pancakes cooked in a pan, served with a fried egg on the side", benefits:["Balanced macros","Kid friendly","Filling"], color:"#c4860a" },
+  { id:7,  name:"Yam & Egg Stew",             category:"Breakfast", calories:320, protein:14, carbs:44, fat:9,  emoji:"🥔", description:"Boiled yam pieces served with a spiced tomato and egg sauce", benefits:["Complex carbs","High protein","Traditional"], color:"#b5541e" },
+  { id:8,  name:"Milk & Cereal",              category:"Breakfast", calories:260, protein:8,  carbs:46, fat:5,  emoji:"🥛", description:"Any cereal of choice served with cold or warm milk - fast and nutritious", benefits:["Fortified vitamins","Quick prep","Good for kids"], color:"#a0522d" },
+
+  // LUNCH
+  { id:9,  name:"Rice & Chicken Stew",        category:"Lunch",     calories:480, protein:28, carbs:58, fat:13, emoji:"🍗", description:"Steamed white rice with a rich tomato and chicken stew - a universal favourite", benefits:["High protein","Balanced meal","Widely available"], color:"#e05c2a" },
+  { id:10, name:"Jollof Rice",                category:"Lunch",     calories:420, protein:12, carbs:68, fat:11, emoji:"🍚", description:"Smoky one-pot tomato rice cooked with spices - one of West Africa's best dishes", benefits:["High energy","Lycopene rich","Crowd pleaser"], color:"#cc4e1a" },
+  { id:11, name:"Rice & Beans",               category:"Lunch",     calories:380, protein:16, carbs:62, fat:7,  emoji:"🫘", description:"White rice cooked or served alongside seasoned black-eyed beans or kidney beans", benefits:["Complete protein","High fibre","Very affordable"], color:"#8b4513" },
+  { id:12, name:"Fried Rice & Sausage",       category:"Lunch",     calories:460, protein:18, carbs:56, fat:16, emoji:"🥘", description:"Stir-fried rice with vegetables, eggs and sliced sausage", benefits:["Balanced macros","Tasty","Easy to make"], color:"#b5700a" },
+  { id:13, name:"Boiled Yam & Sauce",         category:"Lunch",     calories:340, protein:10, carbs:58, fat:9,  emoji:"🍠", description:"Chunks of boiled yam served with tomato stew or palava sauce", benefits:["Complex carbs","Filling","Affordable"], color:"#c4860a" },
+  { id:14, name:"Noodles & Egg",              category:"Lunch",     calories:360, protein:14, carbs:52, fat:10, emoji:"🍜", description:"Instant noodles cooked with egg, vegetables and seasoning - a quick go-to meal", benefits:["Fast prep","Budget friendly","Filling"], color:"#e09020" },
+  { id:15, name:"Banku & Tilapia",            category:"Lunch",     calories:510, protein:38, carbs:52, fat:14, emoji:"🐟", description:"Fermented corn and cassava dumpling served with grilled tilapia and pepper", benefits:["High protein","Omega-3","Traditional"], color:"#1a7a4a" },
+  { id:16, name:"Waakye",                     category:"Lunch",     calories:380, protein:14, carbs:62, fat:8,  emoji:"🌿", description:"Rice and beans cooked together with sorghum leaves, served with stew and sides", benefits:["Complete protein","High fibre","Street food classic"], color:"#5a7a2a" },
+  { id:17, name:"Bread & Sardines",           category:"Lunch",     calories:330, protein:20, carbs:32, fat:12, emoji:"🥫", description:"Sliced bread stuffed with canned sardines, tomato, onion and pepper", benefits:["High protein","Omega-3","Very affordable"], color:"#2d6a7a" },
+  { id:18, name:"Kenkey & Fried Fish",        category:"Lunch",     calories:480, protein:32, carbs:58, fat:13, emoji:"🌽", description:"Fermented corn dumpling with crispy fried fish and a spicy pepper sauce", benefits:["High protein","Probiotic","Filling"], color:"#e09020" },
+
+  // DINNER
+  { id:19, name:"Fufu & Light Soup",          category:"Dinner",    calories:460, protein:24, carbs:62, fat:12, emoji:"🍲", description:"Pounded cassava and plantain served in a light chicken or fish soup with vegetables", benefits:["High energy","Digestive aid","Traditional"], color:"#2d7a5a" },
+  { id:20, name:"Rice & Egg Stew",            category:"Dinner",    calories:390, protein:16, carbs:58, fat:10, emoji:"🍛", description:"White rice with a simple tomato and egg stew - cheap, fast and delicious", benefits:["Balanced","Budget friendly","Easy"], color:"#cc4e1a" },
+  { id:21, name:"Spaghetti & Sauce",          category:"Dinner",    calories:420, protein:14, carbs:64, fat:10, emoji:"🍝", description:"Boiled spaghetti in a tomato-based sauce with vegetables and optional meat", benefits:["Energy dense","Affordable","Easy to cook"], color:"#e05c2a" },
+  { id:22, name:"Kontomire Stew & Rice",      category:"Dinner",    calories:350, protein:18, carbs:48, fat:14, emoji:"🥬", description:"Cocoyam leaves cooked in palm oil with smoked fish and tomatoes, served over rice", benefits:["High iron","Vitamin A","Antioxidants"], color:"#2d6a2d" },
+  { id:23, name:"Grilled Chicken & Veggies",  category:"Dinner",    calories:370, protein:38, carbs:18, fat:14, emoji:"🍗", description:"Seasoned grilled chicken thighs or breast served with boiled or stir-fried vegetables", benefits:["Very high protein","Low carb","Clean eating"], color:"#b5700a" },
+  { id:24, name:"Groundnut Soup & Rice Balls",category:"Dinner",    calories:460, protein:22, carbs:58, fat:16, emoji:"🥜", description:"Thick creamy groundnut soup with chicken served with soft rice balls (omotuo)", benefits:["Healthy fats","High protein","Filling"], color:"#b5541e" },
+  { id:25, name:"Beans Stew & Plantain",      category:"Dinner",    calories:410, protein:14, carbs:66, fat:10, emoji:"🍌", description:"Spicy black-eyed bean stew served alongside fried or boiled ripe plantain", benefits:["Plant protein","High fibre","Potassium rich"], color:"#3a6a3a" },
+  { id:26, name:"Chicken Peanut Stew & Rice", category:"Dinner",    calories:440, protein:34, carbs:32, fat:18, emoji:"🍲", description:"Tender chicken simmered in a thick peanut-based sauce, served with rice", benefits:["High protein","Healthy fats","Vitamin B6"], color:"#b5700a" },
+  { id:27, name:"Egg Fried Rice",             category:"Dinner",    calories:400, protein:15, carbs:58, fat:12, emoji:"🍳", description:"Leftover rice stir-fried with eggs, spring onions, vegetables and soy sauce", benefits:["Uses leftovers","Budget friendly","Balanced"], color:"#a06020" },
+  { id:28, name:"Boiled Plantain & Beans",    category:"Dinner",    calories:370, protein:12, carbs:64, fat:7,  emoji:"🫘", description:"Soft boiled plantain served alongside seasoned beans - a simple wholesome dinner", benefits:["High fibre","Plant protein","Affordable"], color:"#1a7a4a" },
+
+  // SNACKS
+  { id:29, name:"Boiled Groundnuts",          category:"Snack",     calories:160, protein:7,  carbs:12, fat:11, emoji:"🥜", description:"Soft boiled peanuts with a pinch of salt - easy and filling on the go", benefits:["Plant protein","Healthy fats","Affordable"], color:"#a06020" },
+  { id:30, name:"Ripe Plantain (Fried)",      category:"Snack",     calories:190, protein:2,  carbs:38, fat:6,  emoji:"🍌", description:"Sweet ripe plantain sliced and fried until golden - a popular everyday snack", benefits:["Quick energy","Potassium","Natural sugars"], color:"#e0a020" },
+  { id:31, name:"Boiled Egg",                 category:"Snack",     calories:78,  protein:6,  carbs:1,  fat:5,  emoji:"🥚", description:"A single plain boiled egg - one of the cheapest and best protein snacks available", benefits:["High protein","Very affordable","Low calorie"], color:"#d4a017" },
+  { id:32, name:"Bread & Egg",                category:"Snack",     calories:250, protein:10, carbs:30, fat:9,  emoji:"🍞", description:"A slice of bread with a fried or boiled egg - quick protein-rich snack any time of day", benefits:["Protein boost","Cheap","Filling"], color:"#c4860a" },
+  { id:33, name:"Banana",                     category:"Snack",     calories:90,  protein:1,  carbs:23, fat:0,  emoji:"🍌", description:"A fresh ripe banana - nature's perfect pre or post workout snack", benefits:["Quick energy","Potassium","Natural"], color:"#e0a020" },
+  { id:34, name:"Biscuits & Tea",             category:"Snack",     calories:180, protein:3,  carbs:28, fat:6,  emoji:"🍪", description:"Plain or cream biscuits served with hot tea or Milo - a light afternoon snack", benefits:["Quick energy","Light","Widely available"], color:"#a0522d" },
+  { id:35, name:"Roasted Corn",               category:"Snack",     calories:130, protein:4,  carbs:26, fat:2,  emoji:"🌽", description:"Fresh corn roasted over fire - a classic street snack available everywhere", benefits:["Low fat","High fibre","Natural"], color:"#e09020" },
+  { id:36, name:"Milo & Milk",                category:"Snack",     calories:200, protein:6,  carbs:34, fat:4,  emoji:"🥛", description:"Hot or cold Milo chocolate malt drink mixed with milk - loved by all ages", benefits:["Fortified vitamins","Energy boost","Tasty"], color:"#5a3a1a" },
 ];
 
 const QUICK_WORKOUTS = [
@@ -46,47 +215,65 @@ const WORKOUT_PLANS = [
     id:"lose", title:"Lose Weight", icon:"🔥", color:"#e05c2a",
     bgColor:"rgba(224,92,42,0.08)", borderColor:"rgba(224,92,42,0.3)",
     subtitle:"High-intensity fat-burning programme", duration:"8 Weeks", frequency:"4 days/week",
+    about:"This programme is designed to help you burn body fat through a mix of high-intensity cardio and full-body exercises. You do not need a gym - most sessions can be done at home with no equipment. The goal is to keep your heart rate high, burn lots of calories, and build a habit of moving 4 days every week.",
+    howItWorks:"Each week you do 4 sessions on Monday, Wednesday, Friday and Saturday. The sessions alternate between intense cardio days and lighter full-body days so your body gets time to recover. Over 8 weeks your fitness will improve and your body will get better at burning fat even at rest.",
+    rules:[
+      "Do not skip rest days - your body burns fat and repairs itself while resting",
+      "Drink water before, during and after every session",
+      "If an exercise is too hard, slow down or take a longer rest - do not quit",
+      "Pair this programme with a calorie deficit diet for best results",
+      "Aim to sleep 7-8 hours every night - poor sleep slows fat loss",
+    ],
+    schedule:[
+      { day:"Monday",    session:"Cardio Blast",   note:"High-intensity cardio - gets your heart rate up fast" },
+      { day:"Tuesday",   session:"Rest Day",        note:"Light walking allowed but no structured workout" },
+      { day:"Wednesday", session:"Full Body Burn",  note:"Strength-focused session - builds muscle while burning fat" },
+      { day:"Thursday",  session:"Rest Day",        note:"Stretch or go for a short walk if you feel restless" },
+      { day:"Friday",    session:"Skipping & Core", note:"Jump rope burns calories fast + core work for flat abs" },
+      { day:"Saturday",  session:"Easy Cardio Day", note:"Slower pace cardio - trains your body to burn fat as fuel" },
+      { day:"Sunday",    session:"Rest Day",        note:"Full rest - prepare your meals and hydrate well" },
+    ],
     sessions:[
-      { day:"Monday", name:"HIIT Cardio Blast", duration:30, calories:450, difficulty:"Intermediate",
+      { day:"Monday", name:"Cardio Blast", duration:30, calories:450, difficulty:"Intermediate",
         warmup:"5 min light jog in place + arm circles", cooldown:"5 min slow walk + full-body stretch",
         tip:"Keep rest to 20-30s between sets to keep your heart rate elevated for maximum fat burn.",
         exercises:[
-          { move:"Jumping Jacks",     sets:3, reps:"40 reps",    rest:"20s" },
-          { move:"Burpees",           sets:3, reps:"10 reps",    rest:"30s" },
-          { move:"High Knees",        sets:3, reps:"30 seconds", rest:"20s" },
-          { move:"Mountain Climbers", sets:3, reps:"20 reps",    rest:"30s" },
-          { move:"Jump Squats",       sets:3, reps:"15 reps",    rest:"30s" },
-          { move:"Plank Hold",        sets:3, reps:"45 seconds", rest:"20s" },
+          { move:"Star Jumps",          emoji:"⭐", anim:"bounce", sets:3, reps:"40 reps", rest:"20s", desc:"Stand straight. Jump up spreading your arms and legs wide like a star, then jump back to standing. Keep a steady rhythm." },
+          { move:"Burpees",             emoji:"💥", anim:"squat",  sets:3, reps:"10 reps", rest:"30s", desc:"Stand, drop hands to floor, kick feet back to a push-up position, do one push-up, jump feet forward, then jump up with hands overhead. Full body move." },
+          { move:"High Knees",          emoji:"🦵", anim:"run",    sets:3, reps:"30 seconds", rest:"20s", desc:"Run on the spot lifting your knees as high as your waist with each step. Pump your arms. Move fast - this raises your heart rate quickly." },
+          { move:"Mountain Climbers",   emoji:"🧗", anim:"climb",  sets:3, reps:"20 reps", rest:"30s", desc:"Get into a push-up position with arms straight. Drive one knee towards your chest then switch legs fast - like you are running horizontally on the floor." },
+          { move:"Jump Squats",         emoji:"🦘", anim:"jump",   sets:3, reps:"15 reps", rest:"30s", desc:"Stand with feet shoulder-width apart. Lower into a squat then explode upward jumping off the ground. Land softly by bending your knees, then go straight into the next squat." },
+          { move:"Plank Hold",          emoji:"🪵", anim:"plank",  sets:3, reps:"45 seconds", rest:"20s", desc:"Lie face down, lift your body on your forearms and toes keeping your body in a straight line like a plank of wood. Do not let your hips sag or rise. Hold still and breathe." },
         ]},
-      { day:"Wednesday", name:"Full-Body Fat Burn", duration:40, calories:380, difficulty:"Beginner",
+      { day:"Wednesday", name:"Full Body Burn", duration:40, calories:380, difficulty:"Beginner",
         warmup:"5 min brisk walk + leg swings", cooldown:"5 min stretch focusing on hips and hamstrings",
         tip:"Focus on perfect form over speed. Deep squats and lunges activate more muscle and burn more calories.",
         exercises:[
-          { move:"Bodyweight Squats", sets:4, reps:"20 reps",     rest:"30s" },
-          { move:"Push-ups",          sets:4, reps:"12 reps",     rest:"30s" },
-          { move:"Reverse Lunges",    sets:3, reps:"15 each leg", rest:"30s" },
-          { move:"Plank",             sets:3, reps:"45 seconds",  rest:"30s" },
-          { move:"Bicycle Crunches",  sets:3, reps:"20 reps",     rest:"20s" },
-          { move:"Glute Bridges",     sets:3, reps:"20 reps",     rest:"20s" },
+          { move:"Squats",              emoji:"🪑", anim:"squat",  sets:4, reps:"20 reps", rest:"30s", desc:"Stand with feet shoulder-width apart. Push your hips back and bend your knees like you are sitting into a chair. Go until thighs are parallel to the floor, then stand back up." },
+          { move:"Push-ups",            emoji:"💪", anim:"pushup", sets:4, reps:"12 reps", rest:"30s", desc:"Place hands slightly wider than shoulders on the floor. Lower your chest to the ground keeping your body straight, then push back up. If too hard, rest knees on the floor." },
+          { move:"Backward Lunges",     emoji:"🚶", anim:"lunge",  sets:3, reps:"15 each leg", rest:"30s", desc:"Stand tall. Step one foot backward and lower your back knee towards the ground. Front knee should be at 90 degrees. Push through your front foot to return to standing. Alternate legs." },
+          { move:"Plank",               emoji:"🪵", anim:"plank",  sets:3, reps:"45 seconds", rest:"30s", desc:"Hold your body in a straight line from head to heels, resting on forearms and toes. Squeeze your stomach muscles tight. Do not hold your breath." },
+          { move:"Tummy Crunches",      emoji:"🫁", anim:"crunch", sets:3, reps:"20 reps", rest:"20s", desc:"Lie on your back with knees bent and feet flat. Place hands behind your head. Curl your shoulders and upper back off the floor towards your knees, then slowly lower back down." },
+          { move:"Hip Raises",          emoji:"🍑", anim:"bridge", sets:3, reps:"20 reps", rest:"20s", desc:"Lie on your back with knees bent and feet flat on the floor. Push through your heels to lift your hips up until your body forms a straight line from shoulders to knees. Squeeze your bum at the top, then lower." },
         ]},
-      { day:"Friday", name:"Jump Rope & Core", duration:35, calories:420, difficulty:"Intermediate",
+      { day:"Friday", name:"Skipping & Core", duration:35, calories:420, difficulty:"Intermediate",
         warmup:"3 min slow jump rope + shoulder rolls", cooldown:"5 min core stretches + child pose",
-        tip:"10 minutes of jump rope burns the same calories as an 8-min mile run. It is one of the best tools for fat loss.",
+        tip:"10 minutes of skipping burns the same calories as an 8-minute mile run. It is one of the best tools for fat loss.",
         exercises:[
-          { move:"Jump Rope Basic",        sets:5, reps:"2 minutes",  rest:"30s" },
-          { move:"Jump Rope Double Under", sets:3, reps:"1 minute",   rest:"30s" },
-          { move:"Sit-ups",                sets:4, reps:"20 reps",    rest:"20s" },
-          { move:"Leg Raises",             sets:3, reps:"15 reps",    rest:"20s" },
-          { move:"Russian Twists",         sets:3, reps:"20 reps",    rest:"20s" },
-          { move:"Flutter Kicks",          sets:3, reps:"30 seconds", rest:"20s" },
+          { move:"Skipping - Slow Pace",   emoji:"🪢", anim:"skip",   sets:5, reps:"2 minutes",  rest:"30s", desc:"Hold one end of the rope in each hand. Swing it over your head and jump over it with both feet each time it reaches the ground. Keep a steady rhythm you can maintain." },
+          { move:"Skipping - Fast Pace",   emoji:"🪢", anim:"skipfast",sets:3, reps:"1 minute",   rest:"30s", desc:"Same as slow skipping but speed up the rope and your feet. Try to skip as fast as you can for the full minute without stopping." },
+          { move:"Sit-ups",                emoji:"🫁", anim:"situp",  sets:4, reps:"20 reps",    rest:"20s", desc:"Lie on your back with knees bent and feet flat or held down. Cross arms over chest. Use your stomach muscles to pull your upper body all the way up to sitting, then lower back slowly." },
+          { move:"Straight Leg Raises",    emoji:"🦵", anim:"raise",  sets:3, reps:"15 reps",    rest:"20s", desc:"Lie flat on your back with legs straight and hands under your lower back. Keeping legs straight, raise them up to 90 degrees then slowly lower back down without letting feet touch the floor." },
+          { move:"Side-to-Side Twists",    emoji:"🔄", anim:"twist",  sets:3, reps:"20 reps",    rest:"20s", desc:"Sit on the floor with knees slightly bent and feet raised. Lean back slightly. Rotate your upper body left then right touching the floor beside each hip. Keep feet off the ground throughout." },
+          { move:"Flutter Kicks",          emoji:"🏊", anim:"flutter",sets:3, reps:"30 seconds", rest:"20s", desc:"Lie flat on your back with legs straight and hands under your bottom. Lift feet 6 inches off the ground. Kick legs up and down alternately in small fast movements like you are swimming." },
         ]},
-      { day:"Saturday", name:"Steady-State Cardio", duration:50, calories:500, difficulty:"Beginner",
+      { day:"Saturday", name:"Easy Cardio Day", duration:50, calories:500, difficulty:"Beginner",
         warmup:"5 min slow walk", cooldown:"10 min full-body stretch",
-        tip:"Steady cardio trains your body to burn fat as its primary fuel. Stay at a conversational pace for best results.",
+        tip:"Slow and steady cardio trains your body to use fat as fuel. Walk or jog at a pace where you can still hold a conversation.",
         exercises:[
-          { move:"5K Run or Brisk Walk", sets:1, reps:"25-30 minutes", rest:"--" },
-          { move:"Cycling",              sets:1, reps:"20 minutes",     rest:"--" },
-          { move:"Cool-down Walk",       sets:1, reps:"5 minutes",      rest:"--" },
+          { move:"Brisk Walk or Light Jog", emoji:"🏃", anim:"jog",   sets:1, reps:"25-30 minutes", rest:"--", desc:"Walk at a fast pace or jog slowly for 25-30 minutes. You should be slightly out of breath but still able to talk. Go outside or on a treadmill." },
+          { move:"Cycling or Skipping",     emoji:"🚴", anim:"cycle",  sets:1, reps:"15 minutes",     rest:"--", desc:"Ride a bicycle or skip rope at a comfortable steady pace for 15 minutes. This is not a race - keep it easy and rhythmic." },
+          { move:"Cool-down Walk",          emoji:"🚶", anim:"walk",   sets:1, reps:"5 minutes",      rest:"--", desc:"Slow right down and walk at a very gentle pace. This brings your heart rate back to normal and helps your muscles recover." },
         ]},
     ],
   },
@@ -94,50 +281,68 @@ const WORKOUT_PLANS = [
     id:"gain", title:"Build Muscle", icon:"💪", color:"#1a7a4a",
     bgColor:"rgba(26,122,74,0.08)", borderColor:"rgba(26,122,74,0.3)",
     subtitle:"Progressive overload strength training", duration:"12 Weeks", frequency:"4 days/week",
+    about:"This programme is built around lifting weights and getting stronger every week. Each session targets a specific muscle group so each muscle gets enough rest before being trained again. Over 12 weeks you will see noticeable increases in strength, muscle size and body shape. You will need access to a gym or basic weights.",
+    howItWorks:"The plan uses a push-pull-legs split across 4 days. Monday is chest and arms (push). Tuesday is back and biceps (pull). Thursday is legs. Friday is shoulders and abs. This spread ensures no two related muscle groups are trained back to back, allowing maximum recovery and growth.",
+    rules:[
+      "Progressive overload is the key rule - add 2.5 to 5 kg every week once you complete all reps cleanly",
+      "Never rush reps - slow controlled movement builds more muscle than fast sloppy reps",
+      "Eat enough protein - aim for at least 1.6g per kg of your body weight every day",
+      "Warm up properly before every session to avoid injury",
+      "Track your weights each session so you know when to increase the load",
+    ],
+    schedule:[
+      { day:"Monday",    session:"Chest & Arms",    note:"Push movements - bench press, dips, tricep work" },
+      { day:"Tuesday",   session:"Back & Biceps",   note:"Pull movements - rows, pull-ups, curls" },
+      { day:"Wednesday", session:"Rest Day",        note:"Active rest - light walk or stretching only" },
+      { day:"Thursday",  session:"Legs Day",        note:"The most important session - squats, lunges, leg press" },
+      { day:"Friday",    session:"Shoulders & Abs", note:"Overhead press, lateral raises and core work" },
+      { day:"Saturday",  session:"Rest Day",        note:"Rest or light cardio - 20 min walk is perfect" },
+      { day:"Sunday",    session:"Rest Day",        note:"Full rest - meal prep and recovery" },
+    ],
     sessions:[
-      { day:"Monday", name:"Chest & Triceps", duration:55, calories:300, difficulty:"Intermediate",
+      { day:"Monday", name:"Chest & Arms", duration:55, calories:300, difficulty:"Intermediate",
         warmup:"5 min light cardio + 2x15 bodyweight push-ups", cooldown:"5 min chest and tricep stretch",
         tip:"Progressive overload is the number 1 rule. Add 2.5-5 kg every week once you complete all reps with good form.",
         exercises:[
-          { move:"Bench Press",              sets:4, reps:"8-10 reps", rest:"90s" },
-          { move:"Incline Dumbbell Press",   sets:3, reps:"10 reps",   rest:"90s" },
-          { move:"Cable Fly",                sets:3, reps:"12 reps",   rest:"60s" },
-          { move:"Tricep Dips",              sets:3, reps:"12 reps",   rest:"60s" },
-          { move:"Skull Crushers",           sets:3, reps:"12 reps",   rest:"60s" },
-          { move:"Tricep Pushdown",          sets:3, reps:"15 reps",   rest:"60s" },
+          { move:"Chest Press",              emoji:"🏋", anim:"press",  sets:4, reps:"8-10 reps", rest:"90s", desc:"Lie on a bench holding a barbell or dumbbells above your chest with arms extended. Slowly lower the weight to your chest, then push it back up. Keep elbows at 45 degrees." },
+          { move:"Upper Chest Press",        emoji:"📐", anim:"press",  sets:3, reps:"10 reps",   rest:"90s", desc:"Same as chest press but on an incline bench angled upward. This targets the upper part of your chest. Lower the weight to your upper chest then press back up." },
+          { move:"Chest Fly",                emoji:"🦅", anim:"fly",    sets:3, reps:"12 reps",   rest:"60s", desc:"Using cables or dumbbells, extend arms out to the sides like wings then bring them together in front of your chest in a hugging motion. Feel the stretch across your chest." },
+          { move:"Tricep Dips",              emoji:"⬇️", anim:"dip",    sets:3, reps:"12 reps",   rest:"60s", desc:"Grip parallel bars with arms straight. Lower your body by bending elbows until arms are at 90 degrees, then push back up. Lean slightly forward to target the chest too." },
+          { move:"Lying Tricep Extension",   emoji:"💪", anim:"extend", sets:3, reps:"12 reps",   rest:"60s", desc:"Lie on a bench holding a barbell or dumbbells above your forehead with arms extended. Bend only your elbows to lower the weight towards your forehead, then extend back up." },
+          { move:"Tricep Pushdown",          emoji:"⬇️", anim:"push",   sets:3, reps:"15 reps",   rest:"60s", desc:"Stand at a cable machine with a bar or rope attachment at chest height. Keep elbows pinned to your sides and push the bar down until arms are straight, then slowly return up." },
         ]},
       { day:"Tuesday", name:"Back & Biceps", duration:55, calories:290, difficulty:"Intermediate",
         warmup:"5 min light row or band pull-aparts", cooldown:"5 min lat and bicep stretch",
         tip:"Focus on driving your elbows down and back during rows - not pulling with your hands. This activates the lats fully.",
         exercises:[
-          { move:"Pull-ups",               sets:4, reps:"8 reps",    rest:"90s" },
-          { move:"Barbell Bent-Over Row",  sets:4, reps:"8-10 reps", rest:"90s" },
-          { move:"Seated Cable Row",       sets:3, reps:"12 reps",   rest:"60s" },
-          { move:"Single-Arm DB Row",      sets:3, reps:"12 each",   rest:"60s" },
-          { move:"Barbell Bicep Curl",     sets:3, reps:"10 reps",   rest:"60s" },
-          { move:"Hammer Curls",           sets:3, reps:"12 reps",   rest:"60s" },
+          { move:"Pull-ups",               emoji:"🧲", anim:"pullup", sets:4, reps:"8 reps",    rest:"90s", desc:"Hang from a bar with palms facing away. Pull your body up until your chin is above the bar by squeezing your back muscles and driving elbows down. Lower slowly." },
+          { move:"Bent-Over Row",          emoji:"🏋", anim:"row",    sets:4, reps:"8-10 reps", rest:"90s", desc:"Stand holding a barbell, hinge forward at the hips with a flat back. Pull the bar into your belly button driving elbows back, then lower slowly. Keep your back flat throughout." },
+          { move:"Seated Cable Row",       emoji:"🚣", anim:"row",    sets:3, reps:"12 reps",   rest:"60s", desc:"Sit at a cable row machine, feet on the platform. Pull the handle into your stomach keeping your back straight and squeezing your shoulder blades together at the end." },
+          { move:"One-Arm Dumbbell Row",   emoji:"💪", anim:"row",    sets:3, reps:"12 each",   rest:"60s", desc:"Place one knee and hand on a bench for support. Hold a dumbbell in the other hand, let it hang, then pull it up towards your hip driving your elbow back. Lower slowly." },
+          { move:"Bicep Curl",             emoji:"💪", anim:"curl",   sets:3, reps:"10 reps",   rest:"60s", desc:"Stand holding a barbell or dumbbells with palms facing up. Keep elbows pinned to your sides and curl the weight up to your shoulders, then slowly lower back down." },
+          { move:"Hammer Curl",            emoji:"🔨", anim:"curl",   sets:3, reps:"12 reps",   rest:"60s", desc:"Hold dumbbells with palms facing each other like holding a hammer. Curl the weight up keeping that neutral grip. This builds the outer bicep and forearm." },
         ]},
-      { day:"Thursday", name:"Legs & Glutes", duration:60, calories:380, difficulty:"Advanced",
+      { day:"Thursday", name:"Legs Day", duration:60, calories:380, difficulty:"Advanced",
         warmup:"5 min walk + dynamic leg swings and hip circles", cooldown:"8 min deep quad, hamstring and hip flexor stretch",
         tip:"Squat to parallel or below for full muscle activation. Depth over weight - always.",
         exercises:[
-          { move:"Barbell Back Squat",   sets:4, reps:"8 reps",   rest:"120s" },
-          { move:"Romanian Deadlift",    sets:4, reps:"10 reps",  rest:"90s"  },
-          { move:"Leg Press",            sets:3, reps:"12 reps",  rest:"90s"  },
-          { move:"Walking Lunges",       sets:3, reps:"12 each",  rest:"60s"  },
-          { move:"Leg Curl Machine",     sets:3, reps:"15 reps",  rest:"60s"  },
-          { move:"Standing Calf Raises", sets:4, reps:"20 reps",  rest:"45s"  },
+          { move:"Barbell Squat",      emoji:"🦵", anim:"squat",  sets:4, reps:"8 reps",   rest:"120s", desc:"Stand with a barbell across your upper back. Push hips back and bend knees lowering until thighs are parallel to the floor, then drive through your heels to stand back up. Keep chest up and back straight." },
+          { move:"Stiff-Leg Deadlift", emoji:"🏋", anim:"hinge",  sets:4, reps:"10 reps",  rest:"90s",  desc:"Hold a barbell in front of your thighs. Keeping legs mostly straight, hinge at the hips pushing them back and lowering the bar along your legs until you feel a stretch in your hamstrings, then drive hips forward to stand." },
+          { move:"Leg Press Machine",  emoji:"🦿", anim:"press",  sets:3, reps:"12 reps",  rest:"90s",  desc:"Sit in the leg press machine with feet shoulder-width on the platform. Bend knees to 90 degrees letting the weight come towards you, then press through your heels to push the platform away." },
+          { move:"Walking Lunges",     emoji:"🚶", anim:"lunge",  sets:3, reps:"12 each",  rest:"60s",  desc:"Stand tall holding dumbbells. Step forward with one foot and lower your back knee towards the ground. Push through the front foot to bring yourself forward into the next lunge. Keep walking forward." },
+          { move:"Leg Curl Machine",   emoji:"🦵", anim:"curl",   sets:3, reps:"15 reps",  rest:"60s",  desc:"Lie face down on the leg curl machine. Hook your ankles under the pad. Curl your feet up towards your backside squeezing your hamstrings, then slowly lower back down." },
+          { move:"Calf Raises",        emoji:"👣", anim:"raise",  sets:4, reps:"20 reps",  rest:"45s",  desc:"Stand with the balls of your feet on a step or flat surface. Rise up onto your tiptoes as high as you can squeezing your calves, then lower your heels below the step for a full stretch. Slow and controlled." },
         ]},
-      { day:"Friday", name:"Shoulders & Core", duration:50, calories:260, difficulty:"Intermediate",
+      { day:"Friday", name:"Shoulders & Abs", duration:50, calories:260, difficulty:"Intermediate",
         warmup:"5 min light cardio + band shoulder rotations", cooldown:"5 min shoulder and neck stretch",
-        tip:"Hit all 3 shoulder heads - front, lateral, and rear - for balanced, full-looking shoulders.",
+        tip:"Hit all 3 parts of the shoulder - front, side, and back - for balanced, full-looking shoulders.",
         exercises:[
-          { move:"Overhead Press",    sets:4, reps:"8 reps",     rest:"90s" },
-          { move:"Lateral Raises",    sets:3, reps:"15 reps",    rest:"45s" },
-          { move:"Front Raises",      sets:3, reps:"12 reps",    rest:"45s" },
-          { move:"Rear Delt Fly",     sets:3, reps:"15 reps",    rest:"45s" },
-          { move:"Weighted Plank",    sets:3, reps:"60 seconds", rest:"30s" },
-          { move:"Cable Woodchop",    sets:3, reps:"12 each",    rest:"45s" },
+          { move:"Shoulder Press",     emoji:"🏋", anim:"press",  sets:4, reps:"8 reps",     rest:"90s", desc:"Sit or stand holding a barbell or dumbbells at shoulder height. Press the weight straight up overhead until arms are fully extended, then lower back slowly to shoulders." },
+          { move:"Side Raises",        emoji:"🦅", anim:"raise",  sets:3, reps:"15 reps",    rest:"45s", desc:"Stand holding dumbbells at your sides. With a slight bend in the elbows, raise both arms out to the sides until they are level with your shoulders, then slowly lower back down. Do not swing." },
+          { move:"Front Raises",       emoji:"⬆️", anim:"raise",  sets:3, reps:"12 reps",    rest:"45s", desc:"Hold dumbbells in front of your thighs. Keeping arms mostly straight, raise one or both arms directly in front of you up to shoulder height, then slowly lower. This targets the front of the shoulder." },
+          { move:"Rear Delt Raises",   emoji:"🔙", anim:"fly",    sets:3, reps:"15 reps",    rest:"45s", desc:"Bend forward at the hips holding dumbbells hanging down. Raise both arms out to the sides with a slight elbow bend, squeezing the back of your shoulders. Lower slowly." },
+          { move:"Plank with Weight",  emoji:"🪵", anim:"plank",  sets:3, reps:"60 seconds", rest:"30s", desc:"Get into a standard forearm plank position. Ask someone to place a weight plate on your back, or hold the position with extra focus on squeezing your core. Hold perfectly still." },
+          { move:"Rotation Crunches",  emoji:"🔄", anim:"twist",  sets:3, reps:"12 each",    rest:"45s", desc:"Stand holding a cable or band at chest height. Keeping hips square, rotate your upper body away from the cable pulling it across your body like you are chopping wood. Control the return." },
         ]},
     ],
   },
@@ -342,6 +547,15 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
   );
 }
 
+
+/* ── Stick Figure Exercise Animations ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   AI-POWERED EXERCISE VISUALS
+   • Calls Anthropic API to generate a real instructional fitness image
+   • Shows animated human SVG figure while loading / as fallback
+   • Caches per session so each exercise only generates once
+═══════════════════════════════════════════════════════════════════════════ */
+
 function MealCard({ meal, isSelected, onSelect, onLog }) {
   return (
     <div onClick={onSelect} style={{background:isSelected?"linear-gradient(135deg,"+meal.color+"1a,"+meal.color+"0d)":"rgba(255,255,255,0.0)",border:"1px solid "+(isSelected?meal.color+"88":"rgba(255,255,255,0.07)"),borderRadius:16,marginBottom:10,cursor:"pointer",overflow:"hidden",transition:"all 0.22s"}}>
@@ -390,6 +604,7 @@ const DiffBadge = ({level}) => {
 
 export default function KhimFitness() {
   const isMobile = useIsMobile();
+  useEffect(()=>injectStyles(),[]);
 
   // ── Restore session from localStorage on first load ──
   const _sess = lsess();
@@ -523,68 +738,150 @@ export default function KhimFitness() {
     </div>
   );
 
+
+  // ── Daily tip + streak ────────────────────────────────────────────────────
+  const TIPS = [
+    "Drink a full glass of water before every meal - it reduces appetite naturally.",
+    "Your body burns more fat during sleep than during light exercise. Protect your rest.",
+    "Protein takes more energy to digest than carbs or fat - eat it with every meal.",
+    "A 10-minute walk after eating lowers blood sugar and aids digestion.",
+    "Muscle burns 3x more calories at rest than fat does. Strength training pays off.",
+    "Eating slowly and chewing well can reduce calorie intake by up to 10%.",
+    "Skipping breakfast often leads to bigger meals later. Eat within 2 hours of waking.",
+    "Consistency beats perfection. 80% effort 7 days beats 100% effort 3 days.",
+    "Dehydration feels identical to hunger. Drink water first before reaching for food.",
+    "Progress photos every 2 weeks reveal changes the scale cannot show.",
+  ];
+  const todayTip = TIPS[new Date().getDate() % TIPS.length];
+  const streakDays = (() => {
+    let s=0; const d=new Date();
+    while(s<30){ const k=fmt(d); if(!log[k]&&!workoutLog[k]) break; s++; d.setDate(d.getDate()-1); }
+    return s;
+  })();
+
   const HomeContent = () => (
-    <div>
-      <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginBottom:20}}>{new Date().toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
-      <div style={{background:"linear-gradient(135deg,#1a1f2e,#141820)",borderLeft:"3px solid #e05c2a",borderRadius:20,padding:"22px 24px",marginBottom:16,display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
-        <svg width={96} height={96} style={{flexShrink:0}}>
-          <circle cx={48} cy={48} r={38} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={9}/>
-          <circle cx={48} cy={48} r={38} fill="none" stroke={calPct>=100?"#e03030":"#e05c2a"} strokeWidth={9}
-            strokeDasharray={String(2*Math.PI*38)} strokeDashoffset={String(2*Math.PI*38*(1-calPct/100))}
-            strokeLinecap="round" transform="rotate(-90 48 48)" style={{transition:"stroke-dashoffset 0.7s"}}/>
-          <text x={48} y={44} textAnchor="middle" fill="#f0ede8" fontSize={16} fontWeight="800" fontFamily="Georgia">{totCal}</text>
-          <text x={48} y={60} textAnchor="middle" fill="rgba(240,237,232,0.4)" fontSize={9} fontFamily="Georgia">kcal eaten</text>
-        </svg>
-        <div style={{flex:1,display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,minWidth:180}}>
-          {[{l:"Goal",v:calGoal,u:"kcal",c:"#e05c2a"},{l:"Burned",v:burned,u:"kcal",c:"#1a7a4a"},{l:"Net",v:netCal,u:"kcal",c:netCal>calGoal?"#e03030":"#4fc3a1"},{l:"Protein",v:totPro,u:"g",c:"#f0a500"}].map(s=>(
-            <div key={s.l} style={{background:"rgba(255,255,255,0.0)",borderRadius:11,padding:"9px 12px"}}>
-              <div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}<span style={{fontSize:10,fontWeight:400}}> {s.u}</span></div>
-              <div style={{fontSize:10,color:"rgba(240,237,232,0.4)",marginTop:2}}>{s.l}</div>
-            </div>
-          ))}
-        </div>
+    <div style={{fontFamily:BODY_FONT}}>
+      {/* Date + Streak row */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+        <div style={{fontSize:11,color:"rgba(240,237,232,0.35)",letterSpacing:1,textTransform:"uppercase"}}>{new Date().toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long"})}</div>
+        {streakDays>0&&<div style={{display:"flex",alignItems:"center",gap:6,background:"rgba(240,160,0,0.12)",borderLeft:"3px solid #f0a500",borderRadius:20,padding:"4px 12px"}}>
+          <span style={{fontSize:16,animation:streakDays>=3?"streakPop 0.6s ease":"none"}}>🔥</span>
+          <span style={{fontSize:12,fontWeight:700,color:"#f0a500"}}>{streakDays} day streak</span>
+        </div>}
       </div>
-      <div style={{background:"rgba(224,92,42,0.08)",borderLeft:"3px solid #e05c2a",borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
-        <span style={{fontSize:24}}>{GOALS.find(g=>g.id===profile.goal)?.icon}</span>
-        <div><div style={{fontWeight:700,fontSize:13}}>{GOALS.find(g=>g.id===profile.goal)?.label} Mode</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{GOALS.find(g=>g.id===profile.goal)?.desc} - {calGoal} kcal/day target</div></div>
-      </div>
-      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #f0a500",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
-        <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",marginBottom:14,textTransform:"uppercase"}}>Macros Today</div>
-        {[{l:"Carbohydrates",v:totCarb,max:250,c:"#e05c2a"},{l:"Protein",v:totPro,max:profile.goal==="gain"?120:80,c:"#1a7a4a"},{l:"Fat",v:totFat,max:65,c:"#f0a500"}].map(m=>(
-          <div key={m.l} style={{marginBottom:12}}>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:5}}><span style={{color:"rgba(240,237,232,0.6)"}}>{m.l}</span><span style={{color:m.c,fontWeight:700}}>{m.v}g / {m.max}g</span></div>
-            <div style={{height:6,background:"rgba(255,255,255,0.06)",borderRadius:10}}><div style={{height:"100%",borderRadius:10,background:m.c,width:Math.min((m.v/m.max)*100,100)+"%",transition:"width 0.6s"}}/></div>
+
+      {/* HERO — calorie ring + big stats */}
+      <div className="bento-card" style={{background:"linear-gradient(135deg,#1a1f2e,#0f1318)",borderLeft:"4px solid #e05c2a",borderRadius:22,padding:"20px 22px",marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:20,flexWrap:"wrap"}}>
+          <div style={{position:"relative",flexShrink:0}}>
+            <svg width={110} height={110}>
+              <circle cx={55} cy={55} r={46} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={10}/>
+              <circle cx={55} cy={55} r={46} fill="none" stroke={calPct>=100?"#e03030":"#e05c2a"} strokeWidth={10}
+                strokeDasharray={String(2*Math.PI*46)} strokeDashoffset={String(2*Math.PI*46*(1-Math.min(calPct,100)/100))}
+                strokeLinecap="round" transform="rotate(-90 55 55)" style={{transition:"stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1)"}}/>
+              <text x={55} y={50} textAnchor="middle" fill="#f0ede8" fontSize={20} fontWeight="900" fontFamily={SPORT_FONT}>{totCal}</text>
+              <text x={55} y={65} textAnchor="middle" fill="rgba(240,237,232,0.35)" fontSize={9} fontFamily={BODY_FONT}>kcal eaten</text>
+              <text x={55} y={78} textAnchor="middle" fill={calPct>=100?"#e03030":"rgba(224,92,42,0.7)"} fontSize={9} fontFamily={BODY_FONT}>{Math.round(calPct)}% of goal</text>
+            </svg>
           </div>
-        ))}
-      </div>
-      <div style={{background:"rgba(30,144,255,0.08)",borderLeft:"3px solid #4a9eff",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-          <div><div style={{fontSize:11,letterSpacing:2,color:"rgba(30,144,255,0.75)",textTransform:"uppercase"}}>Water Intake</div><div style={{fontSize:20,fontWeight:800,marginTop:3}}>{tWater} <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>/ {waterGoal} glasses</span></div></div>
-          <button onClick={addWater} style={{background:"rgba(30,144,255,0.2)",color:"#7ab8ff",borderRadius:13,padding:"9px 16px",cursor:"pointer",fontSize:13,fontWeight:600}}>+ 250ml</button>
-        </div>
-        <div style={{display:"flex",gap:6}}>{Array.from({length:waterGoal}).map((_,i)=><div key={i} style={{flex:1,height:26,borderRadius:7,background:i<tWater?"rgba(30,144,255,0.6)":"rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,transition:"background 0.3s"}}>{i<tWater&&"💧"}</div>)}</div>
-      </div>
-      <div style={{marginBottom:16}}>
-        <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Today's Meals</div>
-        {tMeals.length===0
-          ? <div style={{background:"rgba(255,255,255,0.0)",borderRadius:14,padding:24,textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14}}>No meals logged yet - go to the Diet tab</div>
-          : tMeals.map(m=>(
-            <div key={m.logId} style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:13,padding:"11px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <div style={{display:"flex",gap:12,alignItems:"center"}}>
-                <div style={{width:40,height:40,borderRadius:10,background:(m.color||"#e05c2a")+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{m.emoji}</div>
-                <div><div style={{fontSize:14,fontWeight:700}}>{m.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{m.calories} kcal - {m.protein}g protein</div></div>
+          <div style={{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,minWidth:160}}>
+            {[{l:"Goal",v:calGoal,u:"kcal",c:"#e05c2a"},{l:"Burned",v:burned,u:"kcal",c:"#1a7a4a"},{l:"Net",v:netCal,u:"kcal",c:netCal>calGoal?"#e03030":"#4fc3a1"},{l:"Protein",v:totPro,u:"g",c:"#f0a500"}].map(s=>(
+              <div key={s.l} className="stat-tile" style={{background:"rgba(255,255,255,0.04)",borderRadius:12,padding:"10px 12px",cursor:"default"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:22,color:s.c,letterSpacing:1,lineHeight:1}}>{s.v}<span style={{fontSize:11,fontFamily:BODY_FONT,fontWeight:400,opacity:0.7}}> {s.u}</span></div>
+                <div style={{fontSize:10,color:"rgba(240,237,232,0.4)",marginTop:4,letterSpacing:0.5}}>{s.l.toUpperCase()}</div>
               </div>
-              <button onClick={()=>rmM(m.logId)} style={{background:"rgba(224,92,42,0.1)",color:"#e05c2a",borderRadius:9,padding:"4px 12px",cursor:"pointer",fontSize:13,flexShrink:0}}>X</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* BENTO ROW 1 — Goal mode (wide) + Streak tile (narrow) */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:10,marginBottom:10}}>
+        <div className="bento-card" style={{background:"rgba(224,92,42,0.08)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,animationDelay:"0.05s"}}>
+          <span style={{fontSize:26}}>{GOALS.find(g=>g.id===profile.goal)?.icon}</span>
+          <div>
+            <div style={{fontFamily:SPORT_FONT,fontSize:18,letterSpacing:1,color:"#e05c2a"}}>{GOALS.find(g=>g.id===profile.goal)?.label} Mode</div>
+            <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:1}}>{calGoal} kcal/day target</div>
+          </div>
+        </div>
+        <div className="bento-card" style={{background:"rgba(26,122,74,0.1)",borderLeft:"3px solid #1a7a4a",borderRadius:16,padding:"12px 16px",textAlign:"center",animationDelay:"0.08s",minWidth:72}}>
+          <div style={{fontFamily:SPORT_FONT,fontSize:28,color:"#4fc3a1",letterSpacing:1,lineHeight:1}}>{tMeals.length}</div>
+          <div style={{fontSize:9,color:"rgba(240,237,232,0.4)",marginTop:4,letterSpacing:0.5}}>MEALS</div>
+        </div>
+      </div>
+
+      {/* BENTO ROW 2 — Macros (tall) + Water (square) side by side */}
+      <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:10,marginBottom:10}}>
+        {/* Macros tile */}
+        <div className="bento-card" style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #f0a500",borderRadius:16,padding:"14px 16px",animationDelay:"0.1s"}}>
+          <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#f0a500",marginBottom:12}}>MACROS</div>
+          {[{l:"Carbs",v:totCarb,max:250,c:"#e05c2a"},{l:"Protein",v:totPro,max:profile.goal==="gain"?120:80,c:"#1a7a4a"},{l:"Fat",v:totFat,max:65,c:"#f0a500"}].map(m=>(
+            <div key={m.l} style={{marginBottom:10}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:4}}>
+                <span style={{color:"rgba(240,237,232,0.5)"}}>{m.l}</span>
+                <span style={{color:m.c,fontWeight:700,fontFamily:SPORT_FONT,fontSize:13}}>{m.v}g</span>
+              </div>
+              <div style={{height:5,background:"rgba(255,255,255,0.06)",borderRadius:10}}>
+                <div style={{height:"100%",borderRadius:10,background:m.c,width:Math.min((m.v/m.max)*100,100)+"%",transition:"width 0.8s cubic-bezier(.4,0,.2,1)"}}/>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Water tile */}
+        <div className="bento-card" style={{background:"rgba(30,144,255,0.08)",borderLeft:"3px solid #4a9eff",borderRadius:16,padding:"14px 14px",animationDelay:"0.12s",display:"flex",flexDirection:"column"}}>
+          <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4a9eff",marginBottom:8}}>WATER</div>
+          <div style={{fontFamily:SPORT_FONT,fontSize:32,color:"#7ab8ff",letterSpacing:1,lineHeight:1,marginBottom:2}}>{tWater}<span style={{fontSize:14,opacity:0.5}}>/{waterGoal}</span></div>
+          <div style={{fontSize:10,color:"rgba(240,237,232,0.35)",marginBottom:10}}>glasses today</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:4,marginBottom:10,flex:1}}>
+            {Array.from({length:waterGoal}).map((_,i)=>(
+              <div key={i} className={i<tWater?"water-drop":""} style={{aspectRatio:"1",borderRadius:8,background:i<tWater?"rgba(30,144,255,0.55)":"rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,animationDelay:i<tWater?`${i*0.06}s`:"0s"}}>
+                {i<tWater&&"💧"}
+              </div>
+            ))}
+          </div>
+          <button className="water-btn" onClick={addWater} style={{background:"rgba(30,144,255,0.25)",border:"none",borderRadius:10,padding:"8px 0",color:"#7ab8ff",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:SPORT_FONT,letterSpacing:1,width:"100%"}}>+ 250ML</button>
+        </div>
+      </div>
+
+      {/* Daily Tip */}
+      <div className="bento-card" style={{background:"rgba(240,160,0,0.06)",borderLeft:"3px solid #f0a500",borderRadius:16,padding:"14px 18px",marginBottom:10,animationDelay:"0.15s"}}>
+        <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+          <span style={{fontSize:20,flexShrink:0}}>💡</span>
+          <div>
+            <div style={{fontFamily:SPORT_FONT,fontSize:12,letterSpacing:2,color:"#f0a500",marginBottom:5}}>TODAY'S TIP</div>
+            <div style={{fontSize:13,color:"rgba(240,237,232,0.65)",lineHeight:1.75}}>{todayTip}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Today's Meals */}
+      <div className="bento-card" style={{marginBottom:10,animationDelay:"0.18s"}}>
+        <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"rgba(240,237,232,0.4)",marginBottom:10}}>TODAY'S MEALS</div>
+        {tMeals.length===0
+          ? <div style={{borderRadius:14,padding:"20px 0",textAlign:"center",color:"rgba(240,237,232,0.25)",fontSize:13}}>Nothing logged yet — head to the Diet tab</div>
+          : tMeals.map(m=>(
+            <div key={m.logId} style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:13,padding:"10px 14px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                <div style={{width:38,height:38,borderRadius:10,background:(m.color||"#e05c2a")+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{m.emoji}</div>
+                <div>
+                  <div style={{fontSize:13,fontWeight:700}}>{m.name}</div>
+                  <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:1}}>{m.calories} kcal · {m.protein}g protein</div>
+                </div>
+              </div>
+              <button onClick={()=>rmM(m.logId)} style={{background:"rgba(224,92,42,0.1)",color:"#e05c2a",borderRadius:8,padding:"4px 10px",cursor:"pointer",fontSize:12,flexShrink:0,border:"none",fontWeight:700}}>✕</button>
             </div>
           ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"16px 18px"}}>
-        <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Log Today's Weight</div>
-        <div style={{display:"flex",gap:10}}>
-          <input type="number" placeholder={"e.g. "+(profile.weight||"70")} value={weightInput} onChange={e=>setWI(e.target.value)} style={{flex:1,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:11,padding:"11px 15px",color:"#f0ede8",fontSize:15,outline:"none",fontFamily:"Georgia"}}/>
-          <button onClick={saveWt} style={{background:"#e05c2a",border:"none",borderRadius:11,padding:"11px 20px",color:"#fff",cursor:"pointer",fontWeight:800,fontSize:14,flexShrink:0}}>Save kg</button>
+
+      {/* Weight logger */}
+      <div className="bento-card" style={{background:"rgba(79,195,161,0.06)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"14px 18px",animationDelay:"0.2s"}}>
+        <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4fc3a1",marginBottom:10}}>LOG WEIGHT</div>
+        <div style={{display:"flex",gap:8}}>
+          <input type="number" placeholder={"e.g. "+(profile.weight||"70")+" kg"} value={weightInput} onChange={e=>setWI(e.target.value)}
+            style={{flex:1,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"10px 14px",color:"#f0ede8",fontSize:14,outline:"none",fontFamily:BODY_FONT}}/>
+          <button onClick={saveWt} style={{background:"#e05c2a",border:"none",borderRadius:10,padding:"10px 18px",color:"#fff",cursor:"pointer",fontWeight:800,fontSize:13,flexShrink:0,fontFamily:SPORT_FONT,letterSpacing:1}}>SAVE</button>
         </div>
-        {weightLog[TODAY]&&<div style={{marginTop:10,fontSize:13,color:"#4fc3a1"}}>Today: {weightLog[TODAY]}kg recorded</div>}
+        {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4fc3a1",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
       </div>
     </div>
   );
@@ -610,7 +907,7 @@ export default function KhimFitness() {
       const alreadyLogged = (workoutRecords[TODAY]||[]).some(r=>r.planId===plan.id&&r.sessionName===sess.name);
       return (
         <div>
-          <button onClick={()=>setOpenSess(null)} style={{background:"none",border:"none",color:"#e05c2a",cursor:"pointer",fontSize:14,padding:"0 0 18px",display:"flex",alignItems:"center",gap:6}}>Back to {plan.title}</button>
+          <button onClick={()=>setOpenSess(null)} style={{background:"rgba(224,92,42,0.1)",border:"none",borderLeft:"3px solid #e05c2a",borderRadius:10,color:"#e05c2a",cursor:"pointer",fontSize:14,padding:"10px 18px",marginBottom:18,display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontFamily:"Georgia"}}>&#8592; Back to {plan.title}</button>
           <div style={{background:plan.bgColor,border:"1px solid "+plan.borderColor,borderRadius:20,padding:"20px 22px",marginBottom:20}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:10}}>
               <div><div style={{fontSize:11,letterSpacing:2,color:plan.color,textTransform:"uppercase",marginBottom:4}}>{plan.icon+" "+plan.title+" - "+sess.day}</div><div style={{fontSize:22,fontWeight:900}}>{sess.name}</div></div>
@@ -626,23 +923,50 @@ export default function KhimFitness() {
               <div style={{fontSize:13,color:"rgba(240,237,232,0.75)"}}>{sess.warmup}</div>
             </div>
           </div>
-          <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,overflow:"hidden",marginBottom:16}}>
-            <div style={{padding:"14px 18px",borderBottom:"none",display:"grid",gridTemplateColumns:"1fr 110px 70px 70px",gap:8}}>
-              {["Exercise","Sets x Reps","Rest","Done"].map(h=><div key={h} style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.35)",textTransform:"uppercase"}}>{h}</div>)}
-            </div>
+          <div style={{marginBottom:16}}>
+            <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"rgba(240,237,232,0.35)",marginBottom:12}}>EXERCISES — WATCH & FOLLOW</div>
             {sess.exercises.map((ex,ei)=>{
               const allDone = Array.from({length:ex.sets}).every((_,si)=>completedSets[plan.id+"-"+openSession.idx+"-"+ei+"-"+si]);
+              const ac = allDone ? "#1a7a4a" : plan.color;
               return (
-                <div key={ei} style={{padding:"13px 18px",borderBottom:"none",display:"grid",gridTemplateColumns:"1fr 110px 70px 70px",gap:8,alignItems:"center",background:allDone?"rgba(26,122,74,0.08)":"transparent"}}>
-                  <div style={{fontWeight:allDone?400:700,color:allDone?"rgba(240,237,232,0.4)":"#f0ede8",fontSize:14,textDecoration:allDone?"line-through":"none"}}>{ex.move}</div>
-                  <div style={{fontSize:13,color:"rgba(240,237,232,0.6)"}}>{ex.sets}x {ex.reps}</div>
-                  <div style={{fontSize:12,color:"rgba(240,237,232,0.4)"}}>{ex.rest}</div>
-                  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-                    {Array.from({length:ex.sets}).map((_,si)=>{
-                      const key=plan.id+"-"+openSession.idx+"-"+ei+"-"+si;
-                      return <button key={si} onClick={()=>toggleSet(key)} style={{width:24,height:24,borderRadius:6,background:completedSets[key]?"#1a7a4a":"rgba(255,255,255,0.08)",border:"1px solid "+(completedSets[key]?"#1a7a4a":"rgba(255,255,255,0.15)"),cursor:"pointer",fontSize:11,color:"#fff",transition:"all 0.2s"}}>{completedSets[key]?"v":si+1}</button>;
-                    })}
+                <div key={ei} style={{background:allDone?"rgba(26,122,74,0.07)":"rgba(255,255,255,0.03)",borderLeft:"3px solid "+ac,borderRadius:18,marginBottom:16,overflow:"hidden",opacity:allDone?0.5:1,transition:"all 0.4s"}}>
+
+                  {/* ── Exercise header row ── */}
+                  <div style={{padding:"14px 16px 0 16px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10,flex:1,minWidth:0}}>
+                      <div style={{fontFamily:SPORT_FONT,fontSize:20,letterSpacing:1,color:allDone?"rgba(240,237,232,0.4)":"#f0ede8",textDecoration:allDone?"line-through":"none",lineHeight:1.2}}>{ex.move}</div>
+                    </div>
+                    <div style={{display:"flex",gap:6,flexShrink:0,alignItems:"center"}}>
+                      <span style={{background:ac+"33",border:"1px solid "+ac+"55",borderRadius:20,padding:"3px 10px",fontSize:11,color:ac,fontWeight:700,fontFamily:SPORT_FONT,letterSpacing:0.5}}>{ex.sets}×{ex.reps}</span>
+                      {ex.rest!=="--"&&<span style={{background:"rgba(255,255,255,0.06)",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(240,237,232,0.5)"}}>⏱ {ex.rest}</span>}
+                      {allDone&&<span style={{fontSize:18}}>✅</span>}
+                    </div>
                   </div>
+
+                  {/* ── Description + tick buttons ── */}
+                  <div style={{padding:"10px 16px 14px"}}>
+                    <div style={{fontSize:12,color:"rgba(240,237,232,0.5)",lineHeight:1.75,marginBottom:12}}>{ex.desc||""}</div>
+                    <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                      <span style={{fontSize:11,color:"rgba(240,237,232,0.3)",letterSpacing:0.5,marginRight:2}}>SETS DONE:</span>
+                      {Array.from({length:ex.sets}).map((_,si)=>{
+                        const key=plan.id+"-"+openSession.idx+"-"+ei+"-"+si;
+                        return (
+                          <button key={si} onClick={()=>toggleSet(key)}
+                            style={{width:36,height:36,borderRadius:10,
+                              background:completedSets[key]?ac:"rgba(255,255,255,0.07)",
+                              border:"none",
+                              cursor:"pointer",fontSize:completedSets[key]?16:14,color:"#fff",fontWeight:900,
+                              transition:"all 0.2s cubic-bezier(.34,1.56,.64,1)",
+                              transform:completedSets[key]?"scale(1.1)":"scale(1)",
+                              fontFamily:SPORT_FONT}}>
+                            {completedSets[key]?"✓":si+1}
+                          </button>
+                        );
+                      })}
+                      {allDone&&<span style={{fontSize:12,color:"#4fc3a1",fontWeight:700,marginLeft:4}}>Complete! 🎯</span>}
+                    </div>
+                  </div>
+
                 </div>
               );
             })}
@@ -707,19 +1031,52 @@ export default function KhimFitness() {
         )}
         {(wTab==="lose"||wTab==="gain") && activePlan && (
           <div>
-            <div style={{background:activePlan.bgColor,border:"1px solid "+activePlan.borderColor,borderRadius:20,padding:"20px 22px",marginBottom:22}}>
-              <div style={{fontSize:28,fontWeight:900,marginBottom:6}}>{activePlan.icon+" "+activePlan.title+" Programme"}</div>
-              <div style={{fontSize:14,color:"rgba(240,237,232,0.6)",marginBottom:16}}>{activePlan.subtitle}</div>
-              <div style={{display:"flex",gap:14,flexWrap:"wrap"}}>
+            {/* ── Plan Header ── */}
+            <div style={{background:activePlan.bgColor,borderLeft:"4px solid "+activePlan.color,borderRadius:20,padding:"22px 24px",marginBottom:16}}>
+              <div style={{fontSize:26,fontWeight:900,marginBottom:4}}>{activePlan.icon} {activePlan.title} Programme</div>
+              <div style={{fontSize:13,color:"rgba(240,237,232,0.5)",marginBottom:18}}>{activePlan.subtitle}</div>
+              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}}>
                 {[{l:"Duration",v:activePlan.duration},{l:"Frequency",v:activePlan.frequency},{l:"Sessions",v:activePlan.sessions.length+" per week"}].map(s=>(
-                  <div key={s.l} style={{background:"rgba(0,0,0,0.2)",borderRadius:10,padding:"8px 14px"}}>
+                  <div key={s.l} style={{background:"rgba(0,0,0,0.25)",borderRadius:10,padding:"8px 14px"}}>
                     <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase"}}>{s.l}</div>
-                    <div style={{fontSize:14,fontWeight:800,color:activePlan.color,marginTop:2}}>{s.v}</div>
+                    <div style={{fontSize:13,fontWeight:800,color:activePlan.color,marginTop:2}}>{s.v}</div>
+                  </div>
+                ))}
+              </div>
+              {/* About */}
+              <div style={{fontSize:14,color:"rgba(240,237,232,0.75)",lineHeight:1.85,marginBottom:20}}>{activePlan.about}</div>
+              {/* How it works */}
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:14,padding:"14px 16px",marginBottom:16}}>
+                <div style={{fontSize:11,letterSpacing:2,color:activePlan.color,textTransform:"uppercase",marginBottom:8}}>How It Works</div>
+                <div style={{fontSize:13,color:"rgba(240,237,232,0.65)",lineHeight:1.85}}>{activePlan.howItWorks}</div>
+              </div>
+              {/* Rules */}
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:14,padding:"14px 16px",marginBottom:16}}>
+                <div style={{fontSize:11,letterSpacing:2,color:activePlan.color,textTransform:"uppercase",marginBottom:10}}>Key Rules</div>
+                {activePlan.rules.map((r,i)=>(
+                  <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:8}}>
+                    <span style={{color:activePlan.color,fontWeight:900,fontSize:14,flexShrink:0,marginTop:1}}>{i+1}.</span>
+                    <span style={{fontSize:13,color:"rgba(240,237,232,0.65)",lineHeight:1.7}}>{r}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Weekly Schedule */}
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:14,padding:"14px 16px"}}>
+                <div style={{fontSize:11,letterSpacing:2,color:activePlan.color,textTransform:"uppercase",marginBottom:10}}>Weekly Schedule</div>
+                {activePlan.schedule.map((s,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"8px 0",borderBottom:i<activePlan.schedule.length-1?"1px solid rgba(255,255,255,0.05)":"none"}}>
+                    <div style={{width:76,flexShrink:0}}>
+                      <div style={{fontSize:11,fontWeight:800,color:activePlan.color}}>{s.day}</div>
+                    </div>
+                    <div>
+                      <div style={{fontSize:12,fontWeight:700,color:s.session==="Rest Day"?"rgba(240,237,232,0.3)":"#f0ede8",marginBottom:2}}>{s.session}</div>
+                      <div style={{fontSize:11,color:"rgba(240,237,232,0.35)",lineHeight:1.5}}>{s.note}</div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:14}}>Weekly Sessions</div>
+            <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:14,marginTop:6}}>Weekly Sessions</div>
             {activePlan.sessions.map((sess,idx)=>{
               const alreadyLogged = (workoutRecords[TODAY]||[]).some(r=>r.planId===activePlan.id&&r.sessionName===sess.name);
               const totalSets = sess.exercises.reduce((s,e)=>s+e.sets,0);
