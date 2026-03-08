@@ -937,7 +937,7 @@ export default function KhimFitness() {
     return s;
   })();
 
-  const HomeContent = useMemo(() => (
+  const HomeContent = (() => (
     <div style={{fontFamily:BODY_FONT}}>
       {/* Date + Streak row */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
@@ -1084,8 +1084,7 @@ export default function KhimFitness() {
         {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4fc3a1",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
       </div>
     </div>
-  // eslint-disable-next-line
-  ), [tWater, totCal, totPro, totCarb, totFat, burned, calGoal, streakDays, log, workoutLog, addWater, addM, weightLog, weightInput, TODAY, profile.spiritAnimal, profile.name]);
+  ))();
 
   const DietContent = () => (
     <div>
