@@ -348,175 +348,11 @@ const WORKOUT_PLANS = [
   },
 ];
 
-const GOALS = [
+const GOALS   = [
   { id:"lose",     label:"Lose Weight",  icon:"🔥", desc:"Calorie deficit focus",    calAdj:-300 },
   { id:"maintain", label:"Stay Fit",     icon:"⚖️", desc:"Balanced maintenance",     calAdj:0    },
   { id:"gain",     label:"Build Muscle", icon:"💪", desc:"Calorie surplus + protein", calAdj:300  },
 ];
-
-/* ── Spirit Animal System ──────────────────────────────────────────────────
-   Each goal maps to a primary spirit animal. Users can also choose freely.
-   DiceBear "bottts" style used for programmatic SVG avatars.
-────────────────────────────────────────────────────────────────────────── */
-const SPIRIT_ANIMALS = [
-  { id:"silverback", name:"Silverback",  emoji:"🦍", element:"🌋", trait:"Strength",   color:"#8B5CF6", bg:"rgba(139,92,246,0.15)", goal:"gain",     desc:"Raw power & muscle. Built to dominate the iron." },
-  { id:"gazelle",    name:"Gazelle",     emoji:"🦌", element:"🌬️", trait:"Endurance",  color:"#10B981", bg:"rgba(16,185,129,0.15)", goal:"lose",     desc:"Lean, fast & unstoppable. Born to outlast all." },
-  { id:"owl",        name:"Wise Owl",    emoji:"🦉", element:"🌙", trait:"Wellness",   color:"#4A9EFF", bg:"rgba(74,158,255,0.15)", goal:"maintain", desc:"Balance, recovery & longevity. The long game." },
-  { id:"panther",    name:"Panther",     emoji:"🐆", element:"⚡", trait:"Agility",    color:"#F59E0B", bg:"rgba(245,158,11,0.15)", goal:"lose",     desc:"Explosive speed & precision. Always hunting." },
-  { id:"bear",       name:"Bear",        emoji:"🐻", element:"🌲", trait:"Resilience", color:"#EF4444", bg:"rgba(239,68,68,0.15)",  goal:"gain",     desc:"Endure anything. Come back stronger every time." },
-  { id:"eagle",      name:"Eagle",       emoji:"🦅", element:"☀️", trait:"Vision",     color:"#E05C2A", bg:"rgba(224,92,42,0.15)", goal:"maintain", desc:"See the bigger picture. Discipline above all." },
-  { id:"wolf",       name:"Wolf",        emoji:"🐺", element:"🌕", trait:"Pack",       color:"#6366F1", bg:"rgba(99,102,241,0.15)", goal:"gain",     desc:"Strength through consistency. Run with purpose." },
-  { id:"dolphin",    name:"Dolphin",     emoji:"🐬", element:"🌊", trait:"Flow",       color:"#06B6D4", bg:"rgba(6,182,212,0.15)",  goal:"maintain", desc:"Effortless movement & mental clarity." },
-];
-
-/* Suggested animal based on goal */
-const suggestAnimal = (goalId) => {
-  const match = SPIRIT_ANIMALS.find(a => a.goal === goalId);
-  return match ? match.id : "eagle";
-};
-
-/* DiceBear avatar URL — bottts style, seeded by animal id + user name */
-const getDiceBearUrl = (animalId, seed) => {
-  const colors = {
-    silverback:"8B5CF6", gazelle:"10B981", owl:"4A9EFF",
-    panther:"F59E0B",    bear:"EF4444",    eagle:"E05C2A",
-    wolf:"6366F1",       dolphin:"06B6D4",
-  };
-  const color = colors[animalId] || "E05C2A";
-  const s = encodeURIComponent((seed||animalId).toLowerCase().replace(/\s+/g,"_"));
-  return `https://api.dicebear.com/9.x/bottts/svg?seed=${s}&backgroundColor=${color}&radius=50`;
-};
-
-/* Spirit animal avatar component */
-const SpiritAvatar = ({ animalId, seed, size=48, ring=true }) => {
-  const animal = SPIRIT_ANIMALS.find(a=>a.id===animalId) || SPIRIT_ANIMALS[5];
-  const url = getDiceBearUrl(animalId, seed);
-  return (
-    <div style={{
-      width:size, height:size, borderRadius:"50%", flexShrink:0, overflow:"hidden",
-      border: ring ? `2px solid ${animal.color}88` : "none",
-      boxShadow: ring ? `0 0 12px ${animal.color}44` : "none",
-      background: animal.bg,
-      display:"flex", alignItems:"center", justifyContent:"center",
-    }}>
-      <img src={url} alt={animal.name} width={size} height={size}
-        style={{width:"100%",height:"100%",objectFit:"cover"}}
-        onError={e=>{ e.target.style.display="none"; e.target.nextSibling.style.display="flex"; }}
-      />
-      <div style={{display:"none",width:"100%",height:"100%",alignItems:"center",justifyContent:"center",fontSize:size*0.48}}>
-        {animal.emoji}
-      </div>
-    </div>
-  );
-};
-
-/* ── Adaptive Progress Sprites ─────────────────────────────────────────────
-   Small animated icons that change state based on daily progress
-────────────────────────────────────────────────────────────────────────── */
-
-/* Hydration Sprite — changes based on water intake */
-const HydrationSprite = ({ current, goal }) => {
-  const pct = Math.min(current / goal, 1);
-  const level = pct === 0 ? "empty" : pct < 0.4 ? "low" : pct < 0.75 ? "mid" : "full";
-  const states = {
-    empty: { emoji:"💀", color:"#666",    label:"Dehydrated!", pulse:false },
-    low:   { emoji:"😰", color:"#F59E0B", label:"Drink up!",   pulse:true  },
-    mid:   { emoji:"💧", color:"#4A9EFF", label:"Hydrating",   pulse:false },
-    full:  { emoji:"⚡", color:"#10B981", label:"Hydrated!",   pulse:true  },
-  };
-  const s = states[level];
-  return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-      <span style={{
-        fontSize:22, lineHeight:1,
-        display:"block",
-        animation: s.pulse ? "pulse 1.2s ease-in-out infinite" : "none",
-        filter: `drop-shadow(0 0 6px ${s.color}88)`,
-      }}>{s.emoji}</span>
-      <span style={{fontSize:8,color:s.color,fontWeight:700,letterSpacing:0.5,fontFamily:"'Bebas Neue',sans-serif"}}>{s.label}</span>
-    </div>
-  );
-};
-
-/* Calorie Flame — changes intensity based on net calorie balance */
-const CalorieFlamSprite = ({ net, goal }) => {
-  const pct = net / goal;
-  const level = pct <= 0 ? "crushed" : pct < 0.6 ? "burning" : pct < 0.9 ? "steady" : pct < 1.1 ? "balanced" : "over";
-  const states = {
-    crushed:  { emoji:"🌟", color:"#10B981", label:"Crushed it!", pulse:true  },
-    burning:  { emoji:"🔥", color:"#E05C2A", label:"On fire!",    pulse:true  },
-    steady:   { emoji:"✨", color:"#F59E0B", label:"Steady",      pulse:false },
-    balanced: { emoji:"⚖️",  color:"#4A9EFF", label:"Balanced",   pulse:false },
-    over:     { emoji:"⚠️",  color:"#EF4444", label:"Over goal",  pulse:true  },
-  };
-  const s = states[level];
-  return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-      <span style={{
-        fontSize:22, lineHeight:1,
-        animation: s.pulse ? "pulse 1s ease-in-out infinite" : "none",
-        filter: `drop-shadow(0 0 6px ${s.color}88)`,
-      }}>{s.emoji}</span>
-      <span style={{fontSize:8,color:s.color,fontWeight:700,letterSpacing:0.5,fontFamily:"'Bebas Neue',sans-serif"}}>{s.label}</span>
-    </div>
-  );
-};
-
-/* Streak Beast — the streak counter becomes a living creature */
-const StreakBeast = ({ days }) => {
-  const tier = days === 0 ? 0 : days < 3 ? 1 : days < 7 ? 2 : days < 14 ? 3 : days < 30 ? 4 : 5;
-  const beasts = [
-    { emoji:"😴", label:"Sleeping",   color:"#666",    title:"Start your streak!" },
-    { emoji:"🐣", label:"Hatching",   color:"#F59E0B", title:"Just woke up" },
-    { emoji:"🦊", label:"Awakening",  color:"#E05C2A", title:"Getting warmed up" },
-    { emoji:"🐺", label:"Unleashed",  color:"#8B5CF6", title:"Week streak unlocked" },
-    { emoji:"🦁", label:"Dominant",   color:"#10B981", title:"2-week warrior" },
-    { emoji:"🐉", label:"LEGENDARY",  color:"#F59E0B", title:"30-day BEAST MODE" },
-  ];
-  const b = beasts[tier];
-  return (
-    <div style={{display:"flex",alignItems:"center",gap:8}}>
-      <span style={{
-        fontSize:26,
-        animation: days > 0 ? "pulse 1.4s ease-in-out infinite" : "none",
-        filter: `drop-shadow(0 0 8px ${b.color}99)`,
-        display:"block",
-      }}>{b.emoji}</span>
-      <div>
-        <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:b.color,letterSpacing:1,lineHeight:1}}>{days} DAY{days!==1?"S":""}</div>
-        <div style={{fontSize:9,color:b.color,opacity:0.8,letterSpacing:1,fontWeight:700}}>{b.label.toUpperCase()}</div>
-      </div>
-    </div>
-  );
-};
-
-/* XP / Level system */
-const calcLevel = (totalCaloriesLogged, streakDays, workoutsTotal) => {
-  const xp = totalCaloriesLogged * 0.1 + streakDays * 50 + workoutsTotal * 30;
-  const level = Math.floor(xp / 500) + 1;
-  const xpInLevel = xp % 500;
-  return { level: Math.min(level, 99), xp: Math.round(xp), xpInLevel: Math.round(xpInLevel), xpToNext: 500 };
-};
-
-const LevelBadge = ({ level, xpInLevel, xpToNext, color }) => (
-  <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.04)",borderRadius:12,padding:"6px 10px"}}>
-    <div style={{
-      width:32, height:32, borderRadius:"50%",
-      background:`conic-gradient(${color} ${(xpInLevel/xpToNext)*360}deg, rgba(255,255,255,0.08) 0deg)`,
-      display:"flex", alignItems:"center", justifyContent:"center",
-      position:"relative",
-    }}>
-      <div style={{width:24,height:24,borderRadius:"50%",background:"#141820",display:"flex",alignItems:"center",justifyContent:"center"}}>
-        <span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:11,color,lineHeight:1}}>{level}</span>
-      </div>
-    </div>
-    <div>
-      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:11,color,letterSpacing:1}}>LEVEL {level}</div>
-      <div style={{fontSize:8,color:"rgba(240,237,232,0.35)",letterSpacing:0.5}}>{xpInLevel}/{xpToNext} XP</div>
-    </div>
-  </div>
-);
-
 const AVATARS = ["🦁","🐯","🦊","🐻","🐼","🦅","🐬","🌟","🔥","⚡","🌿","🏆"];
 const DAYS    = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const CATS    = ["All","Breakfast","Lunch","Dinner","Snack"];
@@ -530,7 +366,7 @@ function calcCalGoal(p) {
     ? 10*+weight + 6.25*+height - 5*+age - 161
     : 10*+weight + 6.25*+height - 5*+age + 5;
   const actMap = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725 };
-  return Math.round(base*(actMap[activity]||1.375)) + ((GOALS.find(g=>g.id===goal)||{calAdj:0}).calAdj||0);
+  return Math.round(base*(actMap[activity]||1.375)) + (GOALS.find(g=>g.id===goal)?.calAdj||0);
 }
 
 const PK    = "khimfit_profiles_v4";
@@ -591,7 +427,7 @@ function Onboarding({ onComplete }) {
         {existing.map(p=>(
           <button key={p.id} onClick={()=>onComplete(p)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:16,padding:"14px 20px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:16,color:"#f0ede8",textAlign:"left"}}>
             <span style={{fontSize:34}}>{p.avatar}</span>
-            <div style={{flex:1}}><div style={{fontWeight:800,fontSize:17}}>{p.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>{(GOALS.find(g=>g.id===p.goal)||{label:""}).label} - {p.calorieGoal} kcal/day</div></div>
+            <div style={{flex:1}}><div style={{fontWeight:800,fontSize:17}}>{p.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>{GOALS.find(g=>g.id===p.goal)?.label} - {p.calorieGoal} kcal/day</div></div>
             <span style={{color:"#e05c2a",fontSize:22}}>&#x2192;</span>
           </button>
         ))}
@@ -643,17 +479,9 @@ function Onboarding({ onComplete }) {
       ))}
       <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",margin:"20px 0 12px"}}>Your Goal</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
-        {GOALS.map(g=>{
-          const suggested = SPIRIT_ANIMALS.find(a=>a.goal===g.id);
-          return (
-            <button key={g.id} onClick={()=>{ set("goal",g.id); if(!form.spiritAnimal) set("avatar",(suggested&&suggested.id)||"eagle"); }}
-              style={{background:form.goal===g.id?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.goal===g.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:15,padding:"16px 8px",cursor:"pointer",textAlign:"center"}}>
-              <div style={{fontSize:28,marginBottom:6}}>{g.icon}</div>
-              <div style={{fontSize:12,fontWeight:700,color:form.goal===g.id?"#e05c2a":"#f0ede8"}}>{g.label}</div>
-              {suggested&&<div style={{fontSize:9,color:suggested.color,marginTop:4,fontWeight:700,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:0.5}}>{suggested.emoji} {suggested.trait}</div>}
-            </button>
-          );
-        })}
+        {GOALS.map(g=><button key={g.id} onClick={()=>set("goal",g.id)} style={{background:form.goal===g.id?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.goal===g.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:15,padding:"16px 8px",cursor:"pointer",textAlign:"center"}}>
+          <div style={{fontSize:28,marginBottom:6}}>{g.icon}</div><div style={{fontSize:12,fontWeight:700,color:form.goal===g.id?"#e05c2a":"#f0ede8"}}>{g.label}</div>
+        </button>)}
       </div>
       <div style={{background:"rgba(224,92,42,0.1)",borderLeft:"3px solid #e05c2a",borderRadius:14,padding:"14px 18px",marginBottom:22,textAlign:"center"}}>
         <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginBottom:4}}>YOUR ESTIMATED DAILY CALORIE GOAL</div>
@@ -692,13 +520,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
           <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(240,237,232,0.4)",fontSize:24,cursor:"pointer"}}>X</button>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:7,marginBottom:20}}>
-          {SPIRIT_ANIMALS.map(a=>(
-            <button key={a.id} onClick={()=>{ set("avatar",a.id); set("spiritAnimal",a.id); }}
-              style={{background:form.avatar===a.id?a.bg:"rgba(255,255,255,0.04)",border:"2px solid "+(form.avatar===a.id?a.color:"rgba(255,255,255,0.08)"),borderRadius:11,padding:"8px 4px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,transition:"all 0.2s"}}>
-              <SpiritAvatar animalId={a.id} seed={a.id} size={34} ring={false}/>
-              <span style={{fontSize:8,color:form.avatar===a.id?a.color:"rgba(240,237,232,0.4)",fontWeight:700,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:0.3}}>{a.name}</span>
-            </button>
-          ))}
+          {AVATARS.map(a=><button key={a} onClick={()=>set("avatar",a)} style={{background:form.avatar===a?"rgba(224,92,42,0.3)":"rgba(255,255,255,0.05)",border:"2px solid "+(form.avatar===a?"#e05c2a":"transparent"),borderRadius:11,padding:"9px 0",fontSize:24,cursor:"pointer"}}>{a}</button>)}
         </div>
         {[{l:"Name",k:"name",t:"text"},{l:"Age",k:"age",t:"number"},{l:"Weight (kg)",k:"weight",t:"number"},{l:"Height (cm)",k:"height",t:"number"}].map(f=>(
           <div key={f.k} style={{marginBottom:16}}>
@@ -806,7 +628,7 @@ export default function KhimFitness() {
   // Save active profile + tab to localStorage whenever they change
   useEffect(() => {
     if (profile) ssess({ profileName: profile.name, tab });
-  }, [profile&&profile.name, tab]);
+  }, [profile?.name, tab]);
 
   useEffect(() => {
     if (!profile) return;
@@ -814,12 +636,12 @@ export default function KhimFitness() {
     setData({ log:s.log||{}, workoutLog:s.workoutLog||{}, water:s.water||{}, weightLog:s.weightLog||{} });
     setWRec(s.workoutRecords||{});
     setCS(s.completedSets||{});
-  }, [profile&&profile.id]);
+  }, [profile?.id]);
 
   useEffect(() => {
     if (!profile) return;
     sd(profile.id, {...ld(profile.id), ...data, workoutRecords, completedSets});
-  }, [data, workoutRecords, completedSets, profile&&profile.id]);
+  }, [data, workoutRecords, completedSets, profile?.id]);
 
   const toast_ = (msg, color="#1a7a4a") => { setToast({msg,color}); setTimeout(()=>setToast(null),2500); };
   if (!profile) return <Onboarding onComplete={p=>{ setProfile(p); setTab("home"); }}/>;
@@ -881,7 +703,7 @@ export default function KhimFitness() {
         <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Khim<span style={{color:"#e05c2a"}}>Fit</span></div>
       </div>
       <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(224,92,42,0.1)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
-        <SpiritAvatar animalId={profile.spiritAnimal||profile.avatar||"eagle"} seed={profile.name} size={40} ring={true}/>
+        <span style={{fontSize:30}}>{profile.avatar}</span>
         <div style={{flex:1,minWidth:0}}><div style={{fontWeight:800,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile.name}</div><div style={{fontSize:11,color:"#e05c2a",marginTop:2}}>{calGoal} kcal goal</div></div>
         <span style={{fontSize:12,color:"rgba(240,237,232,0.3)"}}>edit</span>
       </button>
@@ -937,34 +759,15 @@ export default function KhimFitness() {
     return s;
   })();
 
-  const HomeContent = (() => (
+  const HomeContent = useMemo(() => (
     <div style={{fontFamily:BODY_FONT}}>
       {/* Date + Streak row */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
         <div style={{fontSize:11,color:"rgba(240,237,232,0.35)",letterSpacing:1,textTransform:"uppercase"}}>{new Date().toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long"})}</div>
-        <div style={{background:"rgba(255,255,255,0.03)",borderRadius:16,padding:"6px 12px"}}>
-          <StreakBeast days={streakDays}/>
-        </div>
-      </div>
-
-      {/* Spirit Animal + Level Banner */}
-      <div className="bento-card" style={{background:"rgba(255,255,255,0.02)",borderRadius:18,padding:"12px 16px",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,animationDelay:"0.02s"}}>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <SpiritAvatar animalId={profile.spiritAnimal||"eagle"} seed={profile.name} size={52} ring={true}/>
-          {(() => { const animal = SPIRIT_ANIMALS.find(a=>a.id===(profile.spiritAnimal||"eagle")); return animal ? (
-            <div>
-              <div style={{fontFamily:SPORT_FONT,fontSize:16,letterSpacing:1,color:animal.color,lineHeight:1}}>{animal.emoji} {animal.name}</div>
-              <div style={{fontSize:10,color:"rgba(240,237,232,0.4)",marginTop:3,fontStyle:"italic"}}>{animal.desc}</div>
-            </div>
-          ) : null; })()}
-        </div>
-        {(() => {
-          const totalLogged = Object.values(log).flat().reduce((s,m)=>s+m.calories,0);
-          const totalWorkouts = Object.values(workoutLog).flat().length;
-          const lvl = calcLevel(totalLogged, streakDays, totalWorkouts);
-          const animal = SPIRIT_ANIMALS.find(a=>a.id===(profile.spiritAnimal||"eagle"));
-          return <LevelBadge level={lvl.level} xpInLevel={lvl.xpInLevel} xpToNext={lvl.xpToNext} color={(animal&&animal.color)||"#e05c2a"}/>;
-        })()}
+        {streakDays>0&&<div style={{display:"flex",alignItems:"center",gap:6,background:"rgba(240,160,0,0.12)",borderLeft:"3px solid #f0a500",borderRadius:20,padding:"4px 12px"}}>
+          <span style={{fontSize:16,animation:streakDays>=3?"streakPop 0.6s ease":"none"}}>🔥</span>
+          <span style={{fontSize:12,fontWeight:700,color:"#f0a500"}}>{streakDays} day streak</span>
+        </div>}
       </div>
 
       {/* HERO — calorie ring + big stats */}
@@ -995,9 +798,9 @@ export default function KhimFitness() {
       {/* BENTO ROW 1 — Goal mode (wide) + Streak tile (narrow) */}
       <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:10,marginBottom:10}}>
         <div className="bento-card" style={{background:"rgba(224,92,42,0.08)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,animationDelay:"0.05s"}}>
-          <CalorieFlamSprite net={netCal} goal={calGoal}/>
+          <span style={{fontSize:26}}>{GOALS.find(g=>g.id===profile.goal)?.icon}</span>
           <div>
-            <div style={{fontFamily:SPORT_FONT,fontSize:18,letterSpacing:1,color:"#e05c2a"}}>{(GOALS.find(g=>g.id===profile.goal)||{label:""}).label} Mode</div>
+            <div style={{fontFamily:SPORT_FONT,fontSize:18,letterSpacing:1,color:"#e05c2a"}}>{GOALS.find(g=>g.id===profile.goal)?.label} Mode</div>
             <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:1}}>{calGoal} kcal/day target</div>
           </div>
         </div>
@@ -1026,10 +829,7 @@ export default function KhimFitness() {
         </div>
         {/* Water tile */}
         <div className="bento-card" style={{background:"rgba(30,144,255,0.08)",borderLeft:"3px solid #4a9eff",borderRadius:16,padding:"14px 14px",animationDelay:"0.12s",display:"flex",flexDirection:"column"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4a9eff"}}>WATER</div>
-            <HydrationSprite current={tWater} goal={waterGoal}/>
-          </div>
+          <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4a9eff",marginBottom:8}}>WATER</div>
           <div style={{fontFamily:SPORT_FONT,fontSize:32,color:"#7ab8ff",letterSpacing:1,lineHeight:1,marginBottom:2}}>{tWater}<span style={{fontSize:14,opacity:0.5}}>/{waterGoal}</span></div>
           <div style={{fontSize:10,color:"rgba(240,237,232,0.35)",marginBottom:10}}>glasses today</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:4,marginBottom:10,flex:1}}>
@@ -1084,7 +884,8 @@ export default function KhimFitness() {
         {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4fc3a1",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
       </div>
     </div>
-  ))();
+  // eslint-disable-next-line
+  ), [tWater, totCal, totPro, totCarb, totFat, burned, calGoal, streakDays, log, addWater, addM, weightLog, weightInput, TODAY]);
 
   const DietContent = () => (
     <div>
@@ -1093,7 +894,7 @@ export default function KhimFitness() {
         {CATS.map(c=><button key={c} onClick={()=>setFC(c)} style={{background:filterCat===c?"#e05c2a":"rgba(255,255,255,0.06)",border:filterCat===c?"none":"1px solid transparent",color:filterCat===c?"#fff":"rgba(240,237,232,0.6)",borderRadius:22,padding:"7px 18px",cursor:"pointer",fontSize:13,whiteSpace:"nowrap",fontWeight:filterCat===c?700:400,transition:"all 0.2s"}}>{c}</button>)}
       </div>
       <div style={{fontSize:11,color:"rgba(240,237,232,0.3)",marginBottom:14,letterSpacing:1}}>{filtered.length} MEALS</div>
-      {filtered.map(meal=><MealCard key={meal.id} meal={meal} isSelected={selectedMeal&&selectedMeal.id===meal.id} onSelect={()=>setSM(selectedMeal&&selectedMeal.id===meal.id?null:meal)} onLog={()=>addM(meal)}/>)}
+      {filtered.map(meal=><MealCard key={meal.id} meal={meal} isSelected={selectedMeal?.id===meal.id} onSelect={()=>setSM(selectedMeal?.id===meal.id?null:meal)} onLog={()=>addM(meal)}/>)}
     </div>
   );
 
@@ -1102,7 +903,7 @@ export default function KhimFitness() {
 
     if (openSession) {
       const plan = WORKOUT_PLANS.find(p=>p.id===openSession.planId);
-      const sess = plan&&plan.sessions[openSession.idx];
+      const sess = plan?.sessions[openSession.idx];
       if (!plan||!sess) return null;
       const alreadyLogged = (workoutRecords[TODAY]||[]).some(r=>r.planId===plan.id&&r.sessionName===sess.name);
       return (
@@ -1380,10 +1181,10 @@ export default function KhimFitness() {
       </div>
       <div style={{background:"rgba(224,92,42,0.06)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px"}}>
         <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18}}>
-          <SpiritAvatar animalId={profile.spiritAnimal||"eagle"} seed={profile.name} size={64} ring={true}/>
+          <span style={{fontSize:40}}>{profile.avatar}</span>
           <div><div style={{fontWeight:900,fontSize:20}}>{profile.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>Member since {profile.createdAt||TODAY}</div></div>
         </div>
-        {[{l:"Age",v:profile.age+" years"},{l:"Weight",v:profile.weight+" kg"},{l:"Height",v:profile.height+" cm"},{l:"Activity",v:profile.activity},{l:"Goal",v:(GOALS.find(g=>g.id===profile.goal)||{label:""}).label},{l:"Calorie Target",v:calGoal+" kcal/day"}].map(r=>(
+        {[{l:"Age",v:profile.age+" years"},{l:"Weight",v:profile.weight+" kg"},{l:"Height",v:profile.height+" cm"},{l:"Activity",v:profile.activity},{l:"Goal",v:GOALS.find(g=>g.id===profile.goal)?.label},{l:"Calorie Target",v:calGoal+" kcal/day"}].map(r=>(
           <div key={r.l} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"none"}}>
             <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>{r.l}</span><span style={{fontSize:13,fontWeight:700,textTransform:"capitalize"}}>{r.v}</span>
           </div>
@@ -1596,8 +1397,8 @@ export default function KhimFitness() {
             </div>
             {others.map(p=>(
               <button key={p.id} onClick={()=>{setProfile(p);setShowSw(false);setTab("home");toast_("Welcome back, "+p.name+"! "+p.avatar);}} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:"#f0ede8",textAlign:"left"}}>
-                <SpiritAvatar animalId={p.spiritAnimal||p.avatar||"eagle"} seed={p.name} size={36} ring={true}/>
-                <div style={{flex:1}}><div style={{fontWeight:800,fontSize:15}}>{p.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{p.calorieGoal} kcal goal - {(GOALS.find(g=>g.id===p.goal)||{label:""}).label}</div></div>
+                <span style={{fontSize:30}}>{p.avatar}</span>
+                <div style={{flex:1}}><div style={{fontWeight:800,fontSize:15}}>{p.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{p.calorieGoal} kcal goal - {GOALS.find(g=>g.id===p.goal)?.label}</div></div>
                 <span style={{color:"#e05c2a",fontSize:20}}>&#x2192;</span>
               </button>
             ))}
@@ -1609,8 +1410,7 @@ export default function KhimFitness() {
       {isMobile && (
         <div style={{position:"fixed",top:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderBottom:"none",padding:"13px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:100}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <button onClick={()=>setShowEdit(true)} style={{background:"transparent",border:"none",borderRadius:12,width:44,height:44,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,padding:2}}>
-              <SpiritAvatar animalId={profile.spiritAnimal||"eagle"} seed={profile.name} size={40} ring={true}/></button>
+            <button onClick={()=>setShowEdit(true)} style={{background:"rgba(224,92,42,0.15)",borderLeft:"3px solid #e05c2a",borderRadius:12,width:40,height:40,fontSize:22,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{profile.avatar}</button>
             <div><div style={{fontSize:10,color:"rgba(240,237,232,0.4)",letterSpacing:2,textTransform:"uppercase",lineHeight:1}}>Welcome back</div><div style={{fontSize:17,fontWeight:900,letterSpacing:-0.5}}>{profile.name}</div></div>
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
