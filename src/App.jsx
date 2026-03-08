@@ -468,7 +468,8 @@ export default function KhimFitness() {
   const maxCals   = Math.max(...weekStats.map(s=>s.cals),calGoal,1);
   const filtered  = filterCat==="All"?GHANAIAN_MEALS:GHANAIAN_MEALS.filter(m=>m.category===filterCat);
   const others    = Object.values(lp()).filter(p=>p.id!==profile.id);
-  const delProfile = () => { const a=lp(); delete a[profile.name]; sp(a); localStorage.removeItem("kfd_"+profile.id); setProfile(null); setShowEdit(false); };
+  const delProfile = () => { const a=lp(); delete a[profile.name]; sp(a); localStorage.removeItem("kfd_"+profile.id); setProfile(null); setShowEdit(false); localStorage.removeItem(SK); };
+  const goToWelcome = () => { localStorage.removeItem(SK); setProfile(null); };
 
   const cPad     = isMobile ? "16px" : "28px 32px";
   const navItems = [
@@ -499,8 +500,13 @@ export default function KhimFitness() {
           </button>
         ))}
       </nav>
-      <div style={{padding:"16px 24px",borderTop:"1px solid rgba(255,255,255,0.06)",fontSize:10,color:"rgba(240,237,232,0.2)",letterSpacing:1,lineHeight:1.9}}>
-        KHIMFIT v2.0<br/>BUILT BY JOACHIM<br/>ACCRA, GHANA
+      <div style={{padding:"12px 14px 0",borderTop:"1px solid rgba(255,255,255,0.06)"}}>
+        <button onClick={goToWelcome} style={{width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:11,padding:"10px 14px",cursor:"pointer",color:"rgba(240,237,232,0.4)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+          <span>🏠</span> Welcome Screen
+        </button>
+        <div style={{padding:"0 10px 16px",fontSize:10,color:"rgba(240,237,232,0.2)",letterSpacing:1,lineHeight:1.9}}>
+          KHIMFIT v2.0<br/>BUILT BY JOACHIM<br/>ACCRA, GHANA
+        </div>
       </div>
     </div>
   );
