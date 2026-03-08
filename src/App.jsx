@@ -914,7 +914,7 @@ export default function KhimFitness() {
           { num:1, title:"Go to the Diet tab", body:"Tap Diet in the bottom bar (mobile) or left sidebar (desktop). You will see 20 traditional Ghanaian meals organised by category: Breakfast, Lunch, Dinner and Snack." },
           { num:2, title:"Filter by meal type", body:"Use the category pills at the top (All, Breakfast, Lunch, Dinner, Snack) to quickly find the right meal for the time of day." },
           { num:3, title:"Tap a meal to expand it", body:"Tapping any meal card opens its full details - calories, protein, carbs, fat, a description, and health benefits. Tap again to collapse it." },
-          { num:4, title:"Log the meal", body:'Once expanded, tap the orange "Log [Meal Name]" button. The meal is added instantly to today's diary and your calorie ring updates on the Home tab.' },
+          { num:4, title:"Log the meal", body:"Once expanded, tap the orange Log button. The meal is added instantly to your diary and your calorie ring updates on the Home tab." },
           { num:5, title:"Remove a meal", body:"On the Home tab, find the meal under Today's Meals and tap the X button on the right to remove it from today's log." },
         ]
       },
@@ -924,8 +924,8 @@ export default function KhimFitness() {
           { num:1, title:"Quick Log - fast activity logging", body:"Go to Workout and make sure the Quick Log tab is selected. You will see 14 activity cards (Jog, HIIT, Football, etc). Simply tap any card to instantly log it - the calories burned are added to your daily total." },
           { num:2, title:"Lose Weight programme", body:"Tap the Lose Weight tab. This is an 8-week, 4-days-per-week fat-burning programme. You will see 4 weekly sessions: HIIT Cardio, Full-Body Fat Burn, Jump Rope and Core, and Steady-State Cardio." },
           { num:3, title:"Build Muscle programme", body:"Tap the Build Muscle tab. This is a 12-week strength programme with 4 sessions per week targeting different muscle groups: Chest & Triceps, Back & Biceps, Legs & Glutes, and Shoulders & Core." },
-          { num:4, title:"Start a guided session", body:'Tap "Start Session" on any session card. You will see the full exercise table with sets, reps, and rest times. Tick off each set as you complete it - a progress bar tracks how far through the session you are.' },
-          { num:5, title:"Log a completed session", body:'Once done, tap the big coloured "Log This Session" button at the bottom. This saves the session to your records and adds the calories burned to your daily total. The session will show as Logged with a green badge.' },
+          { num:4, title:"Start a guided session", body:"Tap Start Session on any session card. You will see the full exercise table with sets, reps, and rest times. Tick off each set as you complete it - a progress bar tracks how far through the session you are." },
+          { num:5, title:"Log a completed session", body:"Once done, tap the Log This Session button at the bottom. This saves the session to your records and adds the calories burned to your daily total. The session will show as Logged with a green badge." },
           { num:6, title:"View your records", body:"Scroll down on the Lose Weight or Build Muscle tab to see Your Records - a history of every session you have completed with dates, duration and calories burned." },
         ]
       },
@@ -935,7 +935,7 @@ export default function KhimFitness() {
           { num:1, title:"Calorie ring", body:"The circle on the left fills up as you eat. Orange means within goal, red means you have exceeded your calorie target for the day. The number in the centre is total kcal eaten today." },
           { num:2, title:"Stats grid", body:"The 4 boxes show: Goal (your daily calorie target), Burned (calories from workouts), Net (eaten minus burned), and Protein (grams eaten today)." },
           { num:3, title:"Macro bars", body:"The Carbohydrates, Protein and Fat bars show your progress towards the recommended daily targets for each macro. If your goal is Build Muscle, the protein target is set higher automatically." },
-          { num:4, title:"Water tracker", body:'Tap "+ 250ml" each time you drink a glass of water. The 8 squares fill up with droplets as you go. Try to fill all 8 every day.' },
+          { num:4, title:"Water tracker", body:"Tap the +250ml button each time you drink a glass of water. The 8 squares fill up with droplets as you go. Try to fill all 8 every day." },
           { num:5, title:"Weight logger", body:"Type your current weight in kg at the bottom of the Home tab and tap Save kg. Your weight is stored by date and shown in the Stats tab weight history table." },
         ]
       },
@@ -952,7 +952,7 @@ export default function KhimFitness() {
         id:"profiles", icon:"👤", title:"Managing Profiles",color:"#f0a500",
         steps:[
           { num:1, title:"Multiple profiles", body:"KhimFit supports multiple user profiles on the same device - perfect for families. Each profile has completely separate data, goals and history." },
-          { num:2, title:"Switch profiles", body:'On desktop, click "Switch Profile" at the top right. On mobile, tap Switch in the header. Select any existing profile to switch to it instantly.' },
+          { num:2, title:"Switch profiles", body:"On desktop, click Switch Profile at the top right. On mobile, tap Switch in the header. Select any existing profile to switch to it instantly." },
           { num:3, title:"Edit your profile", body:"Click your avatar/name in the sidebar (desktop) or tap your avatar in the mobile header. Change your name, avatar, stats or goal. Your new calorie target is recalculated automatically." },
           { num:4, title:"Delete a profile", body:"Open Edit Profile, scroll to the bottom and tap Delete This Profile. This permanently removes all data for that profile." },
           { num:5, title:"Your data is stored locally", body:"All data is saved in your browser's localStorage on your device. This means data does not sync across devices, and clearing your browser data will erase it." },
