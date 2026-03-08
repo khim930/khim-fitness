@@ -278,7 +278,7 @@ function Onboarding({ onComplete }) {
           <div style={{fontSize:28,marginBottom:6}}>{g.icon}</div><div style={{fontSize:12,fontWeight:700,color:form.goal===g.id?"#e05c2a":"#f0ede8"}}>{g.label}</div>
         </button>)}
       </div>
-      <div style={{background:"rgba(224,92,42,0.1)",border:"1px solid rgba(224,92,42,0.25)",borderRadius:14,padding:"14px 18px",marginBottom:22,textAlign:"center"}}>
+      <div style={{background:"rgba(224,92,42,0.1)",borderLeft:"3px solid #e05c2a",borderRadius:14,padding:"14px 18px",marginBottom:22,textAlign:"center"}}>
         <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginBottom:4}}>YOUR ESTIMATED DAILY CALORIE GOAL</div>
         <div style={{fontSize:30,fontWeight:900,color:"#e05c2a"}}>{calcCalGoal(form)} <span style={{fontSize:15,fontWeight:400}}>kcal</span></div>
       </div>
@@ -331,12 +331,12 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
             </button>)}
           </div>
         </div>
-        <div style={{background:"rgba(224,92,42,0.09)",border:"1px solid rgba(224,92,42,0.22)",borderRadius:12,padding:"11px 16px",marginBottom:18,textAlign:"center"}}>
+        <div style={{background:"rgba(224,92,42,0.09)",borderLeft:"3px solid #e05c2a",borderRadius:12,padding:"11px 16px",marginBottom:18,textAlign:"center"}}>
           <span style={{fontSize:12,color:"rgba(240,237,232,0.4)"}}>New calorie goal: </span>
           <span style={{fontSize:18,fontWeight:900,color:"#e05c2a"}}>{calcCalGoal(form)} kcal/day</span>
         </div>
         <button onClick={save} style={{width:"100%",background:"#e05c2a",border:"none",borderRadius:14,padding:"15px",color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer",marginBottom:10}}>Save Changes</button>
-        <button onClick={onDelete} style={{width:"100%",background:"rgba(255,50,50,0.08)",border:"1px solid rgba(255,50,50,0.2)",borderRadius:14,padding:"12px",color:"rgba(255,110,110,0.75)",cursor:"pointer",fontSize:13}}>Delete This Profile</button>
+        <button onClick={onDelete} style={{width:"100%",background:"rgba(255,50,50,0.08)",borderRadius:14,padding:"12px",color:"rgba(255,110,110,0.75)",cursor:"pointer",fontSize:13}}>Delete This Profile</button>
       </div>
     </div>
   );
@@ -376,7 +376,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
 }
 
 const StatCard = ({label,val,unit,color}) => (
-  <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"16px 18px"}}>
+  <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"16px 18px"}}>
     <div style={{fontSize:26,fontWeight:900,color}}>{val}</div>
     <div style={{fontSize:10,color,opacity:0.7,marginTop:1}}>{unit}</div>
     <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:5}}>{label}</div>
@@ -487,7 +487,7 @@ export default function KhimFitness() {
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:4}}>Fitness and Nutrition</div>
         <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Khim<span style={{color:"#e05c2a"}}>Fit</span></div>
       </div>
-      <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(224,92,42,0.1)",border:"1px solid rgba(224,92,42,0.25)",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
+      <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(224,92,42,0.1)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
         <span style={{fontSize:30}}>{profile.avatar}</span>
         <div style={{flex:1,minWidth:0}}><div style={{fontWeight:800,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile.name}</div><div style={{fontSize:11,color:"#e05c2a",marginTop:2}}>{calGoal} kcal goal</div></div>
         <span style={{fontSize:12,color:"rgba(240,237,232,0.3)"}}>edit</span>
@@ -526,7 +526,7 @@ export default function KhimFitness() {
   const HomeContent = () => (
     <div>
       <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginBottom:20}}>{new Date().toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
-      <div style={{background:"linear-gradient(135deg,#1a1f2e,#141820)",border:"none",borderRadius:20,padding:"22px 24px",marginBottom:16,display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
+      <div style={{background:"linear-gradient(135deg,#1a1f2e,#141820)",borderLeft:"3px solid #e05c2a",borderRadius:20,padding:"22px 24px",marginBottom:16,display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
         <svg width={96} height={96} style={{flexShrink:0}}>
           <circle cx={48} cy={48} r={38} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={9}/>
           <circle cx={48} cy={48} r={38} fill="none" stroke={calPct>=100?"#e03030":"#e05c2a"} strokeWidth={9}
@@ -544,11 +544,11 @@ export default function KhimFitness() {
           ))}
         </div>
       </div>
-      <div style={{background:"rgba(224,92,42,0.08)",border:"1px solid rgba(224,92,42,0.2)",borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
+      <div style={{background:"rgba(224,92,42,0.08)",borderLeft:"3px solid #e05c2a",borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
         <span style={{fontSize:24}}>{GOALS.find(g=>g.id===profile.goal)?.icon}</span>
         <div><div style={{fontWeight:700,fontSize:13}}>{GOALS.find(g=>g.id===profile.goal)?.label} Mode</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{GOALS.find(g=>g.id===profile.goal)?.desc} - {calGoal} kcal/day target</div></div>
       </div>
-      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #f0a500",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",marginBottom:14,textTransform:"uppercase"}}>Macros Today</div>
         {[{l:"Carbohydrates",v:totCarb,max:250,c:"#e05c2a"},{l:"Protein",v:totPro,max:profile.goal==="gain"?120:80,c:"#1a7a4a"},{l:"Fat",v:totFat,max:65,c:"#f0a500"}].map(m=>(
           <div key={m.l} style={{marginBottom:12}}>
@@ -557,28 +557,28 @@ export default function KhimFitness() {
           </div>
         ))}
       </div>
-      <div style={{background:"rgba(30,144,255,0.08)",border:"1px solid rgba(30,144,255,0.2)",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
+      <div style={{background:"rgba(30,144,255,0.08)",borderLeft:"3px solid #4a9eff",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
           <div><div style={{fontSize:11,letterSpacing:2,color:"rgba(30,144,255,0.75)",textTransform:"uppercase"}}>Water Intake</div><div style={{fontSize:20,fontWeight:800,marginTop:3}}>{tWater} <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>/ {waterGoal} glasses</span></div></div>
-          <button onClick={addWater} style={{background:"rgba(30,144,255,0.2)",border:"1px solid rgba(30,144,255,0.4)",color:"#7ab8ff",borderRadius:13,padding:"9px 16px",cursor:"pointer",fontSize:13,fontWeight:600}}>+ 250ml</button>
+          <button onClick={addWater} style={{background:"rgba(30,144,255,0.2)",color:"#7ab8ff",borderRadius:13,padding:"9px 16px",cursor:"pointer",fontSize:13,fontWeight:600}}>+ 250ml</button>
         </div>
         <div style={{display:"flex",gap:6}}>{Array.from({length:waterGoal}).map((_,i)=><div key={i} style={{flex:1,height:26,borderRadius:7,background:i<tWater?"rgba(30,144,255,0.6)":"rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,transition:"background 0.3s"}}>{i<tWater&&"💧"}</div>)}</div>
       </div>
       <div style={{marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Today's Meals</div>
         {tMeals.length===0
-          ? <div style={{background:"rgba(255,255,255,0.0)",border:"1px dashed rgba(255,255,255,0.06)",borderRadius:14,padding:24,textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14}}>No meals logged yet - go to the Diet tab</div>
+          ? <div style={{background:"rgba(255,255,255,0.0)",borderRadius:14,padding:24,textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14}}>No meals logged yet - go to the Diet tab</div>
           : tMeals.map(m=>(
-            <div key={m.logId} style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:13,padding:"11px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div key={m.logId} style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:13,padding:"11px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{display:"flex",gap:12,alignItems:"center"}}>
                 <div style={{width:40,height:40,borderRadius:10,background:(m.color||"#e05c2a")+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{m.emoji}</div>
                 <div><div style={{fontSize:14,fontWeight:700}}>{m.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{m.calories} kcal - {m.protein}g protein</div></div>
               </div>
-              <button onClick={()=>rmM(m.logId)} style={{background:"rgba(224,92,42,0.1)",border:"1px solid rgba(224,92,42,0.2)",color:"#e05c2a",borderRadius:9,padding:"4px 12px",cursor:"pointer",fontSize:13,flexShrink:0}}>X</button>
+              <button onClick={()=>rmM(m.logId)} style={{background:"rgba(224,92,42,0.1)",color:"#e05c2a",borderRadius:9,padding:"4px 12px",cursor:"pointer",fontSize:13,flexShrink:0}}>X</button>
             </div>
           ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"16px 18px"}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"16px 18px"}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Log Today's Weight</div>
         <div style={{display:"flex",gap:10}}>
           <input type="number" placeholder={"e.g. "+(profile.weight||"70")} value={weightInput} onChange={e=>setWI(e.target.value)} style={{flex:1,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:11,padding:"11px 15px",color:"#f0ede8",fontSize:15,outline:"none",fontFamily:"Georgia"}}/>
@@ -675,7 +675,7 @@ export default function KhimFitness() {
           ))}
         </div>
         {tWorkouts.length>0 && (
-          <div style={{background:"rgba(26,122,74,0.1)",border:"1px solid rgba(26,122,74,0.3)",borderRadius:16,padding:"16px 18px",marginBottom:20}}>
+          <div style={{background:"rgba(26,122,74,0.1)",borderLeft:"3px solid #1a7a4a",borderRadius:16,padding:"16px 18px",marginBottom:20}}>
             <div style={{fontSize:11,letterSpacing:2,color:"#1a7a4a",textTransform:"uppercase",marginBottom:12}}>Logged Today</div>
             {tWorkouts.map(w=>(
               <div key={w.logId} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7,fontSize:14}}>
@@ -699,7 +699,7 @@ export default function KhimFitness() {
                   <div style={{fontWeight:800,fontSize:13,marginBottom:4}}>{w.name}</div>
                   <div style={{fontSize:12,color:"#e05c2a",fontWeight:600}}>{w.calories} kcal</div>
                   <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginBottom:10}}>{w.duration} min</div>
-                  <div style={{background:"rgba(26,122,74,0.15)",border:"1px solid rgba(26,122,74,0.3)",borderRadius:8,padding:"5px 0",fontSize:12,color:"#4fc3a1",fontWeight:600}}>+ Log</div>
+                  <div style={{background:"rgba(26,122,74,0.15)",borderLeft:"3px solid #1a7a4a",borderRadius:8,padding:"5px 0",fontSize:12,color:"#4fc3a1",fontWeight:600}}>+ Log</div>
                 </div>
               ))}
             </div>
@@ -732,7 +732,7 @@ export default function KhimFitness() {
                       <div><div style={{fontSize:11,letterSpacing:2,color:activePlan.color,textTransform:"uppercase",marginBottom:3}}>{sess.day}</div><div style={{fontSize:17,fontWeight:900}}>{sess.name}</div></div>
                       <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                         <DiffBadge level={sess.difficulty}/>
-                        {alreadyLogged&&<span style={{background:"rgba(26,122,74,0.2)",border:"1px solid rgba(26,122,74,0.4)",color:"#4fc3a1",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>Logged</span>}
+                        {alreadyLogged&&<span style={{background:"rgba(26,122,74,0.2)",color:"#4fc3a1",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>Logged</span>}
                       </div>
                     </div>
                     <div style={{display:"flex",gap:16,marginBottom:12,flexWrap:"wrap"}}>
@@ -760,7 +760,7 @@ export default function KhimFitness() {
             {Object.keys(workoutRecords).length>0 && (
               <div style={{marginTop:24}}>
                 <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:14}}>Your Records</div>
-                <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,overflow:"hidden"}}>
+                <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid "+activePlan.color,borderRadius:18,overflow:"hidden"}}>
                   {Object.entries(workoutRecords).reverse().slice(0,10).flatMap(([date,recs])=>
                     recs.filter(r=>r.planId===activePlan.id).map((r,i)=>(
                       <div key={date+"-"+i} style={{padding:"12px 18px",borderBottom:"none",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
@@ -785,7 +785,7 @@ export default function KhimFitness() {
     <div>
       <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Weekly Stats</div>
       <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:22}}>7-day overview for {profile.name}</div>
-      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Calories vs Goal ({calGoal} kcal)</div>
         <div style={{display:"flex",gap:6,alignItems:"flex-end",height:110}}>
           {weekStats.map((s,i)=>(
@@ -810,7 +810,7 @@ export default function KhimFitness() {
         <StatCard label="Active Days"    val={weekStats.filter(d=>d.burned>0).length} unit="/ 7 days" color="#1a7a4a"/>
         <StatCard label="Meals Logged"   val={Object.values(log).flat().length} unit="total" color="#f0a500"/>
       </div>
-      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Weight History</div>
         {weekStats.every(d=>d.w===null)
           ? <div style={{textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14,padding:"16px 0"}}>Log your weight on the Home tab</div>
@@ -821,7 +821,7 @@ export default function KhimFitness() {
             </div>
           ))}
       </div>
-      <div style={{background:"rgba(224,92,42,0.06)",border:"1px solid rgba(224,92,42,0.2)",borderRadius:18,padding:"18px 20px"}}>
+      <div style={{background:"rgba(224,92,42,0.06)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px"}}>
         <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18}}>
           <span style={{fontSize:40}}>{profile.avatar}</span>
           <div><div style={{fontWeight:900,fontSize:20}}>{profile.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>Member since {profile.createdAt||TODAY}</div></div>
@@ -831,7 +831,7 @@ export default function KhimFitness() {
             <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>{r.l}</span><span style={{fontSize:13,fontWeight:700,textTransform:"capitalize"}}>{r.v}</span>
           </div>
         ))}
-        <button onClick={()=>setShowEdit(true)} style={{width:"100%",background:"rgba(224,92,42,0.15)",border:"1px solid rgba(224,92,42,0.3)",borderRadius:13,padding:"12px",color:"#e05c2a",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:16}}>Edit Profile</button>
+        <button onClick={()=>setShowEdit(true)} style={{width:"100%",background:"rgba(224,92,42,0.15)",borderLeft:"3px solid #e05c2a",borderRadius:13,padding:"12px",color:"#e05c2a",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:16}}>Edit Profile</button>
       </div>
     </div>
   );
@@ -840,7 +840,7 @@ export default function KhimFitness() {
     <div>
       <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Contact Us</div>
       <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:28}}>Questions, feedback, or partnerships - we would love to hear from you</div>
-      <div style={{background:"linear-gradient(135deg,rgba(224,92,42,0.18),rgba(26,122,74,0.12))",border:"1px solid rgba(224,92,42,0.3)",borderRadius:22,padding:"28px 26px",marginBottom:24,textAlign:"center"}}>
+      <div style={{background:"linear-gradient(135deg,rgba(224,92,42,0.18),rgba(26,122,74,0.12))",borderRadius:22,padding:"28px 26px",marginBottom:24,textAlign:"center"}}>
         <div style={{marginBottom:12,display:"flex",justifyContent:"center"}}>
           <svg width="72" height="72" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -878,7 +878,7 @@ export default function KhimFitness() {
           <span style={{color:c.color,fontSize:20,flexShrink:0}}>&#x2192;</span>
         </a>
       ))}
-      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"20px 22px",marginBottom:16,marginTop:8}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4fc3a1",borderRadius:18,padding:"20px 22px",marginBottom:16,marginTop:8}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Availability</div>
         {[{d:"Monday - Friday",t:"8:00 AM - 6:00 PM"},{d:"Saturday",t:"9:00 AM - 2:00 PM"},{d:"Sunday",t:"Closed"}].map(r=>(
           <div key={r.d} style={{display:"flex",justifyContent:"space-between",padding:"9px 0",borderBottom:"none"}}>
@@ -887,7 +887,7 @@ export default function KhimFitness() {
           </div>
         ))}
       </div>
-      <div style={{background:"rgba(30,144,255,0.07)",border:"1px solid rgba(30,144,255,0.2)",borderRadius:16,padding:"16px 20px"}}>
+      <div style={{background:"rgba(30,144,255,0.07)",borderLeft:"3px solid #4a9eff",borderRadius:16,padding:"16px 20px"}}>
         <div style={{fontSize:13,color:"rgba(240,237,232,0.6)",lineHeight:1.8}}>
           Want a feature added? Spotted a bug? Have a meal or workout suggestion? Reach out - we reply within 24 hours.
         </div>
@@ -985,7 +985,7 @@ export default function KhimFitness() {
         </div>
         {sections.map(s=>(
           openSection===s.id && (
-            <div key={s.id} style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:20,overflow:"hidden",marginBottom:20}}>
+            <div key={s.id} style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid "+s.color,borderRadius:20,overflow:"hidden",marginBottom:20}}>
               <div style={{background:s.color+"18",borderBottom:"1px solid "+s.color+"33",padding:"18px 22px",display:"flex",alignItems:"center",gap:14}}>
                 <span style={{fontSize:32}}>{s.icon}</span>
                 <div>
@@ -1005,7 +1005,7 @@ export default function KhimFitness() {
             </div>
           )
         ))}
-        <div style={{background:"rgba(224,92,42,0.07)",border:"1px solid rgba(224,92,42,0.2)",borderRadius:16,padding:"16px 20px",marginTop:8}}>
+        <div style={{background:"rgba(224,92,42,0.07)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"16px 20px",marginTop:8}}>
           <div style={{fontSize:13,color:"rgba(240,237,232,0.6)",lineHeight:1.8}}>
             Still have questions? Tap <strong style={{color:"#e05c2a"}}>Contact</strong> in the menu to reach Joachim directly - we reply within 24 hours.
           </div>
@@ -1036,7 +1036,7 @@ export default function KhimFitness() {
                 <span style={{color:"#e05c2a",fontSize:20}}>&#x2192;</span>
               </button>
             ))}
-            <button onClick={()=>{setProfile(null);setShowSw(false);}} style={{width:"100%",background:"rgba(224,92,42,0.1)",border:"1px solid rgba(224,92,42,0.3)",borderRadius:14,padding:"14px",color:"#e05c2a",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:4}}>+ Create New Profile</button>
+            <button onClick={()=>{setProfile(null);setShowSw(false);}} style={{width:"100%",background:"rgba(224,92,42,0.1)",borderRadius:14,padding:"14px",color:"#e05c2a",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:4}}>+ Create New Profile</button>
           </div>
         </div>
       )}
@@ -1044,7 +1044,7 @@ export default function KhimFitness() {
       {isMobile && (
         <div style={{position:"fixed",top:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderBottom:"none",padding:"13px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:100}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <button onClick={()=>setShowEdit(true)} style={{background:"rgba(224,92,42,0.15)",border:"1px solid rgba(224,92,42,0.3)",borderRadius:12,width:40,height:40,fontSize:22,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{profile.avatar}</button>
+            <button onClick={()=>setShowEdit(true)} style={{background:"rgba(224,92,42,0.15)",borderLeft:"3px solid #e05c2a",borderRadius:12,width:40,height:40,fontSize:22,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{profile.avatar}</button>
             <div><div style={{fontSize:10,color:"rgba(240,237,232,0.4)",letterSpacing:2,textTransform:"uppercase",lineHeight:1}}>Welcome back</div><div style={{fontSize:17,fontWeight:900,letterSpacing:-0.5}}>{profile.name}</div></div>
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
