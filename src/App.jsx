@@ -207,7 +207,7 @@ function Onboarding({ onComplete }) {
         {steps[step]}
         {/* Footer credit */}
         <div style={{textAlign:"center",marginTop:32,fontSize:11,color:"rgba(240,237,232,0.2)",letterSpacing:1}}>
-          BUILT BY JOACHIM · KHIMFIT v2.0
+          BUILT BY JOACHIM contact +233 551985225 or +233 531113498 email: joachimnaakureh07@gmail.com· KHIMFIT v2.0
         </div>
       </div>
     </div>
