@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 
 /* ─── Meal Data ──────────────────────────────────────────────────────────── */
 const GHANAIAN_MEALS = [
-  { id:1,  name:"Tom Brown Porridge",        category:"Breakfast", calories:180, protein:6,  carbs:35, fat:3,  emoji:"🌾", description:"Roasted corn & groundnut porridge — traditional morning fuel",            benefits:["Slow release energy","Gut friendly","Low fat"],       color:"#a0522d" },
-  { id:2,  name:"Koose (Bean Cakes)",         category:"Breakfast", calories:210, protein:9,  carbs:28, fat:8,  emoji:"🫓", description:"Deep-fried black-eyed pea fritters — beloved Ghanaian street snack",    benefits:["Plant protein","Quick energy","Portable"],            color:"#d4a017" },
+  { id:1,  name:"Tom Brown Porridge",        category:"Breakfast", calories:180, protein:6,  carbs:35, fat:3,  emoji:"🌾", description:"Roasted corn & groundnut porridge - traditional morning fuel",            benefits:["Slow release energy","Gut friendly","Low fat"],       color:"#a0522d" },
+  { id:2,  name:"Koose (Bean Cakes)",         category:"Breakfast", calories:210, protein:9,  carbs:28, fat:8,  emoji:"🫓", description:"Deep-fried black-eyed pea fritters - beloved Ghanaian street snack",    benefits:["Plant protein","Quick energy","Portable"],            color:"#d4a017" },
   { id:3,  name:"Hausa Koko & Koose",         category:"Breakfast", calories:260, protein:8,  carbs:42, fat:7,  emoji:"🍵", description:"Spiced millet porridge paired with crispy bean cakes",                   benefits:["Iron rich","Warming","Balanced carbs"],               color:"#b8600a" },
   { id:4,  name:"Boiled Yam & Egg Stew",      category:"Breakfast", calories:320, protein:14, carbs:44, fat:9,  emoji:"🥚", description:"Hearty boiled yam slices with spiced tomato egg sauce",                 benefits:["High protein","Sustaining","Vitamin B12"],            color:"#c4860a" },
-  { id:5,  name:"Jollof Rice",                category:"Lunch",     calories:420, protein:12, carbs:68, fat:11, emoji:"🍚", description:"Smoky tomato-based one-pot rice — Ghana's most celebrated dish",         benefits:["High energy","Lycopene rich","Iron source"],          color:"#e05c2a" },
-  { id:6,  name:"Waakye",                     category:"Lunch",     calories:380, protein:14, carbs:62, fat:8,  emoji:"🫘", description:"Rice & beans cooked with sorghum leaves — a street-food classic",       benefits:["Complete protein","High fibre","Low glycaemic"],      color:"#8b4513" },
+  { id:5,  name:"Jollof Rice",                category:"Lunch",     calories:420, protein:12, carbs:68, fat:11, emoji:"🍚", description:"Smoky tomato-based one-pot rice - Ghana's most celebrated dish",         benefits:["High energy","Lycopene rich","Iron source"],          color:"#e05c2a" },
+  { id:6,  name:"Waakye",                     category:"Lunch",     calories:380, protein:14, carbs:62, fat:8,  emoji:"🫘", description:"Rice & beans cooked with sorghum leaves - a street-food classic",       benefits:["Complete protein","High fibre","Low glycaemic"],      color:"#8b4513" },
   { id:7,  name:"Banku & Tilapia",            category:"Lunch",     calories:510, protein:38, carbs:52, fat:14, emoji:"🐟", description:"Fermented corn & cassava dumpling with grilled whole tilapia",          benefits:["High protein","Omega-3","Probiotic"],                 color:"#1a7a4a" },
   { id:8,  name:"Ampesi & Palava Sauce",      category:"Lunch",     calories:340, protein:11, carbs:55, fat:10, emoji:"🍠", description:"Boiled yam & plantain with rich leafy cocoyam sauce",                   benefits:["Complex carbs","Potassium rich","Filling"],           color:"#c4860a" },
   { id:9,  name:"Rice & Stew",                category:"Lunch",     calories:390, protein:15, carbs:60, fat:12, emoji:"🍛", description:"White rice with rich Ghanaian tomato-based chicken stew",               benefits:["Balanced macros","Protein rich","Comforting"],        color:"#cc4e1a" },
@@ -16,12 +16,12 @@ const GHANAIAN_MEALS = [
   { id:12, name:"Omotuo & Groundnut Soup",    category:"Dinner",    calories:460, protein:22, carbs:58, fat:16, emoji:"🥜", description:"Soft rice balls in deep rich groundnut soup with chicken",               benefits:["Healthy fats","High protein","Energy dense"],         color:"#b5541e" },
   { id:13, name:"Kontomire Stew & Rice",      category:"Dinner",    calories:350, protein:18, carbs:48, fat:14, emoji:"🥬", description:"Cocoyam leaves stewed with smoked fish & palm oil over rice",            benefits:["Very high iron","Vitamin A","Antioxidants"],          color:"#2d6a2d" },
   { id:14, name:"Egusi Soup & Fufu",          category:"Dinner",    calories:520, protein:28, carbs:54, fat:22, emoji:"🌿", description:"Ground melon-seed soup with leafy greens, fish & beef",                  benefits:["Protein packed","Zinc rich","Filling"],               color:"#5a7a2a" },
-  { id:15, name:"Palm Nut Soup & Rice",       category:"Dinner",    calories:490, protein:26, carbs:52, fat:20, emoji:"🫙", description:"Velvety palm nut soup with chicken and crabs — festive favourite",      benefits:["Vitamin E","Beta-carotene","Iron"],                   color:"#c04020" },
+  { id:15, name:"Palm Nut Soup & Rice",       category:"Dinner",    calories:490, protein:26, carbs:52, fat:20, emoji:"🫙", description:"Velvety palm nut soup with chicken and crabs - festive favourite",      benefits:["Vitamin E","Beta-carotene","Iron"],                   color:"#c04020" },
   { id:16, name:"Abunabun (Garden Egg Stew)", category:"Dinner",    calories:280, protein:12, carbs:30, fat:14, emoji:"🍆", description:"Roasted garden egg stew with smoked fish and tomatoes",                  benefits:["Low calorie","Antioxidants","Fibre rich"],            color:"#6a3a8a" },
-  { id:17, name:"Tuo Zaafi & Ayoyo",          category:"Dinner",    calories:410, protein:16, carbs:66, fat:9,  emoji:"🌾", description:"Northern Ghana staple — thick millet porridge with jute leaf soup",     benefits:["Iron rich","High fibre","Traditional"],               color:"#3a6a3a" },
+  { id:17, name:"Tuo Zaafi & Ayoyo",          category:"Dinner",    calories:410, protein:16, carbs:66, fat:9,  emoji:"🌾", description:"Northern Ghana staple - thick millet porridge with jute leaf soup",     benefits:["Iron rich","High fibre","Traditional"],               color:"#3a6a3a" },
   { id:18, name:"Chicken Peanut Stew",        category:"Dinner",    calories:440, protein:34, carbs:28, fat:22, emoji:"🍗", description:"Slow-simmered chicken in a thick aromatic groundnut sauce",              benefits:["High protein","Healthy fats","Vitamin B6"],           color:"#b5700a" },
-  { id:19, name:"Kelewele",                   category:"Snack",     calories:190, protein:2,  carbs:38, fat:6,  emoji:"🍌", description:"Spiced fried plantain cubes — a sweet and fiery street-food treat",     benefits:["Quick energy","Potassium","Antioxidants"],            color:"#e0a020" },
-  { id:20, name:"Roasted Groundnuts",         category:"Snack",     calories:170, protein:8,  carbs:10, fat:12, emoji:"🥜", description:"Salted roasted peanuts — the most popular Ghanaian on-the-go snack",   benefits:["Healthy fats","Plant protein","Satisfying"],          color:"#a06020" },
+  { id:19, name:"Kelewele",                   category:"Snack",     calories:190, protein:2,  carbs:38, fat:6,  emoji:"🍌", description:"Spiced fried plantain cubes - a sweet and fiery street-food treat",     benefits:["Quick energy","Potassium","Antioxidants"],            color:"#e0a020" },
+  { id:20, name:"Roasted Groundnuts",         category:"Snack",     calories:170, protein:8,  carbs:10, fat:12, emoji:"🥜", description:"Salted roasted peanuts - the most popular Ghanaian on-the-go snack",   benefits:["Healthy fats","Plant protein","Satisfying"],          color:"#a06020" },
 ];
 
 const QUICK_WORKOUTS = [
@@ -208,14 +208,10 @@ function Onboarding({ onComplete }) {
               <stop offset="100%" stopColor="rgba(255,255,255,0)"/>
             </linearGradient>
           </defs>
-          {/* Outer circle background */}
           <circle cx="48" cy="48" r="46" fill="url(#bgGrad)"/>
           <circle cx="48" cy="48" r="46" fill="url(#shineGrad)"/>
-          {/* Outer ring */}
           <circle cx="48" cy="48" r="46" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
-          {/* K letter */}
           <text x="48" y="58" textAnchor="middle" fontFamily="Georgia,serif" fontWeight="900" fontSize="46" fill="white" style={{letterSpacing:"-2px"}}>K</text>
-          {/* Small flame accent */}
           <text x="72" y="30" textAnchor="middle" fontSize="18">🔥</text>
         </svg>
       </div>
@@ -481,6 +477,7 @@ export default function KhimFitness() {
     {id:"workout", icon:"🏋", label:"Workout"},
     {id:"stats",   icon:"📊", label:"Stats"},
     {id:"contact", icon:"📞", label:"Contact"},
+    {id:"help",    icon:"❓",  label:"Help"},
   ];
 
   const Sidebar = () => (
@@ -892,8 +889,127 @@ export default function KhimFitness() {
     </div>
   );
 
-  const contentMap = { home:<HomeContent/>, diet:<DietContent/>, workout:<WorkoutContent/>, stats:<StatsContent/>, contact:<ContactContent/> };
-  const pageTitle  = { home:"Good "+(new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening")+", "+profile.name+" "+profile.avatar, diet:"Diet Guide", workout:"Workouts", stats:"Stats and Records", contact:"Contact Us" };
+
+  const HelpContent = () => {
+    const [openSection, setOpenSec] = useState(null);
+    const sections = [
+      {
+        id:"start", icon:"🚀", title:"Getting Started",color:"#e05c2a",
+        steps:[
+          { num:1, title:"Create your profile", body:"When you first open KhimFit, tap Get Started. Enter your name, pick an avatar, then fill in your age, weight, height and sex. This lets us calculate your personal daily calorie goal using the BMR formula." },
+          { num:2, title:"Pick your activity level", body:"Choose how active you are: Sedentary (desk job, no exercise), Lightly Active (1-3 days/week), Moderately Active (3-5 days/week), or Very Active (6-7 days/week). Be honest - this directly affects your calorie target." },
+          { num:3, title:"Set your goal", body:"Choose Lose Weight (we subtract 300 kcal from your target), Stay Fit (maintenance), or Build Muscle (we add 300 kcal). You can always change this later from Edit Profile." },
+          { num:4, title:"Your dashboard is ready", body:"You will land on the Home tab showing your calorie ring, macros, water tracker and today's meals. All your data is saved automatically on this device." },
+        ]
+      },
+      {
+        id:"diet", icon:"🍽", title:"Logging Meals",color:"#f0a500",
+        steps:[
+          { num:1, title:"Go to the Diet tab", body:"Tap Diet in the bottom bar (mobile) or left sidebar (desktop). You will see 20 traditional Ghanaian meals organised by category: Breakfast, Lunch, Dinner and Snack." },
+          { num:2, title:"Filter by meal type", body:"Use the category pills at the top (All, Breakfast, Lunch, Dinner, Snack) to quickly find the right meal for the time of day." },
+          { num:3, title:"Tap a meal to expand it", body:"Tapping any meal card opens its full details - calories, protein, carbs, fat, a description, and health benefits. Tap again to collapse it." },
+          { num:4, title:"Log the meal", body:'Once expanded, tap the orange "Log [Meal Name]" button. The meal is added instantly to today's diary and your calorie ring updates on the Home tab.' },
+          { num:5, title:"Remove a meal", body:"On the Home tab, find the meal under Today's Meals and tap the X button on the right to remove it from today's log." },
+        ]
+      },
+      {
+        id:"workout", icon:"🏋", title:"Tracking Workouts",color:"#1a7a4a",
+        steps:[
+          { num:1, title:"Quick Log - fast activity logging", body:"Go to Workout and make sure the Quick Log tab is selected. You will see 14 activity cards (Jog, HIIT, Football, etc). Simply tap any card to instantly log it - the calories burned are added to your daily total." },
+          { num:2, title:"Lose Weight programme", body:"Tap the Lose Weight tab. This is an 8-week, 4-days-per-week fat-burning programme. You will see 4 weekly sessions: HIIT Cardio, Full-Body Fat Burn, Jump Rope and Core, and Steady-State Cardio." },
+          { num:3, title:"Build Muscle programme", body:"Tap the Build Muscle tab. This is a 12-week strength programme with 4 sessions per week targeting different muscle groups: Chest & Triceps, Back & Biceps, Legs & Glutes, and Shoulders & Core." },
+          { num:4, title:"Start a guided session", body:'Tap "Start Session" on any session card. You will see the full exercise table with sets, reps, and rest times. Tick off each set as you complete it - a progress bar tracks how far through the session you are.' },
+          { num:5, title:"Log a completed session", body:'Once done, tap the big coloured "Log This Session" button at the bottom. This saves the session to your records and adds the calories burned to your daily total. The session will show as Logged with a green badge.' },
+          { num:6, title:"View your records", body:"Scroll down on the Lose Weight or Build Muscle tab to see Your Records - a history of every session you have completed with dates, duration and calories burned." },
+        ]
+      },
+      {
+        id:"home", icon:"⌂", title:"Home Tab Features",color:"#4fc3a1",
+        steps:[
+          { num:1, title:"Calorie ring", body:"The circle on the left fills up as you eat. Orange means within goal, red means you have exceeded your calorie target for the day. The number in the centre is total kcal eaten today." },
+          { num:2, title:"Stats grid", body:"The 4 boxes show: Goal (your daily calorie target), Burned (calories from workouts), Net (eaten minus burned), and Protein (grams eaten today)." },
+          { num:3, title:"Macro bars", body:"The Carbohydrates, Protein and Fat bars show your progress towards the recommended daily targets for each macro. If your goal is Build Muscle, the protein target is set higher automatically." },
+          { num:4, title:"Water tracker", body:'Tap "+ 250ml" each time you drink a glass of water. The 8 squares fill up with droplets as you go. Try to fill all 8 every day.' },
+          { num:5, title:"Weight logger", body:"Type your current weight in kg at the bottom of the Home tab and tap Save kg. Your weight is stored by date and shown in the Stats tab weight history table." },
+        ]
+      },
+      {
+        id:"stats", icon:"📊", title:"Stats and Records",color:"#e05c2a",
+        steps:[
+          { num:1, title:"7-day calorie chart", body:"The bar chart shows your calorie intake (orange) and calories burned (green) for each day of the past week. Red bars mean you went over your goal that day." },
+          { num:2, title:"Summary cards", body:"Below the chart you will see: Average Daily Calories, Total Burned this week, Active Days (days you logged a workout), and Total Meals logged across all time." },
+          { num:3, title:"Weight history", body:"If you have logged your weight on the Home tab, it appears here as a table by day. Use this to track your progress week by week." },
+          { num:4, title:"Profile card", body:"Your full profile summary is at the bottom - age, weight, height, activity level, goal and calorie target. Tap Edit Profile to update any of these values." },
+        ]
+      },
+      {
+        id:"profiles", icon:"👤", title:"Managing Profiles",color:"#f0a500",
+        steps:[
+          { num:1, title:"Multiple profiles", body:"KhimFit supports multiple user profiles on the same device - perfect for families. Each profile has completely separate data, goals and history." },
+          { num:2, title:"Switch profiles", body:'On desktop, click "Switch Profile" at the top right. On mobile, tap Switch in the header. Select any existing profile to switch to it instantly.' },
+          { num:3, title:"Edit your profile", body:"Click your avatar/name in the sidebar (desktop) or tap your avatar in the mobile header. Change your name, avatar, stats or goal. Your new calorie target is recalculated automatically." },
+          { num:4, title:"Delete a profile", body:"Open Edit Profile, scroll to the bottom and tap Delete This Profile. This permanently removes all data for that profile." },
+          { num:5, title:"Your data is stored locally", body:"All data is saved in your browser's localStorage on your device. This means data does not sync across devices, and clearing your browser data will erase it." },
+        ]
+      },
+      {
+        id:"tips", icon:"💡", title:"Tips for Best Results",color:"#1a7a4a",
+        steps:[
+          { num:1, title:"Log meals before or right after eating", body:"The sooner you log, the more accurate your daily totals will be. Use the Diet tab filter to quickly find the meal category you are eating from." },
+          { num:2, title:"Be consistent with weight logging", body:"Log your weight at the same time each day - ideally in the morning before eating. This gives the most accurate trend in your Stats history." },
+          { num:3, title:"Use the guided programmes consistently", body:"The Lose Weight and Build Muscle programmes are designed as multi-week plans. Follow the schedule (Monday, Wednesday, Friday, Saturday) as closely as possible for real results." },
+          { num:4, title:"Hit your water goal daily", body:"Drinking 8 glasses of water per day supports metabolism, reduces hunger and improves workout performance. Tap the water tracker every time you finish a glass." },
+          { num:5, title:"Adjust your goal as you progress", body:"If you are losing or gaining weight faster or slower than expected, go to Edit Profile and update your weight. Your calorie target will recalculate automatically to match your new stats." },
+        ]
+      },
+    ];
+
+    return (
+      <div>
+        <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Help and User Guide</div>
+        <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:28}}>Everything you need to know to get the most out of KhimFit</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:10,marginBottom:28}}>
+          {sections.map(s=>(
+            <button key={s.id} onClick={()=>setOpenSec(openSection===s.id?null:s.id)}
+              style={{background:openSection===s.id?s.color+"22":"rgba(255,255,255,0.04)",border:"1px solid "+(openSection===s.id?s.color+"66":"rgba(255,255,255,0.08)"),borderRadius:16,padding:"16px 10px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
+              <div style={{fontSize:28,marginBottom:7}}>{s.icon}</div>
+              <div style={{fontSize:12,fontWeight:700,color:openSection===s.id?s.color:"#f0ede8",lineHeight:1.3}}>{s.title}</div>
+            </button>
+          ))}
+        </div>
+        {sections.map(s=>(
+          openSection===s.id && (
+            <div key={s.id} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,overflow:"hidden",marginBottom:20}}>
+              <div style={{background:s.color+"18",borderBottom:"1px solid "+s.color+"33",padding:"18px 22px",display:"flex",alignItems:"center",gap:14}}>
+                <span style={{fontSize:32}}>{s.icon}</span>
+                <div>
+                  <div style={{fontSize:18,fontWeight:900}}>{s.title}</div>
+                  <div style={{fontSize:12,color:"rgba(240,237,232,0.45)",marginTop:2}}>{s.steps.length} steps</div>
+                </div>
+              </div>
+              {s.steps.map((step,i)=>(
+                <div key={i} style={{padding:"18px 22px",borderBottom:i<s.steps.length-1?"1px solid rgba(255,255,255,0.05)":undefined,display:"flex",gap:16,alignItems:"flex-start"}}>
+                  <div style={{width:30,height:30,borderRadius:"50%",background:s.color+"22",border:"1px solid "+s.color+"55",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,color:s.color,flexShrink:0,marginTop:2}}>{step.num}</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontWeight:800,fontSize:14,marginBottom:6}}>{step.title}</div>
+                    <div style={{fontSize:13,color:"rgba(240,237,232,0.6)",lineHeight:1.75}}>{step.body}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        ))}
+        <div style={{background:"rgba(224,92,42,0.07)",border:"1px solid rgba(224,92,42,0.2)",borderRadius:16,padding:"16px 20px",marginTop:8}}>
+          <div style={{fontSize:13,color:"rgba(240,237,232,0.6)",lineHeight:1.8}}>
+            Still have questions? Tap <strong style={{color:"#e05c2a"}}>Contact</strong> in the menu to reach Joachim directly - we reply within 24 hours.
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const contentMap = { home:<HomeContent/>, diet:<DietContent/>, workout:<WorkoutContent/>, stats:<StatsContent/>, contact:<ContactContent/>, help:<HelpContent/> };
+  const pageTitle  = { home:"Good "+(new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening")+", "+profile.name+" "+profile.avatar, diet:"Diet Guide", workout:"Workouts", stats:"Stats and Records", contact:"Contact Us", help:"Help and User Guide" };
 
   return (
     <div style={{minHeight:"100vh",background:"#0d1117",color:"#f0ede8",fontFamily:"Georgia,'Times New Roman',serif",display:"flex",position:"relative"}}>
