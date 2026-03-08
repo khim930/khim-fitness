@@ -192,7 +192,7 @@ function Onboarding({ onComplete }) {
     const p = { ...form, name:form.name.trim(), id:form.name.trim().toLowerCase().replace(/\s+/g,"_")+"_"+Date.now(), calorieGoal:calcCalGoal(form), createdAt:TODAY };
     const all = lp(); all[p.name] = p; sp(all); onComplete(p);
   };
-  const inp = { width:"100%", background:"rgba(255,255,255,0.08)", border:"1px solid transparent", borderRadius:14, padding:"15px 18px", color:"#f0ede8", outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
+  const inp = { width:"100%", background:"rgba(255,255,255,0.08)", border:"none", borderRadius:14, padding:"15px 18px", color:"#f0ede8", outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
 
   const steps = [
     <div key="w" style={{textAlign:"center"}}>
@@ -220,7 +220,7 @@ function Onboarding({ onComplete }) {
       {existing.length > 0 && <>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:14}}>Existing Profiles</div>
         {existing.map(p=>(
-          <button key={p.id} onClick={()=>onComplete(p)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1px solid transparent",borderRadius:16,padding:"14px 20px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:16,color:"#f0ede8",textAlign:"left"}}>
+          <button key={p.id} onClick={()=>onComplete(p)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:16,padding:"14px 20px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:16,color:"#f0ede8",textAlign:"left"}}>
             <span style={{fontSize:34}}>{p.avatar}</span>
             <div style={{flex:1}}><div style={{fontWeight:800,fontSize:17}}>{p.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>{GOALS.find(g=>g.id===p.goal)?.label} - {p.calorieGoal} kcal/day</div></div>
             <span style={{color:"#e05c2a",fontSize:22}}>&#x2192;</span>
@@ -268,13 +268,13 @@ function Onboarding({ onComplete }) {
       <div style={{fontSize:14,color:"rgba(240,237,232,0.45)",marginBottom:22}}>Fine-tune your daily calorie target</div>
       <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:11}}>Activity Level</div>
       {[{id:"sedentary",l:"Sedentary",d:"Little or no exercise"},{id:"light",l:"Lightly Active",d:"1-3 days/week"},{id:"moderate",l:"Moderately Active",d:"3-5 days/week"},{id:"active",l:"Very Active",d:"6-7 days/week"}].map(a=>(
-        <button key={a.id} onClick={()=>set("activity",a.id)} style={{width:"100%",background:form.activity===a.id?"rgba(224,92,42,0.15)":"rgba(255,255,255,0.04)",border:"1px solid "+(form.activity===a.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:13,padding:"12px 16px",marginBottom:9,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",color:"#f0ede8"}}>
+        <button key={a.id} onClick={()=>set("activity",a.id)} style={{width:"100%",background:form.activity===a.id?"rgba(224,92,42,0.15)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.activity===a.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:13,padding:"12px 16px",marginBottom:9,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",color:"#f0ede8"}}>
           <span style={{fontWeight:700,fontSize:14}}>{a.l}</span><span style={{fontSize:12,color:"rgba(240,237,232,0.4)"}}>{a.d}</span>
         </button>
       ))}
       <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",margin:"20px 0 12px"}}>Your Goal</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
-        {GOALS.map(g=><button key={g.id} onClick={()=>set("goal",g.id)} style={{background:form.goal===g.id?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.04)",border:"1px solid "+(form.goal===g.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:15,padding:"16px 8px",cursor:"pointer",textAlign:"center"}}>
+        {GOALS.map(g=><button key={g.id} onClick={()=>set("goal",g.id)} style={{background:form.goal===g.id?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.goal===g.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:15,padding:"16px 8px",cursor:"pointer",textAlign:"center"}}>
           <div style={{fontSize:28,marginBottom:6}}>{g.icon}</div><div style={{fontSize:12,fontWeight:700,color:form.goal===g.id?"#e05c2a":"#f0ede8"}}>{g.label}</div>
         </button>)}
       </div>
@@ -306,7 +306,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
   const [form, setForm] = useState({...profile});
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
   const save = () => { const u={...form,calorieGoal:calcCalGoal(form)}; const a=lp(); if(form.name!==profile.name) delete a[profile.name]; a[u.name]=u; sp(a); onSave(u); };
-  const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid transparent", borderRadius:11, padding:"12px 15px", color:"#f0ede8", fontSize:15, outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
+  const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"none", borderRadius:11, padding:"12px 15px", color:"#f0ede8", fontSize:15, outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:600,display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"Georgia,serif"}}>
       <div style={{background:"#141820",borderRadius:22,padding:28,width:"100%",maxWidth:460,maxHeight:"90vh",overflowY:"auto",color:"#f0ede8"}}>
@@ -344,7 +344,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
 
 function MealCard({ meal, isSelected, onSelect, onLog }) {
   return (
-    <div onClick={onSelect} style={{background:isSelected?"linear-gradient(135deg,"+meal.color+"1a,"+meal.color+"0d)":"rgba(255,255,255,0.025)",border:"1px solid "+(isSelected?meal.color+"88":"rgba(255,255,255,0.07)"),borderRadius:16,marginBottom:10,cursor:"pointer",overflow:"hidden",transition:"all 0.22s"}}>
+    <div onClick={onSelect} style={{background:isSelected?"linear-gradient(135deg,"+meal.color+"1a,"+meal.color+"0d)":"rgba(255,255,255,0.0)",border:"1px solid "+(isSelected?meal.color+"88":"rgba(255,255,255,0.07)"),borderRadius:16,marginBottom:10,cursor:"pointer",overflow:"hidden",transition:"all 0.22s"}}>
       <div style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px"}}>
         <div style={{width:48,height:48,borderRadius:13,background:meal.color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{meal.emoji}</div>
         <div style={{flex:1,minWidth:0}}>
@@ -355,7 +355,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
           <div style={{fontSize:12,color:"rgba(240,237,232,0.45)",marginTop:5,lineHeight:1.5}}>{meal.description}</div>
         </div>
       </div>
-      <div style={{display:"flex",borderTop:"1px solid transparent"}}>
+      <div style={{display:"flex",borderTop:"none"}}>
         {[{l:"Protein",v:meal.protein,c:"#4fc3a1"},{l:"Carbs",v:meal.carbs,c:"#f0a500"},{l:"Fat",v:meal.fat,c:"#e05c2a"}].map((m,i)=>(
           <div key={m.l} style={{flex:1,padding:"9px 0",textAlign:"center",borderRight:i<2?"1px solid transparent":undefined}}>
             <div style={{fontSize:14,fontWeight:800,color:m.c}}>{m.v}g</div>
@@ -364,7 +364,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
         ))}
       </div>
       {isSelected && (
-        <div style={{padding:"14px 16px",borderTop:"1px solid transparent"}}>
+        <div style={{padding:"14px 16px",borderTop:"none"}}>
           <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:14}}>
             {meal.benefits.map(b=><span key={b} style={{background:meal.color+"1a",border:"1px solid "+meal.color+"44",color:meal.color,borderRadius:20,padding:"4px 12px",fontSize:11}}>{"+ "+b}</span>)}
           </div>
@@ -376,7 +376,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
 }
 
 const StatCard = ({label,val,unit,color}) => (
-  <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:16,padding:"16px 18px"}}>
+  <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"16px 18px"}}>
     <div style={{fontSize:26,fontWeight:900,color}}>{val}</div>
     <div style={{fontSize:10,color,opacity:0.7,marginTop:1}}>{unit}</div>
     <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:5}}>{label}</div>
@@ -482,7 +482,7 @@ export default function KhimFitness() {
   ];
 
   const Sidebar = () => (
-    <div style={{width:260,flexShrink:0,background:"#0e1218",borderRight:"1px solid transparent",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
+    <div style={{width:260,flexShrink:0,background:"#0d1117",borderRight:"none",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
       <div style={{padding:"28px 24px 20px"}}>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:4}}>Fitness and Nutrition</div>
         <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Khim<span style={{color:"#e05c2a"}}>Fit</span></div>
@@ -492,7 +492,7 @@ export default function KhimFitness() {
         <div style={{flex:1,minWidth:0}}><div style={{fontWeight:800,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile.name}</div><div style={{fontSize:11,color:"#e05c2a",marginTop:2}}>{calGoal} kcal goal</div></div>
         <span style={{fontSize:12,color:"rgba(240,237,232,0.3)"}}>edit</span>
       </button>
-      {others.length>0 && <button onClick={()=>setShowSw(true)} style={{margin:"0 14px 20px",background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:12,padding:"9px 14px",cursor:"pointer",color:"rgba(240,237,232,0.5)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8}}>Switch Profile ({others.length})</button>}
+      {others.length>0 && <button onClick={()=>setShowSw(true)} style={{margin:"0 14px 20px",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:12,padding:"9px 14px",cursor:"pointer",color:"rgba(240,237,232,0.5)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8}}>Switch Profile ({others.length})</button>}
       <nav style={{flex:1,padding:"0 14px"}}>
         {navItems.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(224,92,42,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(224,92,42,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#e05c2a":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
@@ -500,8 +500,8 @@ export default function KhimFitness() {
           </button>
         ))}
       </nav>
-      <div style={{padding:"12px 14px 0",borderTop:"1px solid transparent"}}>
-        <button onClick={goToWelcome} style={{width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:11,padding:"10px 14px",cursor:"pointer",color:"rgba(240,237,232,0.4)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+      <div style={{padding:"12px 14px 0",borderTop:"none"}}>
+        <button onClick={goToWelcome} style={{width:"100%",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:11,padding:"10px 14px",cursor:"pointer",color:"rgba(240,237,232,0.4)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
           <span>🏠</span> Welcome Screen
         </button>
         <div style={{padding:"0 10px 16px",fontSize:10,color:"rgba(240,237,232,0.2)",letterSpacing:1,lineHeight:1.9}}>
@@ -512,7 +512,7 @@ export default function KhimFitness() {
   );
 
   const BottomNav = () => (
-    <div style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderTop:"1px solid transparent",display:"grid",gridTemplateColumns:"repeat(5,1fr)",zIndex:100}}>
+    <div style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderTop:"none",display:"grid",gridTemplateColumns:"repeat(5,1fr)",zIndex:100}}>
       {navItems.map(t=>(
         <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
           <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
@@ -526,7 +526,7 @@ export default function KhimFitness() {
   const HomeContent = () => (
     <div>
       <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginBottom:20}}>{new Date().toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
-      <div style={{background:"linear-gradient(135deg,#1a1f2e,#141820)",border:"1px solid transparent",borderRadius:20,padding:"22px 24px",marginBottom:16,display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
+      <div style={{background:"linear-gradient(135deg,#1a1f2e,#141820)",border:"none",borderRadius:20,padding:"22px 24px",marginBottom:16,display:"flex",alignItems:"center",gap:24,flexWrap:"wrap"}}>
         <svg width={96} height={96} style={{flexShrink:0}}>
           <circle cx={48} cy={48} r={38} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={9}/>
           <circle cx={48} cy={48} r={38} fill="none" stroke={calPct>=100?"#e03030":"#e05c2a"} strokeWidth={9}
@@ -537,7 +537,7 @@ export default function KhimFitness() {
         </svg>
         <div style={{flex:1,display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,minWidth:180}}>
           {[{l:"Goal",v:calGoal,u:"kcal",c:"#e05c2a"},{l:"Burned",v:burned,u:"kcal",c:"#1a7a4a"},{l:"Net",v:netCal,u:"kcal",c:netCal>calGoal?"#e03030":"#4fc3a1"},{l:"Protein",v:totPro,u:"g",c:"#f0a500"}].map(s=>(
-            <div key={s.l} style={{background:"rgba(255,255,255,0.04)",borderRadius:11,padding:"9px 12px"}}>
+            <div key={s.l} style={{background:"rgba(255,255,255,0.0)",borderRadius:11,padding:"9px 12px"}}>
               <div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}<span style={{fontSize:10,fontWeight:400}}> {s.u}</span></div>
               <div style={{fontSize:10,color:"rgba(240,237,232,0.4)",marginTop:2}}>{s.l}</div>
             </div>
@@ -548,7 +548,7 @@ export default function KhimFitness() {
         <span style={{fontSize:24}}>{GOALS.find(g=>g.id===profile.goal)?.icon}</span>
         <div><div style={{fontWeight:700,fontSize:13}}>{GOALS.find(g=>g.id===profile.goal)?.label} Mode</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{GOALS.find(g=>g.id===profile.goal)?.desc} - {calGoal} kcal/day target</div></div>
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"16px 18px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",marginBottom:14,textTransform:"uppercase"}}>Macros Today</div>
         {[{l:"Carbohydrates",v:totCarb,max:250,c:"#e05c2a"},{l:"Protein",v:totPro,max:profile.goal==="gain"?120:80,c:"#1a7a4a"},{l:"Fat",v:totFat,max:65,c:"#f0a500"}].map(m=>(
           <div key={m.l} style={{marginBottom:12}}>
@@ -567,9 +567,9 @@ export default function KhimFitness() {
       <div style={{marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Today's Meals</div>
         {tMeals.length===0
-          ? <div style={{background:"rgba(255,255,255,0.03)",border:"1px dashed rgba(255,255,255,0.06)",borderRadius:14,padding:24,textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14}}>No meals logged yet - go to the Diet tab</div>
+          ? <div style={{background:"rgba(255,255,255,0.0)",border:"1px dashed rgba(255,255,255,0.06)",borderRadius:14,padding:24,textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14}}>No meals logged yet - go to the Diet tab</div>
           : tMeals.map(m=>(
-            <div key={m.logId} style={{background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:13,padding:"11px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div key={m.logId} style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:13,padding:"11px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{display:"flex",gap:12,alignItems:"center"}}>
                 <div style={{width:40,height:40,borderRadius:10,background:(m.color||"#e05c2a")+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{m.emoji}</div>
                 <div><div style={{fontSize:14,fontWeight:700}}>{m.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{m.calories} kcal - {m.protein}g protein</div></div>
@@ -578,10 +578,10 @@ export default function KhimFitness() {
             </div>
           ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:16,padding:"16px 18px"}}>
+      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"16px 18px"}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Log Today's Weight</div>
         <div style={{display:"flex",gap:10}}>
-          <input type="number" placeholder={"e.g. "+(profile.weight||"70")} value={weightInput} onChange={e=>setWI(e.target.value)} style={{flex:1,background:"rgba(255,255,255,0.06)",border:"1px solid transparent",borderRadius:11,padding:"11px 15px",color:"#f0ede8",fontSize:15,outline:"none",fontFamily:"Georgia"}}/>
+          <input type="number" placeholder={"e.g. "+(profile.weight||"70")} value={weightInput} onChange={e=>setWI(e.target.value)} style={{flex:1,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:11,padding:"11px 15px",color:"#f0ede8",fontSize:15,outline:"none",fontFamily:"Georgia"}}/>
           <button onClick={saveWt} style={{background:"#e05c2a",border:"none",borderRadius:11,padding:"11px 20px",color:"#fff",cursor:"pointer",fontWeight:800,fontSize:14,flexShrink:0}}>Save kg</button>
         </div>
         {weightLog[TODAY]&&<div style={{marginTop:10,fontSize:13,color:"#4fc3a1"}}>Today: {weightLog[TODAY]}kg recorded</div>}
@@ -626,14 +626,14 @@ export default function KhimFitness() {
               <div style={{fontSize:13,color:"rgba(240,237,232,0.75)"}}>{sess.warmup}</div>
             </div>
           </div>
-          <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:18,overflow:"hidden",marginBottom:16}}>
-            <div style={{padding:"14px 18px",borderBottom:"1px solid transparent",display:"grid",gridTemplateColumns:"1fr 110px 70px 70px",gap:8}}>
+          <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,overflow:"hidden",marginBottom:16}}>
+            <div style={{padding:"14px 18px",borderBottom:"none",display:"grid",gridTemplateColumns:"1fr 110px 70px 70px",gap:8}}>
               {["Exercise","Sets x Reps","Rest","Done"].map(h=><div key={h} style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.35)",textTransform:"uppercase"}}>{h}</div>)}
             </div>
             {sess.exercises.map((ex,ei)=>{
               const allDone = Array.from({length:ex.sets}).every((_,si)=>completedSets[plan.id+"-"+openSession.idx+"-"+ei+"-"+si]);
               return (
-                <div key={ei} style={{padding:"13px 18px",borderBottom:"1px solid transparent",display:"grid",gridTemplateColumns:"1fr 110px 70px 70px",gap:8,alignItems:"center",background:allDone?"rgba(26,122,74,0.08)":"transparent"}}>
+                <div key={ei} style={{padding:"13px 18px",borderBottom:"none",display:"grid",gridTemplateColumns:"1fr 110px 70px 70px",gap:8,alignItems:"center",background:allDone?"rgba(26,122,74,0.08)":"transparent"}}>
                   <div style={{fontWeight:allDone?400:700,color:allDone?"rgba(240,237,232,0.4)":"#f0ede8",fontSize:14,textDecoration:allDone?"line-through":"none"}}>{ex.move}</div>
                   <div style={{fontSize:13,color:"rgba(240,237,232,0.6)"}}>{ex.sets}x {ex.reps}</div>
                   <div style={{fontSize:12,color:"rgba(240,237,232,0.4)"}}>{ex.rest}</div>
@@ -647,7 +647,7 @@ export default function KhimFitness() {
               );
             })}
           </div>
-          <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:14,padding:"14px 18px",marginBottom:16}}>
+          <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:16}}>
             <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:5}}>Cool-down</div>
             <div style={{fontSize:13,color:"rgba(240,237,232,0.75)",marginBottom:12}}>{sess.cooldown}</div>
             <div style={{background:plan.color+"15",border:"1px solid "+plan.color+"33",borderRadius:10,padding:"10px 14px"}}>
@@ -667,7 +667,7 @@ export default function KhimFitness() {
       <div>
         <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Workouts</div>
         <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:20}}>Log activities, follow guided plans, and track records</div>
-        <div style={{display:"flex",gap:8,marginBottom:24,background:"rgba(255,255,255,0.04)",borderRadius:16,padding:5}}>
+        <div style={{display:"flex",gap:8,marginBottom:24,background:"rgba(255,255,255,0.0)",borderRadius:16,padding:5}}>
           {[{id:"log",label:"Quick Log",icon:"⚡"},{id:"lose",label:"Lose Weight",icon:"🔥"},{id:"gain",label:"Build Muscle",icon:"💪"}].map(t=>(
             <button key={t.id} onClick={()=>setWTab(t.id)} style={{flex:1,background:wTab===t.id?"#e05c2a":"transparent",border:"none",borderRadius:12,padding:"10px 6px",cursor:"pointer",color:wTab===t.id?"#fff":"rgba(240,237,232,0.5)",fontSize:12,fontWeight:wTab===t.id?800:400,transition:"all 0.2s"}}>
               {t.icon+" "+t.label}
@@ -694,7 +694,7 @@ export default function KhimFitness() {
             <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:14}}>Quick Log Activity</div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",gap:11}}>
               {QUICK_WORKOUTS.map(w=>(
-                <div key={w.id} onClick={()=>addQW(w)} style={{background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:16,padding:"18px 12px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
+                <div key={w.id} onClick={()=>addQW(w)} style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"18px 12px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
                   <div style={{fontSize:36,marginBottom:8}}>{w.icon}</div>
                   <div style={{fontWeight:800,fontSize:13,marginBottom:4}}>{w.name}</div>
                   <div style={{fontSize:12,color:"#e05c2a",fontWeight:600}}>{w.calories} kcal</div>
@@ -726,7 +726,7 @@ export default function KhimFitness() {
               const doneSets  = sess.exercises.reduce((s,e,ei)=>s+Array.from({length:e.sets}).filter((_,si)=>completedSets[activePlan.id+"-"+idx+"-"+ei+"-"+si]).length,0);
               const pct = totalSets>0?Math.round((doneSets/totalSets)*100):0;
               return (
-                <div key={idx} style={{background:"rgba(255,255,255,0.03)",border:"1px solid "+(alreadyLogged?"rgba(26,122,74,0.4)":"rgba(255,255,255,0.07)"),borderRadius:18,marginBottom:12,overflow:"hidden"}}>
+                <div key={idx} style={{background:"rgba(255,255,255,0.0)",border:"1px solid "+(alreadyLogged?"rgba(26,122,74,0.4)":"rgba(255,255,255,0.07)"),borderRadius:18,marginBottom:12,overflow:"hidden"}}>
                   <div style={{padding:"16px 18px"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,marginBottom:8,flexWrap:"wrap"}}>
                       <div><div style={{fontSize:11,letterSpacing:2,color:activePlan.color,textTransform:"uppercase",marginBottom:3}}>{sess.day}</div><div style={{fontSize:17,fontWeight:900}}>{sess.name}</div></div>
@@ -747,8 +747,8 @@ export default function KhimFitness() {
                       </div>
                     )}
                     <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:14}}>
-                      {sess.exercises.slice(0,4).map((ex,ei)=><span key={ei} style={{background:"rgba(255,255,255,0.06)",border:"1px solid transparent",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(240,237,232,0.6)"}}>{ex.move}</span>)}
-                      {sess.exercises.length>4&&<span style={{background:"rgba(255,255,255,0.06)",border:"1px solid transparent",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(240,237,232,0.4)"}}>+{sess.exercises.length-4} more</span>}
+                      {sess.exercises.slice(0,4).map((ex,ei)=><span key={ei} style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(240,237,232,0.6)"}}>{ex.move}</span>)}
+                      {sess.exercises.length>4&&<span style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(240,237,232,0.4)"}}>+{sess.exercises.length-4} more</span>}
                     </div>
                     <button onClick={()=>setOpenSess({planId:activePlan.id,idx})} style={{width:"100%",background:activePlan.color,border:"none",borderRadius:13,padding:"13px",color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer"}}>
                       {pct>0?"Continue Session":"Start Session"}
@@ -760,10 +760,10 @@ export default function KhimFitness() {
             {Object.keys(workoutRecords).length>0 && (
               <div style={{marginTop:24}}>
                 <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:14}}>Your Records</div>
-                <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:18,overflow:"hidden"}}>
+                <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,overflow:"hidden"}}>
                   {Object.entries(workoutRecords).reverse().slice(0,10).flatMap(([date,recs])=>
                     recs.filter(r=>r.planId===activePlan.id).map((r,i)=>(
-                      <div key={date+"-"+i} style={{padding:"12px 18px",borderBottom:"1px solid transparent",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+                      <div key={date+"-"+i} style={{padding:"12px 18px",borderBottom:"none",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
                         <div><div style={{fontSize:13,fontWeight:700}}>{r.sessionName}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{new Date(date).toLocaleDateString("en-GH",{weekday:"short",day:"numeric",month:"short"})}</div></div>
                         <div style={{textAlign:"right"}}><div style={{fontSize:13,color:activePlan.color,fontWeight:700}}>-{r.calories} kcal</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)"}}>{r.duration} min</div></div>
                       </div>
@@ -785,7 +785,7 @@ export default function KhimFitness() {
     <div>
       <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Weekly Stats</div>
       <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:22}}>7-day overview for {profile.name}</div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Calories vs Goal ({calGoal} kcal)</div>
         <div style={{display:"flex",gap:6,alignItems:"flex-end",height:110}}>
           {weekStats.map((s,i)=>(
@@ -810,12 +810,12 @@ export default function KhimFitness() {
         <StatCard label="Active Days"    val={weekStats.filter(d=>d.burned>0).length} unit="/ 7 days" color="#1a7a4a"/>
         <StatCard label="Meals Logged"   val={Object.values(log).flat().length} unit="total" color="#f0a500"/>
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Weight History</div>
         {weekStats.every(d=>d.w===null)
           ? <div style={{textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14,padding:"16px 0"}}>Log your weight on the Home tab</div>
           : weekStats.filter(d=>d.w!==null).map((d,i)=>(
-            <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid transparent"}}>
+            <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"none"}}>
               <span style={{fontSize:14,color:"rgba(240,237,232,0.6)"}}>{d.day}</span>
               <span style={{fontSize:14,fontWeight:800,color:"#4fc3a1"}}>{d.w} kg</span>
             </div>
@@ -827,7 +827,7 @@ export default function KhimFitness() {
           <div><div style={{fontWeight:900,fontSize:20}}>{profile.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>Member since {profile.createdAt||TODAY}</div></div>
         </div>
         {[{l:"Age",v:profile.age+" years"},{l:"Weight",v:profile.weight+" kg"},{l:"Height",v:profile.height+" cm"},{l:"Activity",v:profile.activity},{l:"Goal",v:GOALS.find(g=>g.id===profile.goal)?.label},{l:"Calorie Target",v:calGoal+" kcal/day"}].map(r=>(
-          <div key={r.l} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid transparent"}}>
+          <div key={r.l} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"none"}}>
             <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>{r.l}</span><span style={{fontSize:13,fontWeight:700,textTransform:"capitalize"}}>{r.v}</span>
           </div>
         ))}
@@ -869,7 +869,7 @@ export default function KhimFitness() {
         { icon:"📱", label:"Phone / WhatsApp", value:"+233 55 198 5225",  href:"tel:+233551985225",                        color:"#1a7a4a" },
         { icon:"✉️", label:"Email",            value:"joachimnaakureh07@gmail.com", href:"mailto:joachimnaakureh07@gmail.com", color:"#e05c2a" },
       ].map((c,i)=>(
-        <a key={i} href={c.href} style={{display:"flex",alignItems:"center",gap:18,background:"rgba(255,255,255,0.04)",border:"1px solid transparent",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",color:"#f0ede8",transition:"all 0.2s"}}>
+        <a key={i} href={c.href} style={{display:"flex",alignItems:"center",gap:18,background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",color:"#f0ede8",transition:"all 0.2s"}}>
           <div style={{width:52,height:52,borderRadius:15,background:c.color+"22",border:"1px solid "+c.color+"44",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{c.icon}</div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:4}}>{c.label}</div>
@@ -878,10 +878,10 @@ export default function KhimFitness() {
           <span style={{color:c.color,fontSize:20,flexShrink:0}}>&#x2192;</span>
         </a>
       ))}
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:18,padding:"20px 22px",marginBottom:16,marginTop:8}}>
+      <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"20px 22px",marginBottom:16,marginTop:8}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Availability</div>
         {[{d:"Monday - Friday",t:"8:00 AM - 6:00 PM"},{d:"Saturday",t:"9:00 AM - 2:00 PM"},{d:"Sunday",t:"Closed"}].map(r=>(
-          <div key={r.d} style={{display:"flex",justifyContent:"space-between",padding:"9px 0",borderBottom:"1px solid transparent"}}>
+          <div key={r.d} style={{display:"flex",justifyContent:"space-between",padding:"9px 0",borderBottom:"none"}}>
             <span style={{fontSize:13,color:"rgba(240,237,232,0.6)"}}>{r.d}</span>
             <span style={{fontSize:13,fontWeight:700,color:r.t==="Closed"?"rgba(240,237,232,0.3)":"#4fc3a1"}}>{r.t}</span>
           </div>
@@ -977,7 +977,7 @@ export default function KhimFitness() {
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:10,marginBottom:28}}>
           {sections.map(s=>(
             <button key={s.id} onClick={()=>setOpenSec(openSection===s.id?null:s.id)}
-              style={{background:openSection===s.id?s.color+"22":"rgba(255,255,255,0.04)",border:"1px solid "+(openSection===s.id?s.color+"66":"rgba(255,255,255,0.08)"),borderRadius:16,padding:"16px 10px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
+              style={{background:openSection===s.id?s.color+"22":"rgba(255,255,255,0.0)",border:"1px solid "+(openSection===s.id?s.color+"66":"rgba(255,255,255,0.08)"),borderRadius:16,padding:"16px 10px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
               <div style={{fontSize:28,marginBottom:7}}>{s.icon}</div>
               <div style={{fontSize:12,fontWeight:700,color:openSection===s.id?s.color:"#f0ede8",lineHeight:1.3}}>{s.title}</div>
             </button>
@@ -985,7 +985,7 @@ export default function KhimFitness() {
         </div>
         {sections.map(s=>(
           openSection===s.id && (
-            <div key={s.id} style={{background:"rgba(255,255,255,0.03)",border:"1px solid transparent",borderRadius:20,overflow:"hidden",marginBottom:20}}>
+            <div key={s.id} style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:20,overflow:"hidden",marginBottom:20}}>
               <div style={{background:s.color+"18",borderBottom:"1px solid "+s.color+"33",padding:"18px 22px",display:"flex",alignItems:"center",gap:14}}>
                 <span style={{fontSize:32}}>{s.icon}</span>
                 <div>
@@ -1030,7 +1030,7 @@ export default function KhimFitness() {
               <button onClick={()=>setShowSw(false)} style={{background:"none",border:"none",color:"rgba(240,237,232,0.4)",fontSize:24,cursor:"pointer"}}>X</button>
             </div>
             {others.map(p=>(
-              <button key={p.id} onClick={()=>{setProfile(p);setShowSw(false);setTab("home");toast_("Welcome back, "+p.name+"! "+p.avatar);}} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1px solid transparent",borderRadius:14,padding:"14px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:"#f0ede8",textAlign:"left"}}>
+              <button key={p.id} onClick={()=>{setProfile(p);setShowSw(false);setTab("home");toast_("Welcome back, "+p.name+"! "+p.avatar);}} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:"#f0ede8",textAlign:"left"}}>
                 <span style={{fontSize:30}}>{p.avatar}</span>
                 <div style={{flex:1}}><div style={{fontWeight:800,fontSize:15}}>{p.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{p.calorieGoal} kcal goal - {GOALS.find(g=>g.id===p.goal)?.label}</div></div>
                 <span style={{color:"#e05c2a",fontSize:20}}>&#x2192;</span>
@@ -1042,14 +1042,14 @@ export default function KhimFitness() {
       )}
       {!isMobile && <Sidebar/>}
       {isMobile && (
-        <div style={{position:"fixed",top:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderBottom:"1px solid transparent",padding:"13px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:100}}>
+        <div style={{position:"fixed",top:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderBottom:"none",padding:"13px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:100}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <button onClick={()=>setShowEdit(true)} style={{background:"rgba(224,92,42,0.15)",border:"1px solid rgba(224,92,42,0.3)",borderRadius:12,width:40,height:40,fontSize:22,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{profile.avatar}</button>
             <div><div style={{fontSize:10,color:"rgba(240,237,232,0.4)",letterSpacing:2,textTransform:"uppercase",lineHeight:1}}>Welcome back</div><div style={{fontSize:17,fontWeight:900,letterSpacing:-0.5}}>{profile.name}</div></div>
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             <div style={{textAlign:"right"}}><div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:2}}>GOAL</div><div style={{fontSize:14,fontWeight:900,color:"#e05c2a"}}>{calGoal} kcal</div></div>
-            {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"1px solid transparent",borderRadius:10,padding:"6px 10px",cursor:"pointer",fontSize:11,color:"rgba(240,237,232,0.5)"}}>Switch</button>}
+            {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"6px 10px",cursor:"pointer",fontSize:11,color:"rgba(240,237,232,0.5)"}}>Switch</button>}
           </div>
         </div>
       )}
@@ -1060,7 +1060,7 @@ export default function KhimFitness() {
               <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",letterSpacing:2,textTransform:"uppercase"}}>{new Date().toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
               <div style={{fontSize:26,fontWeight:900,marginTop:2}}>{pageTitle[tab]}</div>
             </div>
-            {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"1px solid transparent",borderRadius:12,padding:"10px 18px",cursor:"pointer",fontSize:13,color:"rgba(240,237,232,0.6)",fontWeight:600}}>Switch Profile ({others.length})</button>}
+            {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:12,padding:"10px 18px",cursor:"pointer",fontSize:13,color:"rgba(240,237,232,0.6)",fontWeight:600}}>Switch Profile ({others.length})</button>}
           </div>
         )}
         <div style={{padding:cPad}}>{contentMap[tab]}</div>
