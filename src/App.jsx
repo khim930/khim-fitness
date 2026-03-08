@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const SPORT_FONT = "'Bebas Neue', 'Impact', sans-serif";
 const BODY_FONT  = "Georgia, 'Times New Roman', serif";
@@ -1632,6 +1633,7 @@ export default function KhimFitness() {
         <div style={{padding:cPad}}>{renderContent()}</div>
       </main>
       {isMobile && <BottomNav/>}
+      <SpeedInsights />
       <style>{`*{box-sizing:border-box;}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}input[type=number]{-moz-appearance:textfield;}::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}a:hover{opacity:0.85;}button:hover{opacity:0.88;}`}</style>
     </div>
   );
