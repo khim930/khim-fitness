@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 const SPORT_FONT = "'Bebas Neue', 'Impact', sans-serif";
 const BODY_FONT  = "Georgia, 'Times New Roman', serif";
@@ -665,7 +665,7 @@ export default function KhimFitness() {
   const addM   = m  => { upd("log",{...log,[TODAY]:[...(log[TODAY]||[]),{...m,logId:Date.now()}]}); toast_(m.emoji+" "+m.name+" added!"); setSM(null); };
   const rmM    = id => upd("log",{...log,[TODAY]:(log[TODAY]||[]).filter(m=>m.logId!==id)});
   const addQW  = w  => { upd("workoutLog",{...workoutLog,[TODAY]:[...(workoutLog[TODAY]||[]),{...w,logId:Date.now()}]}); toast_(w.icon+" "+w.name+" logged!","#e05c2a"); };
-  const addWater = () => { upd("water",{...water,[TODAY]:(water[TODAY]||0)+1}); toast_("Water +250ml logged!","#1e90ff"); };
+  const addWater = useCallback(() => { upd("water",{...water,[TODAY]:(water[TODAY]||0)+1}); toast_("Water +250ml logged!","#1e90ff"); }, [water]);
   const saveWt   = () => { if(!weightInput) return; upd("weightLog",{...weightLog,[TODAY]:parseFloat(weightInput)}); toast_("Weight "+weightInput+"kg saved!"); setWI(""); };
 
   const logPlanSession = (plan, sess) => {
@@ -759,7 +759,7 @@ export default function KhimFitness() {
     return s;
   })();
 
-  const HomeContent = () => (
+  const HomeContent = useMemo(() => (
     <div style={{fontFamily:BODY_FONT}}>
       {/* Date + Streak row */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
@@ -884,7 +884,8 @@ export default function KhimFitness() {
         {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4fc3a1",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
       </div>
     </div>
-  );
+  // eslint-disable-next-line
+  ), [tWater, totCal, totPro, totCarb, totFat, burned, calGoal, streakDays, log, addWater, addM, weightLog, weightInput, TODAY]);
 
   const DietContent = () => (
     <div>
@@ -1371,7 +1372,15 @@ export default function KhimFitness() {
     );
   };
 
-  const contentMap = { home:<HomeContent/>, diet:<DietContent/>, workout:<WorkoutContent/>, stats:<StatsContent/>, contact:<ContactContent/>, help:<HelpContent/> };
+  const renderContent = () => {
+    if (tab==="home")     return HomeContent;
+    if (tab==="diet")     return <DietContent/>;
+    if (tab==="workout")  return <WorkoutContent/>;
+    if (tab==="stats")    return <StatsContent/>;
+    if (tab==="contact")  return <ContactContent/>;
+    if (tab==="help")     return <HelpContent/>;
+    return null;
+  };
   const pageTitle  = { home:"Good "+(new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening")+", "+profile.name+" "+profile.avatar, diet:"Diet Guide", workout:"Workouts", stats:"Stats and Records", contact:"Contact Us", help:"Help and User Guide" };
 
   return (
@@ -1420,7 +1429,7 @@ export default function KhimFitness() {
             {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:12,padding:"10px 18px",cursor:"pointer",fontSize:13,color:"rgba(240,237,232,0.6)",fontWeight:600}}>Switch Profile ({others.length})</button>}
           </div>
         )}
-        <div style={{padding:cPad}}>{contentMap[tab]}</div>
+        <div style={{padding:cPad}}>{renderContent()}</div>
       </main>
       {isMobile && <BottomNav/>}
       <style>{`*{box-sizing:border-box;}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}input[type=number]{-moz-appearance:textfield;}::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}a:hover{opacity:0.85;}button:hover{opacity:0.88;}`}</style>
