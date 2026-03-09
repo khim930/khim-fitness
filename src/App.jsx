@@ -210,6 +210,144 @@ const QUICK_WORKOUTS = [
   { id:14, name:"Pull-ups",          icon:"💥", calories:200, duration:30 },
 ];
 
+/* ── Exercise YouTube Drill Videos ────────────────────────────────────────
+   Each key matches the exact exercise move name.
+   Videos are short form-focused YouTube tutorials / drill clips.
+   Using YouTube embed with autoplay + mute + loop for GIF-like experience.
+────────────────────────────────────────────────────────────────────────── */
+const EXERCISE_VIDEOS = {
+  // Cardio / HIIT
+  "Star Jumps":           "iSSAk4XCsRA",
+  "Burpees":              "dZgVxmf6jkA",
+  "High Knees":           "oDdkytliOqE",
+  "Mountain Climbers":    "nmwgirgXLYM",
+  "Jump Squats":          "Azl5tkCzDcc",
+  "Plank Hold":           "ASdvSXg_up8",
+  // Full body
+  "Squats":               "aclHkVaku9U",
+  "Push-ups":             "IODxDxX7oi4",
+  "Backward Lunges":      "xrPteyQLGAo",
+  "Plank":                "ASdvSXg_up8",
+  "Tummy Crunches":       "Xyd_fa5zoEU",
+  "Hip Raises":           "wPM8icPu6H8",
+  // Skipping & Core
+  "Skipping - Slow Pace": "u3zgHI8QnqE",
+  "Skipping - Fast Pace": "u3zgHI8QnqE",
+  "Sit-ups":              "jDwoBqPH0jk",
+  "Straight Leg Raises":  "JB2oyawG9KQ",
+  "Flutter Kicks":        "ANVdMDaYRts",
+  "Side Plank":           "K2VljzCC16g",
+  // Easy cardio
+  "Brisk Walk / Jog":     "pHkNHMsVlPE",
+  "Slow Jogging":         "pHkNHMsVlPE",
+  "Walking Lunges":       "L8fvypPrzzs",
+  "Step-ups":             "aP7PzMfmGlQ",
+  "Cool-down Stretch":    "qULTwquOuT4",
+  // Chest & Triceps
+  "Bench Press":          "vcBig73ojpE",
+  "Incline Dumbbell Press":"8iPEnn-ltC8",
+  "Chest Fly":            "eozdVDA78K0",
+  "Dips":                 "2z8JmcrW-As",
+  "Tricep Pushdown":      "2-LAMcpzODU",
+  "Skull Crushers":       "NIvwLDs0UHQ",
+  // Back & Biceps
+  "Pull-ups":             "eGo4IYlbE5g",
+  "Bent-Over Row":        "FWJR5Ve8bnQ",
+  "Seated Cable Row":     "GZbfZ033f74",
+  "One-Arm Dumbbell Row": "pYcpY20QaE8",
+  "Bicep Curl":           "ykJmrZ5v0Oo",
+  "Hammer Curl":          "zC3nLlEvin4",
+  // Legs
+  "Barbell Squat":        "Dy28eq2PjcM",
+  "Stiff-Leg Deadlift":   "1uDiW5--rAE",
+  "Leg Press Machine":    "IZxyjW7MPJQ",
+  "Leg Curl Machine":     "1Tq3QdYUuHs",
+  "Calf Raises":          "gwLzBJYoWlA",
+  // Shoulders & Abs
+  "Shoulder Press":       "qEwKCR5JCog",
+  "Side Raises":          "3VcKaXpzqRo",
+  "Front Raises":         "soxrZlIl35U",
+  "Rear Delt Raises":     "EA7u4Q_8HQ0",
+  "Plank with Weight":    "ASdvSXg_up8",
+  "Rotation Crunches":    "lDBPKoFWCRc",
+};
+
+/* Exercise Video Drill Modal */
+const ExerciseDrillModal = ({ exercise, onClose }) => {
+  const videoId = EXERCISE_VIDEOS[exercise.move];
+  return (
+    <div onClick={onClose} style={{
+      position:"fixed", inset:0, zIndex:9999,
+      background:"rgba(0,0,0,0.88)",
+      display:"flex", flexDirection:"column",
+      alignItems:"center", justifyContent:"center",
+      padding:20, backdropFilter:"blur(6px)",
+    }}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        background:"#141820",
+        border:"1px solid rgba(255,255,255,0.1)",
+        borderRadius:24, overflow:"hidden",
+        width:"100%", maxWidth:480,
+        boxShadow:"0 24px 80px rgba(0,0,0,0.8)",
+      }}>
+        {/* Header */}
+        <div style={{
+          background:"linear-gradient(135deg,#1a1f2e,#0f1318)",
+          borderBottom:"1px solid rgba(255,255,255,0.07)",
+          padding:"16px 20px",
+          display:"flex", alignItems:"center", justifyContent:"space-between",
+        }}>
+          <div>
+            <div style={{fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:20,letterSpacing:1,color:"#f0ede8",lineHeight:1}}>
+              {exercise.emoji} {exercise.move}
+            </div>
+            <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:4,letterSpacing:0.5}}>
+              {exercise.sets} sets · {exercise.reps} · Rest {exercise.rest}
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            background:"rgba(255,255,255,0.06)", border:"none",
+            borderRadius:10, width:34, height:34, cursor:"pointer",
+            color:"rgba(240,237,232,0.6)", fontSize:18,
+            display:"flex", alignItems:"center", justifyContent:"center",
+          }}>✕</button>
+        </div>
+
+        {/* Video */}
+        <div style={{position:"relative", paddingBottom:"56.25%", background:"#000"}}>
+          {videoId ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=1&rel=0&modestbranding=1`}
+              title={exercise.move}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              style={{position:"absolute",inset:0,width:"100%",height:"100%",border:"none"}}
+            />
+          ) : (
+            <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10}}>
+              <span style={{fontSize:48}}>{exercise.emoji}</span>
+              <div style={{color:"rgba(240,237,232,0.4)",fontSize:13}}>No video available</div>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        <div style={{padding:"16px 20px"}}>
+          <div style={{fontSize:13,color:"rgba(240,237,232,0.65)",lineHeight:1.75,marginBottom:14}}>
+            {exercise.desc}
+          </div>
+          <button onClick={onClose} style={{
+            width:"100%", background:"#e05c2a", border:"none",
+            borderRadius:12, padding:"12px 0",
+            fontFamily:"'Bebas Neue',Impact,sans-serif",
+            fontSize:15, letterSpacing:2, color:"white", cursor:"pointer",
+          }}>GOT IT — START EXERCISE</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const WORKOUT_PLANS = [
   {
     id:"lose", title:"Lose Weight", icon:"🔥", color:"#e05c2a",
@@ -924,6 +1062,7 @@ export default function KhimFitness() {
   const [showSwitch, setShowSw] = useState(false);
   const [wTab, setWTab]         = useState("log");
   const [openSession, setOpenSess] = useState(null);
+  const [drillEx, setDrillEx]       = useState(null);
   const [completedSets, setCS]  = useState({});
   const [workoutRecords, setWRec] = useState({});
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -1252,6 +1391,7 @@ export default function KhimFitness() {
       const alreadyLogged = (workoutRecords[TODAY]||[]).some(r=>r.planId===plan.id&&r.sessionName===sess.name);
       return (
         <div>
+          {drillEx && <ExerciseDrillModal exercise={drillEx} onClose={()=>setDrillEx(null)}/>}
           <button onClick={()=>setOpenSess(null)} style={{background:"rgba(224,92,42,0.1)",border:"none",borderLeft:"3px solid #e05c2a",borderRadius:10,color:"#e05c2a",cursor:"pointer",fontSize:14,padding:"10px 18px",marginBottom:18,display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontFamily:"Georgia"}}>&#8592; Back to {plan.title}</button>
           <div style={{background:plan.bgColor,border:"1px solid "+plan.borderColor,borderRadius:20,padding:"20px 22px",marginBottom:20}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:10}}>
@@ -1288,9 +1428,22 @@ export default function KhimFitness() {
                     </div>
                   </div>
 
-                  {/* ── Description + tick buttons ── */}
+                  {/* ── Description + Watch Drill + tick buttons ── */}
                   <div style={{padding:"10px 16px 14px"}}>
-                    <div style={{fontSize:12,color:"rgba(240,237,232,0.5)",lineHeight:1.75,marginBottom:12}}>{ex.desc||""}</div>
+                    <div style={{fontSize:12,color:"rgba(240,237,232,0.5)",lineHeight:1.75,marginBottom:10}}>{ex.desc||""}</div>
+                    {/* Watch Drill button */}
+                    <button onClick={()=>setDrillEx(ex)} style={{
+                      display:"flex", alignItems:"center", gap:7,
+                      background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)",
+                      borderRadius:10, padding:"7px 14px", cursor:"pointer",
+                      marginBottom:12, transition:"all 0.2s",
+                    }}
+                      onMouseEnter={e=>{e.currentTarget.style.background="rgba(224,92,42,0.18)"; e.currentTarget.style.borderColor="rgba(224,92,42,0.5)";}}
+                      onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.1)";}}>
+                      <span style={{fontSize:15}}>▶️</span>
+                      <span style={{fontFamily:SPORT_FONT,fontSize:12,letterSpacing:1,color:"#f0ede8"}}>WATCH DRILL</span>
+                      {!EXERCISE_VIDEOS[ex.move] && <span style={{fontSize:9,color:"rgba(240,237,232,0.3)"}}>· coming soon</span>}
+                    </button>
                     <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
                       <span style={{fontSize:11,color:"rgba(240,237,232,0.3)",letterSpacing:0.5,marginRight:2}}>SETS DONE:</span>
                       {Array.from({length:ex.sets}).map((_,si)=>{
