@@ -2,12 +2,147 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Khim Fitness</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA / App behaviour -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="KhimFit" />
+    <meta name="application-name" content="KhimFit" />
+    <meta name="theme-color" content="#e05c2a" />
+    <meta name="msapplication-TileColor" content="#0d1117" />
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+    <meta name="msapplication-config" content="none" />
+
+    <!-- SEO -->
+    <meta name="description" content="KhimFit — Ghana's personal fitness and nutrition tracker. Track calories, log Ghanaian meals, follow guided workout programmes, and hit your goals." />
+    <meta name="keywords" content="Ghana fitness app, calorie tracker Ghana, workout app, Ghanaian food calories, KhimFit" />
+    <meta name="author" content="Joachim Naakureh" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph (WhatsApp / Facebook previews) -->
+    <meta property="og:title" content="KhimFit — Ghana Fitness Tracker" />
+    <meta property="og:description" content="Track calories, log Ghanaian meals, and follow guided workout plans. Free fitness app built for Ghana." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://khim-fitness.vercel.app" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="KhimFit — Ghana Fitness Tracker" />
+    <meta name="twitter:description" content="Free fitness tracker with Ghanaian meal plans and guided workouts." />
+    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png" />
+    <link rel="shortcut icon" href="/icons/icon-96x96.png" />
+
+    <!-- Apple Touch Icons (iOS install icon) -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png" />
+
+    <title>KhimFit — Ghana Fitness Tracker</title>
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body {
+        background: #0d1117;
+        color: #f0ede8;
+        height: 100%;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root { min-height: 100vh; min-height: 100dvh; }
+
+      /* iOS safe area support */
+      body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+
+      /* Splash screen while app loads */
+      #splash {
+        position: fixed; inset: 0;
+        background: #0d1117;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 18px; z-index: 9999;
+        transition: opacity 0.4s ease;
+      }
+      #splash.hidden { opacity: 0; pointer-events: none; }
+      #splash-logo {
+        width: 96px; height: 96px; border-radius: 22px;
+        background: linear-gradient(135deg, #1a1f2e, #0d1117);
+        border: 2px solid #e05c2a44;
+        display: flex; align-items: center; justify-content: center;
+        font-family: Impact, sans-serif; font-size: 52px; color: white;
+        box-shadow: 0 0 40px #e05c2a33;
+      }
+      #splash-name {
+        font-family: Impact, sans-serif; font-size: 32px;
+        letter-spacing: 4px; color: #f0ede8;
+      }
+      #splash-sub {
+        font-size: 13px; color: rgba(240,237,232,0.4);
+        letter-spacing: 2px; text-transform: uppercase;
+      }
+      #splash-bar {
+        width: 120px; height: 3px; background: rgba(255,255,255,0.08);
+        border-radius: 2px; overflow: hidden; margin-top: 8px;
+      }
+      #splash-fill {
+        height: 100%; width: 0%; background: #e05c2a;
+        border-radius: 2px;
+        animation: splashLoad 1.2s ease forwards;
+      }
+      @keyframes splashLoad {
+        0%   { width: 0% }
+        60%  { width: 70% }
+        100% { width: 100% }
+      }
+    </style>
   </head>
   <body>
+    <!-- Splash screen -->
+    <div id="splash">
+      <div id="splash-logo">K</div>
+      <div id="splash-name">KHIMFIT</div>
+      <div id="splash-sub">Ghana Fitness Tracker</div>
+      <div id="splash-bar"><div id="splash-fill"></div></div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      // Hide splash when React mounts
+      window.__hideSplash = function() {
+        const s = document.getElementById('splash');
+        if (s) { s.classList.add('hidden'); setTimeout(()=>s.remove(), 500); }
+      };
+      // Fallback: hide after 2.5s max
+      setTimeout(window.__hideSplash, 2500);
+
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('✓ KhimFit SW registered'))
+            .catch(err => console.log('SW failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>

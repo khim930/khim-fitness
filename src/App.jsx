@@ -903,6 +903,37 @@ export default function KhimFitness() {
   const isMobile = useIsMobile();
   useEffect(()=>injectStyles(),[]);
 
+  // Hide splash screen once app mounts
+  useEffect(() => {
+    if (window.__hideSplash) window.__hideSplash();
+  }, []);
+
+  // PWA Install prompt
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      // Show banner after 3 seconds if not already installed
+      if (!window.matchMedia('(display-mode: standalone)').matches) {
+        setTimeout(() => setShowInstallBanner(true), 3000);
+      }
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setShowInstallBanner(false);
+      setInstallPrompt(null);
+    }
+  };
+
   // ── Restore session from localStorage on first load ──
   const _sess = lsess();
   const _profiles = lp();
@@ -921,6 +952,27 @@ export default function KhimFitness() {
   const [openSession, setOpenSess] = useState(null);
   const [completedSets, setCS]  = useState({});
   const [workoutRecords, setWRec] = useState({});
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  // PWA install prompt
+  useEffect(() => {
+    const onPrompt = (e) => { e.preventDefault(); setInstallPrompt(e); setShowInstallBanner(true); };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    if (window.matchMedia("(display-mode: standalone)").matches) setIsInstalled(true);
+    window.addEventListener("appinstalled", () => { setIsInstalled(true); setShowInstallBanner(false); });
+    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") { setIsInstalled(true); setShowInstallBanner(false); toast_("KhimFit installed! Ready to go","#1a7a4a"); }
+    setInstallPrompt(null);
+  };
+
 
   // Save active profile + tab to localStorage whenever they change
   useEffect(() => {
@@ -1585,6 +1637,27 @@ export default function KhimFitness() {
   return (
     <div style={{minHeight:"100vh",background:"#0d1117",color:"#f0ede8",fontFamily:"Georgia,'Times New Roman',serif",display:"flex",position:"relative"}}>
       <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",background:"radial-gradient(ellipse at 15% 10%,rgba(224,92,42,0.1),transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(26,122,74,0.08),transparent 55%)"}}/>
+      {/* PWA Install Banner */}
+      {showInstallBanner && !isInstalled && (
+        <div style={{position:"fixed",bottom:isMobile?80:24,left:"50%",transform:"translateX(-50%)",zIndex:9998,
+          background:"linear-gradient(135deg,#1a1f2e,#141820)",border:"1px solid rgba(224,92,42,0.35)",
+          borderRadius:20,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,
+          boxShadow:"0 12px 40px rgba(0,0,0,0.7)",maxWidth:380,width:"calc(100vw - 32px)"}}>
+          <div style={{width:46,height:46,borderRadius:13,background:"rgba(224,92,42,0.2)",border:"1px solid rgba(224,92,42,0.4)",
+            display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>💪</div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:SPORT_FONT,fontSize:13,color:"#f0ede8",letterSpacing:1,lineHeight:1}}>INSTALL KHIMFIT</div>
+            <div style={{fontSize:10,color:"rgba(240,237,232,0.45)",marginTop:4,lineHeight:1.4}}>Add to home screen for the full app experience</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:5,flexShrink:0}}>
+            <button onClick={handleInstall} style={{background:"#e05c2a",border:"none",borderRadius:10,
+              padding:"8px 14px",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",
+              fontFamily:SPORT_FONT,letterSpacing:1}}>INSTALL</button>
+            <button onClick={()=>setShowInstallBanner(false)} style={{background:"transparent",border:"none",
+              color:"rgba(240,237,232,0.35)",fontSize:10,cursor:"pointer",padding:"2px 0",textAlign:"center"}}>Not now</button>
+          </div>
+        </div>
+      )}
       {toast && <div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",background:toast.color,color:"#fff",padding:"11px 24px",borderRadius:32,zIndex:9999,fontSize:14,fontWeight:700,boxShadow:"0 6px 28px rgba(0,0,0,0.45)",whiteSpace:"nowrap"}}>{toast.msg}</div>}
       {showEdit && <EditProfile profile={profile} onSave={p=>{setProfile(p);setShowEdit(false);toast_("Profile updated!");}} onClose={()=>setShowEdit(false)} onDelete={delProfile}/>}
       {showSwitch && (
