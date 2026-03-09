@@ -275,6 +275,7 @@ const EXERCISE_VIDEOS = {
 /* Exercise Video Drill Modal */
 const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
   const videoId = EXERCISE_VIDEOS[exercise.move];
+
   return (
     <div onClick={onClose} style={{
       position:"fixed", inset:0, zIndex:9999,
@@ -313,7 +314,7 @@ const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
           }}>✕</button>
         </div>
 
-        {/* Video — stable src so iframe never remounts */}
+        {/* Video — stable src, never remounts */}
         <div style={{position:"relative", paddingBottom:"56.25%", background:"#000"}}>
           {videoId ? (
             <iframe
@@ -1231,7 +1232,15 @@ export default function KhimFitness() {
   const [wTab, setWTab]         = useState("log");
   const [openSession, setOpenSess] = useState(null);
   const [drillEx, setDrillEx]       = useState(null);
-  const closeDrill = useCallback(() => setDrillEx(null), []);
+  const closeDrill = useCallback(() => {
+    setDrillEx(null);
+    setTimerRun(true); // resume timer when modal closes
+  }, []);
+
+  const openDrill = useCallback((ex) => {
+    setDrillEx(ex);
+    setTimerRun(false); // pause timer while watching drill
+  }, []);
   const [timerSecs, setTimerSecs]   = useState(0);
   const [timerRunning, setTimerRun] = useState(false);
   const [restSecs, setRestSecs]     = useState(0);
@@ -1710,7 +1719,7 @@ export default function KhimFitness() {
                   <div style={{padding:"10px 16px 14px"}}>
                     <div style={{fontSize:12,color:"rgba(240,237,232,0.5)",lineHeight:1.75,marginBottom:10}}>{ex.desc||""}</div>
                     {/* Watch Drill button */}
-                    <button onClick={()=>setDrillEx(ex)} style={{
+                    <button onClick={()=>openDrill(ex)} style={{
                       display:"flex", alignItems:"center", gap:7,
                       background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)",
                       borderRadius:10, padding:"7px 14px", cursor:"pointer",
