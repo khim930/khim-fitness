@@ -908,32 +908,6 @@ export default function KhimFitness() {
     if (window.__hideSplash) window.__hideSplash();
   }, []);
 
-  // PWA Install prompt
-  const [installPrompt, setInstallPrompt] = useState(null);
-  const [showInstallBanner, setShowInstallBanner] = useState(false);
-  useEffect(() => {
-    const handler = (e) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-      // Show banner after 3 seconds if not already installed
-      if (!window.matchMedia('(display-mode: standalone)').matches) {
-        setTimeout(() => setShowInstallBanner(true), 3000);
-      }
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
-
-  const handleInstall = async () => {
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setShowInstallBanner(false);
-      setInstallPrompt(null);
-    }
-  };
-
   // ── Restore session from localStorage on first load ──
   const _sess = lsess();
   const _profiles = lp();
