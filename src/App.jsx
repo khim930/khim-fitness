@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 const SPORT_FONT = "'Bebas Neue', 'Impact', sans-serif";
 const BODY_FONT  = "Georgia, 'Times New Roman', serif";
@@ -273,7 +273,7 @@ const EXERCISE_VIDEOS = {
 };
 
 /* Exercise Video Drill Modal */
-const ExerciseDrillModal = ({ exercise, onClose }) => {
+const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
   const videoId = EXERCISE_VIDEOS[exercise.move];
   return (
     <div onClick={onClose} style={{
@@ -313,7 +313,7 @@ const ExerciseDrillModal = ({ exercise, onClose }) => {
           }}>✕</button>
         </div>
 
-        {/* Video */}
+        {/* Video — stable src so iframe never remounts */}
         <div style={{position:"relative", paddingBottom:"56.25%", background:"#000"}}>
           {videoId ? (
             <iframe
@@ -346,7 +346,7 @@ const ExerciseDrillModal = ({ exercise, onClose }) => {
       </div>
     </div>
   );
-};
+});
 
 const WORKOUT_PLANS = [
   {
@@ -1231,6 +1231,7 @@ export default function KhimFitness() {
   const [wTab, setWTab]         = useState("log");
   const [openSession, setOpenSess] = useState(null);
   const [drillEx, setDrillEx]       = useState(null);
+  const closeDrill = useCallback(() => setDrillEx(null), []);
   const [timerSecs, setTimerSecs]   = useState(0);
   const [timerRunning, setTimerRun] = useState(false);
   const [restSecs, setRestSecs]     = useState(0);
@@ -1611,7 +1612,7 @@ export default function KhimFitness() {
       const alreadyLogged = (workoutRecords[TODAY]||[]).some(r=>r.planId===plan.id&&r.sessionName===sess.name);
       return (
         <div>
-          {drillEx && <ExerciseDrillModal exercise={drillEx} onClose={()=>setDrillEx(null)}/>}
+          {drillEx && <ExerciseDrillModal exercise={drillEx} onClose={closeDrill}/>}
 
           {/* ── Sticky Live Timer Bar ── */}
           <div style={{
