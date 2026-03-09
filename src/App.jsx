@@ -692,7 +692,7 @@ function useIsMobile() {
 
 function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ name:"", avatar:"🦁", age:"", sex:"male", weight:"", height:"", activity:"moderate", goal:"maintain" });
+  const [form, setForm] = useState({ name:"", avatar:"🦁", age:"", sex:"male", weight:"", height:"", heightFt:"", heightIn:"", weightUnit:"kg", heightUnit:"cm", activity:"moderate", goal:"maintain" });
   const existing = Object.values(lp());
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
   const finish = () => {
@@ -752,15 +752,95 @@ function Onboarding({ onComplete }) {
     <div key="s">
       <div style={{fontSize:26,fontWeight:900,marginBottom:6}}>Your body stats</div>
       <div style={{fontSize:14,color:"rgba(240,237,232,0.45)",marginBottom:26}}>We calculate your personalised calorie goal</div>
-      {[{l:"Age",k:"age",u:"yrs",p:"e.g. 25"},{l:"Weight",k:"weight",u:"kg",p:"e.g. 70"},{l:"Height",k:"height",u:"cm",p:"e.g. 170"}].map(f=>(
-        <div key={f.k} style={{marginBottom:18}}>
-          <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:8}}>{f.l}</div>
-          <div style={{position:"relative"}}>
-            <input type="number" value={form[f.k]} onChange={e=>set(f.k,e.target.value)} placeholder={f.p} style={{...inp,fontSize:17,paddingRight:50}}/>
-            <span style={{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>{f.u}</span>
+      {/* Age */}
+      <div style={{marginBottom:18}}>
+        <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:8}}>Age</div>
+        <div style={{position:"relative"}}>
+          <input type="number" value={form.age} onChange={e=>set("age",e.target.value)} placeholder="e.g. 25" style={{...inp,fontSize:17,paddingRight:50}}/>
+          <span style={{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>yrs</span>
+        </div>
+      </div>
+
+      {/* Weight with kg/lbs toggle */}
+      <div style={{marginBottom:18}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase"}}>Weight</div>
+          <div style={{display:"flex",gap:4}}>
+            {["kg","lbs"].map(u=>(
+              <button key={u} onClick={()=>{
+                const cur = parseFloat(form.weight)||0;
+                if(u==="lbs" && form.weightUnit!=="lbs") set("weight", cur ? Math.round(cur*2.2046*10)/10 : "");
+                if(u==="kg"  && form.weightUnit==="lbs") set("weight", cur ? Math.round(cur/2.2046*10)/10 : "");
+                set("weightUnit",u);
+              }} style={{background:form.weightUnit===u||(!form.weightUnit&&u==="kg")?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700,letterSpacing:0.5}}>
+                {u}
+              </button>
+            ))}
           </div>
         </div>
-      ))}
+        <div style={{position:"relative"}}>
+          <input type="number" value={form.weight} onChange={e=>set("weight",e.target.value)}
+            placeholder={form.weightUnit==="lbs"?"e.g. 154":"e.g. 70"}
+            style={{...inp,fontSize:17,paddingRight:50}}/>
+          <span style={{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>{form.weightUnit||"kg"}</span>
+        </div>
+      </div>
+
+      {/* Height with cm/ft+in toggle */}
+      <div style={{marginBottom:18}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase"}}>Height</div>
+          <div style={{display:"flex",gap:4}}>
+            {["cm","ft"].map(u=>(
+              <button key={u} onClick={()=>{
+                const cur = parseFloat(form.height)||0;
+                if(u==="ft" && form.heightUnit!=="ft") {
+                  const totalIn = cur/2.54;
+                  set("heightFt", Math.floor(totalIn/12)||"");
+                  set("heightIn", Math.round(totalIn%12)||"");
+                  set("height","");
+                }
+                if(u==="cm" && form.heightUnit==="ft") {
+                  const cm = Math.round(((parseFloat(form.heightFt)||0)*12 + (parseFloat(form.heightIn)||0))*2.54);
+                  set("height", cm||"");
+                }
+                set("heightUnit",u);
+              }} style={{background:form.heightUnit===u||(!form.heightUnit&&u==="cm")?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700,letterSpacing:0.5}}>
+                {u==="ft"?"ft / in":"cm"}
+              </button>
+            ))}
+          </div>
+        </div>
+        {form.heightUnit==="ft" ? (
+          <div style={{display:"flex",gap:10}}>
+            <div style={{position:"relative",flex:1}}>
+              <input type="number" value={form.heightFt||""} onChange={e=>{
+                set("heightFt",e.target.value);
+                const cm=Math.round(((parseFloat(e.target.value)||0)*12+(parseFloat(form.heightIn)||0))*2.54);
+                set("height",cm||"");
+              }} placeholder="5" style={{...inp,fontSize:17,paddingRight:36}}/>
+              <span style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>ft</span>
+            </div>
+            <div style={{position:"relative",flex:1}}>
+              <input type="number" value={form.heightIn||""} onChange={e=>{
+                set("heightIn",e.target.value);
+                const cm=Math.round(((parseFloat(form.heightFt)||0)*12+(parseFloat(e.target.value)||0))*2.54);
+                set("height",cm||"");
+              }} placeholder="9" style={{...inp,fontSize:17,paddingRight:36}}/>
+              <span style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>in</span>
+            </div>
+          </div>
+        ) : (
+          <div style={{position:"relative"}}>
+            <input type="number" value={form.height} onChange={e=>set("height",e.target.value)} placeholder="e.g. 170"
+              style={{...inp,fontSize:17,paddingRight:50}}/>
+            <span style={{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>cm</span>
+          </div>
+        )}
+        {form.height && form.heightUnit==="ft" && (
+          <div style={{fontSize:10,color:"rgba(240,237,232,0.3)",marginTop:5,textAlign:"right"}}>= {form.height} cm (stored internally)</div>
+        )}
+      </div>
       <div style={{marginBottom:22}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:10}}>Sex</div>
         <div style={{display:"flex",gap:10}}>
@@ -820,7 +900,16 @@ function Onboarding({ onComplete }) {
 function EditProfile({ profile, onSave, onClose, onDelete }) {
   const [form, setForm] = useState({...profile});
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
-  const save = () => { const u={...form,calorieGoal:calcCalGoal(form)}; const a=lp(); if(form.name!==profile.name) delete a[profile.name]; a[u.name]=u; sp(a); onSave(u); };
+  const save = () => {
+    // Normalise weight to kg before saving
+    let saveForm = {...form};
+    if(saveForm.weightUnit==="lbs" && saveForm.weight) {
+      saveForm.weight = Math.round(parseFloat(saveForm.weight)/2.2046*10)/10;
+      saveForm.weightUnit = "kg";
+    }
+    const u={...saveForm,calorieGoal:calcCalGoal(saveForm)};
+    const a=lp(); if(form.name!==profile.name) delete a[profile.name]; a[u.name]=u; sp(a); onSave(u);
+  };
   const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"none", borderRadius:11, padding:"12px 15px", color:"#f0ede8", fontSize:15, outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:600,display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"Georgia,serif"}}>
@@ -838,12 +927,91 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
             </button>
           ))}
         </div>
-        {[{l:"Name",k:"name",t:"text"},{l:"Age",k:"age",t:"number"},{l:"Weight (kg)",k:"weight",t:"number"},{l:"Height (cm)",k:"height",t:"number"}].map(f=>(
+        {/* Edit profile — Name and Age */}
+        {[{l:"Name",k:"name",t:"text"},{l:"Age",k:"age",t:"number"}].map(f=>(
           <div key={f.k} style={{marginBottom:16}}>
             <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:7}}>{f.l}</div>
             <input type={f.t} value={form[f.k]} onChange={e=>set(f.k,e.target.value)} style={inp}/>
           </div>
         ))}
+
+        {/* Weight with kg/lbs toggle */}
+        <div style={{marginBottom:16}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase"}}>Weight</div>
+            <div style={{display:"flex",gap:4}}>
+              {["kg","lbs"].map(u=>(
+                <button key={u} onClick={()=>{
+                  const cur = parseFloat(form.weight)||0;
+                  if(u==="lbs" && form.weightUnit!=="lbs") set("weight", cur ? Math.round(cur*2.2046*10)/10 : "");
+                  if(u==="kg"  && form.weightUnit==="lbs") set("weight", cur ? Math.round(cur/2.2046*10)/10 : "");
+                  set("weightUnit",u);
+                }} style={{background:(form.weightUnit||"kg")===u?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700}}>
+                  {u}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{position:"relative"}}>
+            <input type="number" value={form.weight} onChange={e=>set("weight",e.target.value)}
+              placeholder={(form.weightUnit||"kg")==="lbs"?"e.g. 154":"e.g. 70"}
+              style={{...inp,paddingRight:50}}/>
+            <span style={{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>{form.weightUnit||"kg"}</span>
+          </div>
+        </div>
+
+        {/* Height with cm/ft toggle */}
+        <div style={{marginBottom:18}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+            <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase"}}>Height</div>
+            <div style={{display:"flex",gap:4}}>
+              {["cm","ft"].map(u=>(
+                <button key={u} onClick={()=>{
+                  const cur = parseFloat(form.height)||0;
+                  if(u==="ft" && (form.heightUnit||"cm")!=="ft") {
+                    const totalIn=cur/2.54;
+                    set("heightFt",Math.floor(totalIn/12)||"");
+                    set("heightIn",Math.round(totalIn%12)||"");
+                    set("height","");
+                  }
+                  if(u==="cm" && (form.heightUnit||"cm")==="ft") {
+                    const cm=Math.round(((parseFloat(form.heightFt)||0)*12+(parseFloat(form.heightIn)||0))*2.54);
+                    set("height",cm||"");
+                  }
+                  set("heightUnit",u);
+                }} style={{background:(form.heightUnit||"cm")===u?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700}}>
+                  {u==="ft"?"ft / in":"cm"}
+                </button>
+              ))}
+            </div>
+          </div>
+          {(form.heightUnit||"cm")==="ft" ? (
+            <div style={{display:"flex",gap:10}}>
+              <div style={{position:"relative",flex:1}}>
+                <input type="number" value={form.heightFt||""} onChange={e=>{
+                  set("heightFt",e.target.value);
+                  const cm=Math.round(((parseFloat(e.target.value)||0)*12+(parseFloat(form.heightIn)||0))*2.54);
+                  set("height",cm||"");
+                }} placeholder="5" style={{...inp,paddingRight:36}}/>
+                <span style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>ft</span>
+              </div>
+              <div style={{position:"relative",flex:1}}>
+                <input type="number" value={form.heightIn||""} onChange={e=>{
+                  set("heightIn",e.target.value);
+                  const cm=Math.round(((parseFloat(form.heightFt)||0)*12+(parseFloat(e.target.value)||0))*2.54);
+                  set("height",cm||"");
+                }} placeholder="9" style={{...inp,paddingRight:36}}/>
+                <span style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>in</span>
+              </div>
+            </div>
+          ) : (
+            <div style={{position:"relative"}}>
+              <input type="number" value={form.height} onChange={e=>set("height",e.target.value)}
+                placeholder="e.g. 170" style={{...inp,paddingRight:50}}/>
+              <span style={{position:"absolute",right:16,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.3)",fontSize:13}}>cm</span>
+            </div>
+          )}
+        </div>
         <div style={{marginBottom:18}}>
           <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:10}}>Goal</div>
           <div style={{display:"flex",gap:9}}>
@@ -1063,6 +1231,10 @@ export default function KhimFitness() {
   const [wTab, setWTab]         = useState("log");
   const [openSession, setOpenSess] = useState(null);
   const [drillEx, setDrillEx]       = useState(null);
+  const [timerSecs, setTimerSecs]   = useState(0);
+  const [timerRunning, setTimerRun] = useState(false);
+  const [restSecs, setRestSecs]     = useState(0);
+  const [restRunning, setRestRun]   = useState(false);
   const [completedSets, setCS]  = useState({});
   const [workoutRecords, setWRec] = useState({});
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -1105,6 +1277,42 @@ export default function KhimFitness() {
     sd(profile.id, {...ld(profile.id), ...data, workoutRecords, completedSets});
   }, [data, workoutRecords, completedSets, profile&&profile.id]);
 
+  // ── Session stopwatch ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (!timerRunning) return;
+    const id = setInterval(() => setTimerSecs(s => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [timerRunning]);
+
+  // ── Rest countdown ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!restRunning) return;
+    if (restSecs <= 0) { setRestRun(false); return; }
+    const id = setInterval(() => setRestSecs(s => {
+      if (s <= 1) { setRestRun(false); return 0; }
+      return s - 1;
+    }), 1000);
+    return () => clearInterval(id);
+  }, [restRunning, restSecs]);
+
+  // Reset timer when session closes
+  useEffect(() => {
+    if (!openSession) { setTimerSecs(0); setTimerRun(false); setRestSecs(0); setRestRun(false); }
+    else { setTimerSecs(0); setTimerRun(true); } // auto-start on session open
+  }, [openSession]);
+
+  const fmtTime = (s) => {
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    return h > 0
+      ? `${h}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`
+      : `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+  };
+
+  const startRest = (restStr) => {
+    const secs = restStr==="--" ? 0 : parseInt(restStr)*( restStr.includes("min") ? 60 : 1 );
+    if (secs > 0) { setRestSecs(secs); setRestRun(true); }
+  };
+
   const toast_ = (msg, color="#1a7a4a") => { setToast({msg,color}); setTimeout(()=>setToast(null),2500); };
   if (!profile) return <Onboarding onComplete={p=>{ setProfile(p); setTab("home"); }}/>;
 
@@ -1139,7 +1347,13 @@ export default function KhimFitness() {
     toast_(plan.icon+" "+sess.name+" logged!", plan.color);
   };
 
-  const toggleSet = (key) => setCS(prev=>({...prev,[key]:!prev[key]}));
+  const toggleSet = (key, restStr) => {
+    setCS(prev => {
+      const nowDone = !prev[key];
+      if (nowDone && restStr && restStr !== "--") startRest(restStr);
+      return {...prev, [key]: nowDone};
+    });
+  };
 
   const weekStats = DAYS.map((d,i)=>{ const dt=new Date(); dt.setDate(dt.getDate()-(6-i)); const k=fmt(dt); const ms=log[k]||[]; const ws=workoutLog[k]||[]; return {day:d,cals:ms.reduce((s,m)=>s+m.calories,0),burned:ws.reduce((s,w)=>s+w.calories,0),w:weightLog[k]||null}; });
   const maxCals   = Math.max(...weekStats.map(s=>s.cals),calGoal,1);
@@ -1359,10 +1573,16 @@ export default function KhimFitness() {
 
       {/* Weight logger */}
       <div className="bento-card" style={{background:"rgba(79,195,161,0.06)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"14px 18px",animationDelay:"0.2s"}}>
-        <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4fc3a1",marginBottom:10}}>LOG WEIGHT</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4fc3a1"}}>LOG WEIGHT</div>
+          <span style={{fontSize:10,color:"rgba(240,237,232,0.3)",letterSpacing:1}}>stored in kg</span>
+        </div>
         <div style={{display:"flex",gap:8}}>
-          <input type="number" placeholder={"e.g. "+(profile.weight||"70")+" kg"} value={weightInput} onChange={e=>setWI(e.target.value)}
-            style={{flex:1,background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"10px 14px",color:"#f0ede8",fontSize:14,outline:"none",fontFamily:BODY_FONT}}/>
+          <div style={{position:"relative",flex:1}}>
+            <input type="number" placeholder={"e.g. "+(profile.weight||"70")} value={weightInput} onChange={e=>setWI(e.target.value)}
+              style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"10px 44px 10px 14px",color:"#f0ede8",fontSize:14,outline:"none",fontFamily:BODY_FONT}}/>
+            <span style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.35)",fontSize:12}}>kg</span>
+          </div>
           <button onClick={saveWt} style={{background:"#e05c2a",border:"none",borderRadius:10,padding:"10px 18px",color:"#fff",cursor:"pointer",fontWeight:800,fontSize:13,flexShrink:0,fontFamily:SPORT_FONT,letterSpacing:1}}>SAVE</button>
         </div>
         {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4fc3a1",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
@@ -1392,6 +1612,63 @@ export default function KhimFitness() {
       return (
         <div>
           {drillEx && <ExerciseDrillModal exercise={drillEx} onClose={()=>setDrillEx(null)}/>}
+
+          {/* ── Sticky Live Timer Bar ── */}
+          <div style={{
+            position:"sticky", top:0, zIndex:100,
+            background:"linear-gradient(135deg,#141820,#0f1318)",
+            border:"1px solid rgba(255,255,255,0.08)",
+            borderRadius:16, padding:"12px 18px", marginBottom:16,
+            display:"flex", alignItems:"center", justifyContent:"space-between", gap:12,
+            boxShadow:"0 4px 24px rgba(0,0,0,0.5)",
+          }}>
+            {/* Elapsed time */}
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{
+                width:40, height:40, borderRadius:12,
+                background: timerRunning ? "rgba(224,92,42,0.2)" : "rgba(255,255,255,0.06)",
+                border:`1px solid ${timerRunning ? "#e05c2a88" : "rgba(255,255,255,0.1)"}`,
+                display:"flex", alignItems:"center", justifyContent:"center", fontSize:18,
+                animation: timerRunning ? "pulse 2s ease-in-out infinite" : "none",
+              }}>⏱</div>
+              <div>
+                <div style={{fontFamily:SPORT_FONT,fontSize:26,letterSpacing:2,color:timerRunning?"#e05c2a":"rgba(240,237,232,0.5)",lineHeight:1}}>
+                  {fmtTime(timerSecs)}
+                </div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:1,marginTop:2}}>
+                  {timerRunning ? "SESSION RUNNING" : "PAUSED"}
+                </div>
+              </div>
+            </div>
+
+            {/* Rest countdown (shown when active) */}
+            {restRunning && (
+              <div style={{
+                background:"rgba(74,158,255,0.15)", border:"1px solid rgba(74,158,255,0.4)",
+                borderRadius:12, padding:"8px 14px", textAlign:"center", animation:"pulse 1s ease-in-out infinite",
+              }}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:22,color:"#4a9eff",letterSpacing:1,lineHeight:1}}>{fmtTime(restSecs)}</div>
+                <div style={{fontSize:9,color:"#4a9eff",letterSpacing:1,marginTop:2}}>REST</div>
+              </div>
+            )}
+
+            {/* Controls */}
+            <div style={{display:"flex",gap:8,flexShrink:0}}>
+              <button onClick={()=>setTimerRun(r=>!r)} style={{
+                background: timerRunning ? "rgba(224,92,42,0.2)" : "rgba(16,185,129,0.2)",
+                border:`1px solid ${timerRunning ? "#e05c2a66" : "#10B98166"}`,
+                borderRadius:10, padding:"8px 14px", cursor:"pointer",
+                fontFamily:SPORT_FONT, fontSize:12, letterSpacing:1,
+                color: timerRunning ? "#e05c2a" : "#10B981",
+              }}>
+                {timerRunning ? "⏸ PAUSE" : "▶ START"}
+              </button>
+              <button onClick={()=>{setTimerSecs(0); setTimerRun(false); setRestSecs(0); setRestRun(false);}} style={{
+                background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)",
+                borderRadius:10, padding:"8px 10px", cursor:"pointer", fontSize:13, color:"rgba(240,237,232,0.4)",
+              }}>↺</button>
+            </div>
+          </div>
           <button onClick={()=>setOpenSess(null)} style={{background:"rgba(224,92,42,0.1)",border:"none",borderLeft:"3px solid #e05c2a",borderRadius:10,color:"#e05c2a",cursor:"pointer",fontSize:14,padding:"10px 18px",marginBottom:18,display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontFamily:"Georgia"}}>&#8592; Back to {plan.title}</button>
           <div style={{background:plan.bgColor,border:"1px solid "+plan.borderColor,borderRadius:20,padding:"20px 22px",marginBottom:20}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:10}}>
@@ -1449,7 +1726,7 @@ export default function KhimFitness() {
                       {Array.from({length:ex.sets}).map((_,si)=>{
                         const key=plan.id+"-"+openSession.idx+"-"+ei+"-"+si;
                         return (
-                          <button key={si} onClick={()=>toggleSet(key)}
+                          <button key={si} onClick={()=>toggleSet(key, ex.rest)}
                             style={{width:36,height:36,borderRadius:10,
                               background:completedSets[key]?ac:"rgba(255,255,255,0.07)",
                               border:"none",
@@ -1477,9 +1754,28 @@ export default function KhimFitness() {
               <div style={{fontSize:13,color:"rgba(240,237,232,0.7)",lineHeight:1.6}}>{sess.tip}</div>
             </div>
           </div>
-          <button onClick={()=>{ if(!alreadyLogged) logPlanSession(plan,sess); }} disabled={alreadyLogged}
+          {/* Session summary before log */}
+          {!alreadyLogged && timerSecs > 0 && (
+            <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 18px",marginBottom:12,display:"flex",justifyContent:"space-around"}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#e05c2a",letterSpacing:1}}>{fmtTime(timerSecs)}</div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>TIME ELAPSED</div>
+              </div>
+              <div style={{width:1,background:"rgba(255,255,255,0.07)"}}/>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#10B981",letterSpacing:1}}>~{sess.calories}</div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>KCAL BURNED</div>
+              </div>
+              <div style={{width:1,background:"rgba(255,255,255,0.07)"}}/>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#4a9eff",letterSpacing:1}}>{sess.exercises.length}</div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>EXERCISES</div>
+              </div>
+            </div>
+          )}
+          <button onClick={()=>{ if(!alreadyLogged){ setTimerRun(false); logPlanSession(plan,sess); }}} disabled={alreadyLogged}
             style={{width:"100%",background:alreadyLogged?"rgba(255,255,255,0.06)":plan.color,border:"none",borderRadius:16,padding:"16px",color:alreadyLogged?"rgba(240,237,232,0.3)":"#fff",fontWeight:900,fontSize:16,cursor:alreadyLogged?"default":"pointer",marginBottom:16}}>
-            {alreadyLogged?"Session Already Logged Today":plan.icon+" Log This Session (+"+sess.calories+" kcal burned)"}
+            {alreadyLogged?"✅ Session Already Logged Today":plan.icon+" Log This Session (+"+sess.calories+" kcal burned)"}
           </button>
         </div>
       );
