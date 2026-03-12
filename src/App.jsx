@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 const SPORT_FONT = "'Bebas Neue', 'Impact', sans-serif";
 const BODY_FONT  = "Georgia, 'Times New Roman', serif";
 
 // Inject Google Fonts + global CSS animations once
 const injectStyles = () => {
-  if (document.getElementById("khimfit-styles")) return;
+  if (document.getElementById("jhimfit-styles")) return;
   const el = document.createElement("style");
-  el.id = "khimfit-styles";
+  el.id = "jhimfit-styles";
   el.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;800&display=swap');
     @keyframes dropFill  { from{transform:scaleY(0);opacity:0} to{transform:scaleY(1);opacity:1} }
@@ -159,13 +160,13 @@ const GHANAIAN_MEALS = [
   { id:8,  name:"Milk & Cereal",              category:"Breakfast", calories:260, protein:8,  carbs:46, fat:5,  emoji:"🥛", description:"Any cereal of choice served with cold or warm milk - fast and nutritious", benefits:["Fortified vitamins","Quick prep","Good for kids"], color:"#a0522d" },
 
   // LUNCH
-  { id:9,  name:"Rice & Chicken Stew",        category:"Lunch",     calories:480, protein:28, carbs:58, fat:13, emoji:"🍗", description:"Steamed white rice with a rich tomato and chicken stew - a universal favourite", benefits:["High protein","Balanced meal","Widely available"], color:"#e05c2a" },
+  { id:9,  name:"Rice & Chicken Stew",        category:"Lunch",     calories:480, protein:28, carbs:58, fat:13, emoji:"🍗", description:"Steamed white rice with a rich tomato and chicken stew - a universal favourite", benefits:["High protein","Balanced meal","Widely available"], color:"#C9A84C" },
   { id:10, name:"Jollof Rice",                category:"Lunch",     calories:420, protein:12, carbs:68, fat:11, emoji:"🍚", description:"Smoky one-pot tomato rice cooked with spices - one of West Africa's best dishes", benefits:["High energy","Lycopene rich","Crowd pleaser"], color:"#cc4e1a" },
   { id:11, name:"Rice & Beans",               category:"Lunch",     calories:380, protein:16, carbs:62, fat:7,  emoji:"🫘", description:"White rice cooked or served alongside seasoned black-eyed beans or kidney beans", benefits:["Complete protein","High fibre","Very affordable"], color:"#8b4513" },
   { id:12, name:"Fried Rice & Sausage",       category:"Lunch",     calories:460, protein:18, carbs:56, fat:16, emoji:"🥘", description:"Stir-fried rice with vegetables, eggs and sliced sausage", benefits:["Balanced macros","Tasty","Easy to make"], color:"#b5700a" },
   { id:13, name:"Boiled Yam & Sauce",         category:"Lunch",     calories:340, protein:10, carbs:58, fat:9,  emoji:"🍠", description:"Chunks of boiled yam served with tomato stew or palava sauce", benefits:["Complex carbs","Filling","Affordable"], color:"#c4860a" },
   { id:14, name:"Noodles & Egg",              category:"Lunch",     calories:360, protein:14, carbs:52, fat:10, emoji:"🍜", description:"Instant noodles cooked with egg, vegetables and seasoning - a quick go-to meal", benefits:["Fast prep","Budget friendly","Filling"], color:"#e09020" },
-  { id:15, name:"Banku & Tilapia",            category:"Lunch",     calories:510, protein:38, carbs:52, fat:14, emoji:"🐟", description:"Fermented corn and cassava dumpling served with grilled tilapia and pepper", benefits:["High protein","Omega-3","Traditional"], color:"#1a7a4a" },
+  { id:15, name:"Banku & Tilapia",            category:"Lunch",     calories:510, protein:38, carbs:52, fat:14, emoji:"🐟", description:"Fermented corn and cassava dumpling served with grilled tilapia and pepper", benefits:["High protein","Omega-3","Traditional"], color:"#1a6e5a" },
   { id:16, name:"Waakye",                     category:"Lunch",     calories:380, protein:14, carbs:62, fat:8,  emoji:"🌿", description:"Rice and beans cooked together with sorghum leaves, served with stew and sides", benefits:["Complete protein","High fibre","Street food classic"], color:"#5a7a2a" },
   { id:17, name:"Bread & Sardines",           category:"Lunch",     calories:330, protein:20, carbs:32, fat:12, emoji:"🥫", description:"Sliced bread stuffed with canned sardines, tomato, onion and pepper", benefits:["High protein","Omega-3","Very affordable"], color:"#2d6a7a" },
   { id:18, name:"Kenkey & Fried Fish",        category:"Lunch",     calories:480, protein:32, carbs:58, fat:13, emoji:"🌽", description:"Fermented corn dumpling with crispy fried fish and a spicy pepper sauce", benefits:["High protein","Probiotic","Filling"], color:"#e09020" },
@@ -173,14 +174,14 @@ const GHANAIAN_MEALS = [
   // DINNER
   { id:19, name:"Fufu & Light Soup",          category:"Dinner",    calories:460, protein:24, carbs:62, fat:12, emoji:"🍲", description:"Pounded cassava and plantain served in a light chicken or fish soup with vegetables", benefits:["High energy","Digestive aid","Traditional"], color:"#2d7a5a" },
   { id:20, name:"Rice & Egg Stew",            category:"Dinner",    calories:390, protein:16, carbs:58, fat:10, emoji:"🍛", description:"White rice with a simple tomato and egg stew - cheap, fast and delicious", benefits:["Balanced","Budget friendly","Easy"], color:"#cc4e1a" },
-  { id:21, name:"Spaghetti & Sauce",          category:"Dinner",    calories:420, protein:14, carbs:64, fat:10, emoji:"🍝", description:"Boiled spaghetti in a tomato-based sauce with vegetables and optional meat", benefits:["Energy dense","Affordable","Easy to cook"], color:"#e05c2a" },
+  { id:21, name:"Spaghetti & Sauce",          category:"Dinner",    calories:420, protein:14, carbs:64, fat:10, emoji:"🍝", description:"Boiled spaghetti in a tomato-based sauce with vegetables and optional meat", benefits:["Energy dense","Affordable","Easy to cook"], color:"#C9A84C" },
   { id:22, name:"Kontomire Stew & Rice",      category:"Dinner",    calories:350, protein:18, carbs:48, fat:14, emoji:"🥬", description:"Cocoyam leaves cooked in palm oil with smoked fish and tomatoes, served over rice", benefits:["High iron","Vitamin A","Antioxidants"], color:"#2d6a2d" },
   { id:23, name:"Grilled Chicken & Veggies",  category:"Dinner",    calories:370, protein:38, carbs:18, fat:14, emoji:"🍗", description:"Seasoned grilled chicken thighs or breast served with boiled or stir-fried vegetables", benefits:["Very high protein","Low carb","Clean eating"], color:"#b5700a" },
   { id:24, name:"Groundnut Soup & Rice Balls",category:"Dinner",    calories:460, protein:22, carbs:58, fat:16, emoji:"🥜", description:"Thick creamy groundnut soup with chicken served with soft rice balls (omotuo)", benefits:["Healthy fats","High protein","Filling"], color:"#b5541e" },
   { id:25, name:"Beans Stew & Plantain",      category:"Dinner",    calories:410, protein:14, carbs:66, fat:10, emoji:"🍌", description:"Spicy black-eyed bean stew served alongside fried or boiled ripe plantain", benefits:["Plant protein","High fibre","Potassium rich"], color:"#3a6a3a" },
   { id:26, name:"Chicken Peanut Stew & Rice", category:"Dinner",    calories:440, protein:34, carbs:32, fat:18, emoji:"🍲", description:"Tender chicken simmered in a thick peanut-based sauce, served with rice", benefits:["High protein","Healthy fats","Vitamin B6"], color:"#b5700a" },
   { id:27, name:"Egg Fried Rice",             category:"Dinner",    calories:400, protein:15, carbs:58, fat:12, emoji:"🍳", description:"Leftover rice stir-fried with eggs, spring onions, vegetables and soy sauce", benefits:["Uses leftovers","Budget friendly","Balanced"], color:"#a06020" },
-  { id:28, name:"Boiled Plantain & Beans",    category:"Dinner",    calories:370, protein:12, carbs:64, fat:7,  emoji:"🫘", description:"Soft boiled plantain served alongside seasoned beans - a simple wholesome dinner", benefits:["High fibre","Plant protein","Affordable"], color:"#1a7a4a" },
+  { id:28, name:"Boiled Plantain & Beans",    category:"Dinner",    calories:370, protein:12, carbs:64, fat:7,  emoji:"🫘", description:"Soft boiled plantain served alongside seasoned beans - a simple wholesome dinner", benefits:["High fibre","Plant protein","Affordable"], color:"#1a6e5a" },
 
   // SNACKS
   { id:29, name:"Boiled Groundnuts",          category:"Snack",     calories:160, protein:7,  carbs:12, fat:11, emoji:"🥜", description:"Soft boiled peanuts with a pinch of salt - easy and filling on the go", benefits:["Plant protein","Healthy fats","Affordable"], color:"#a06020" },
@@ -276,7 +277,9 @@ const EXERCISE_VIDEOS = {
 const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
   const videoId = EXERCISE_VIDEOS[exercise.move];
 
-  return (
+  // Render into document.body via Portal — completely outside the
+  // WorkoutContent tree so timer ticks NEVER cause this to re-render
+  return createPortal(
     <div onClick={onClose} style={{
       position:"fixed", inset:0, zIndex:9999,
       background:"rgba(0,0,0,0.88)",
@@ -285,7 +288,7 @@ const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
       padding:20, backdropFilter:"blur(6px)",
     }}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:"#141820",
+        background:"#0d1320",
         border:"1px solid rgba(255,255,255,0.1)",
         borderRadius:24, overflow:"hidden",
         width:"100%", maxWidth:480,
@@ -293,7 +296,7 @@ const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
       }}>
         {/* Header */}
         <div style={{
-          background:"linear-gradient(135deg,#1a1f2e,#0f1318)",
+          background:"linear-gradient(135deg,#111827,#090d16)",
           borderBottom:"1px solid rgba(255,255,255,0.07)",
           padding:"16px 20px",
           display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -338,21 +341,22 @@ const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
             {exercise.desc}
           </div>
           <button onClick={onClose} style={{
-            width:"100%", background:"#e05c2a", border:"none",
+            width:"100%", background:"#C9A84C", border:"none",
             borderRadius:12, padding:"12px 0",
             fontFamily:"'Bebas Neue',Impact,sans-serif",
             fontSize:15, letterSpacing:2, color:"white", cursor:"pointer",
           }}>GOT IT — START EXERCISE</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 });
 
 const WORKOUT_PLANS = [
   {
-    id:"lose", title:"Lose Weight", icon:"🔥", color:"#e05c2a",
-    bgColor:"rgba(224,92,42,0.08)", borderColor:"rgba(224,92,42,0.3)",
+    id:"lose", title:"Lose Weight", icon:"🔥", color:"#C9A84C",
+    bgColor:"rgba(201,168,76,0.08)", borderColor:"rgba(201,168,76,0.3)",
     subtitle:"High-intensity fat-burning programme", duration:"8 Weeks", frequency:"4 days/week",
     about:"This programme is designed to help you burn body fat through a mix of high-intensity cardio and full-body exercises. You do not need a gym - most sessions can be done at home with no equipment. The goal is to keep your heart rate high, burn lots of calories, and build a habit of moving 4 days every week.",
     howItWorks:"Each week you do 4 sessions on Monday, Wednesday, Friday and Saturday. The sessions alternate between intense cardio days and lighter full-body days so your body gets time to recover. Over 8 weeks your fitness will improve and your body will get better at burning fat even at rest.",
@@ -417,7 +421,7 @@ const WORKOUT_PLANS = [
     ],
   },
   {
-    id:"gain", title:"Build Muscle", icon:"💪", color:"#1a7a4a",
+    id:"gain", title:"Build Muscle", icon:"💪", color:"#1a6e5a",
     bgColor:"rgba(26,122,74,0.08)", borderColor:"rgba(26,122,74,0.3)",
     subtitle:"Progressive overload strength training", duration:"12 Weeks", frequency:"4 days/week",
     about:"This programme is built around lifting weights and getting stronger every week. Each session targets a specific muscle group so each muscle gets enough rest before being trained again. Over 12 weeks you will see noticeable increases in strength, muscle size and body shape. You will need access to a gym or basic weights.",
@@ -503,7 +507,7 @@ const SPIRIT_ANIMALS = [
   { id:"owl",        name:"Wise Owl",    emoji:"🦉", element:"🌙", trait:"Wellness",   color:"#4A9EFF", bg:"rgba(74,158,255,0.15)", goal:"maintain", desc:"Balance, recovery & longevity. The long game." },
   { id:"panther",    name:"Panther",     emoji:"🐆", element:"⚡", trait:"Agility",    color:"#F59E0B", bg:"rgba(245,158,11,0.15)", goal:"lose",     desc:"Explosive speed & precision. Always hunting." },
   { id:"bear",       name:"Bear",        emoji:"🐻", element:"🌲", trait:"Resilience", color:"#EF4444", bg:"rgba(239,68,68,0.15)",  goal:"gain",     desc:"Endure anything. Come back stronger every time." },
-  { id:"eagle",      name:"Eagle",       emoji:"🦅", element:"☀️", trait:"Vision",     color:"#E05C2A", bg:"rgba(224,92,42,0.15)", goal:"maintain", desc:"See the bigger picture. Discipline above all." },
+  { id:"eagle",      name:"Eagle",       emoji:"🦅", element:"☀️", trait:"Vision",     color:"#E05C2A", bg:"rgba(201,168,76,0.15)", goal:"maintain", desc:"See the bigger picture. Discipline above all." },
   { id:"wolf",       name:"Wolf",        emoji:"🐺", element:"🌕", trait:"Pack",       color:"#6366F1", bg:"rgba(99,102,241,0.15)", goal:"gain",     desc:"Strength through consistency. Run with purpose." },
   { id:"dolphin",    name:"Dolphin",     emoji:"🐬", element:"🌊", trait:"Flow",       color:"#06B6D4", bg:"rgba(6,182,212,0.15)",  goal:"maintain", desc:"Effortless movement & mental clarity." },
 ];
@@ -645,7 +649,7 @@ const LevelBadge = ({ level, xpInLevel, xpToNext, color }) => (
       display:"flex", alignItems:"center", justifyContent:"center",
       position:"relative",
     }}>
-      <div style={{width:24,height:24,borderRadius:"50%",background:"#141820",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{width:24,height:24,borderRadius:"50%",background:"#0d1320",display:"flex",alignItems:"center",justifyContent:"center"}}>
         <span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:11,color,lineHeight:1}}>{level}</span>
       </div>
     </div>
@@ -672,8 +676,8 @@ function calcCalGoal(p) {
   return Math.round(base*(actMap[activity]||1.375)) + ((GOALS.find(g=>g.id===goal)||{calAdj:0}).calAdj||0);
 }
 
-const PK    = "khimfit_profiles_v4";
-const SK    = "khimfit_session";
+const PK    = "jhimfit_profiles_v4";
+const SK    = "jhimfit_session";
 const lp    = () => { try { return JSON.parse(localStorage.getItem(PK)||"{}"); } catch { return {}; } };
 const sp    = (v) => localStorage.setItem(PK, JSON.stringify(v));
 const ld    = (uid) => { try { return JSON.parse(localStorage.getItem("kfd_"+uid)||"{}"); } catch { return {}; } };
@@ -708,8 +712,8 @@ function Onboarding({ onComplete }) {
         <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="bgGrad" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#e05c2a"/>
-              <stop offset="100%" stopColor="#1a7a4a"/>
+              <stop offset="0%" stopColor="#C9A84C"/>
+              <stop offset="100%" stopColor="#1a6e5a"/>
             </linearGradient>
             <linearGradient id="shineGrad" x1="0" y1="0" x2="0" y2="96" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor="rgba(255,255,255,0.18)"/>
@@ -723,7 +727,7 @@ function Onboarding({ onComplete }) {
           <text x="72" y="30" textAnchor="middle" fontSize="18">🔥</text>
         </svg>
       </div>
-      <div style={{fontSize:36,fontWeight:900,letterSpacing:-1.5,marginBottom:8}}>Khim<span style={{color:"#e05c2a"}}>Fit</span></div>
+      <div style={{fontSize:36,fontWeight:900,letterSpacing:-1.5,marginBottom:8}}>Khim<span style={{color:"#C9A84C"}}>Fit</span></div>
       <div style={{fontSize:15,color:"rgba(240,237,232,0.5)",lineHeight:1.8,marginBottom:36}}>Your personal Ghanaian fitness and nutrition tracker</div>
       {existing.length > 0 && <>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:14}}>Existing Profiles</div>
@@ -731,12 +735,12 @@ function Onboarding({ onComplete }) {
           <button key={p.id} onClick={()=>onComplete(p)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:16,padding:"14px 20px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:16,color:"#f0ede8",textAlign:"left"}}>
             <span style={{fontSize:34}}>{p.avatar}</span>
             <div style={{flex:1}}><div style={{fontWeight:800,fontSize:17}}>{p.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>{(GOALS.find(g=>g.id===p.goal)||{label:""}).label} - {p.calorieGoal} kcal/day</div></div>
-            <span style={{color:"#e05c2a",fontSize:22}}>&#x2192;</span>
+            <span style={{color:"#C9A84C",fontSize:22}}>&#x2192;</span>
           </button>
         ))}
         <div style={{color:"rgba(240,237,232,0.25)",fontSize:13,margin:"14px 0"}}>or create a new profile</div>
       </>}
-      <button onClick={()=>setStep(1)} style={{width:"100%",background:"#e05c2a",border:"none",borderRadius:16,padding:"17px",color:"#fff",fontWeight:900,fontSize:17,cursor:"pointer"}}>{existing.length>0?"+ New Profile":"Get Started"}</button>
+      <button onClick={()=>setStep(1)} style={{width:"100%",background:"#C9A84C",border:"none",borderRadius:16,padding:"17px",color:"#fff",fontWeight:900,fontSize:17,cursor:"pointer"}}>{existing.length>0?"+ New Profile":"Get Started"}</button>
     </div>,
 
     <div key="n">
@@ -745,9 +749,9 @@ function Onboarding({ onComplete }) {
       <input value={form.name} onChange={e=>set("name",e.target.value)} placeholder="Your name" style={{...inp,fontSize:22,fontWeight:900,marginBottom:26}}/>
       <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:12}}>Choose your avatar</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:9,marginBottom:30}}>
-        {AVATARS.map(a=><button key={a} onClick={()=>set("avatar",a)} style={{background:form.avatar===a?"rgba(224,92,42,0.3)":"rgba(255,255,255,0.05)",border:"2px solid "+(form.avatar===a?"#e05c2a":"transparent"),borderRadius:13,padding:"11px 0",fontSize:28,cursor:"pointer"}}>{a}</button>)}
+        {AVATARS.map(a=><button key={a} onClick={()=>set("avatar",a)} style={{background:form.avatar===a?"rgba(201,168,76,0.3)":"rgba(255,255,255,0.05)",border:"2px solid "+(form.avatar===a?"#C9A84C":"transparent"),borderRadius:13,padding:"11px 0",fontSize:28,cursor:"pointer"}}>{a}</button>)}
       </div>
-      <button disabled={!form.name.trim()} onClick={()=>setStep(2)} style={{width:"100%",background:form.name.trim()?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:14,padding:"16px",color:form.name.trim()?"#fff":"rgba(255,255,255,0.25)",fontWeight:800,fontSize:16,cursor:form.name.trim()?"pointer":"default"}}>Continue</button>
+      <button disabled={!form.name.trim()} onClick={()=>setStep(2)} style={{width:"100%",background:form.name.trim()?"#C9A84C":"rgba(255,255,255,0.08)",border:"none",borderRadius:14,padding:"16px",color:form.name.trim()?"#fff":"rgba(255,255,255,0.25)",fontWeight:800,fontSize:16,cursor:form.name.trim()?"pointer":"default"}}>Continue</button>
     </div>,
 
     <div key="s">
@@ -773,7 +777,7 @@ function Onboarding({ onComplete }) {
                 if(u==="lbs" && form.weightUnit!=="lbs") set("weight", cur ? Math.round(cur*2.2046*10)/10 : "");
                 if(u==="kg"  && form.weightUnit==="lbs") set("weight", cur ? Math.round(cur/2.2046*10)/10 : "");
                 set("weightUnit",u);
-              }} style={{background:form.weightUnit===u||(!form.weightUnit&&u==="kg")?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700,letterSpacing:0.5}}>
+              }} style={{background:form.weightUnit===u||(!form.weightUnit&&u==="kg")?"#C9A84C":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700,letterSpacing:0.5}}>
                 {u}
               </button>
             ))}
@@ -806,7 +810,7 @@ function Onboarding({ onComplete }) {
                   set("height", cm||"");
                 }
                 set("heightUnit",u);
-              }} style={{background:form.heightUnit===u||(!form.heightUnit&&u==="cm")?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700,letterSpacing:0.5}}>
+              }} style={{background:form.heightUnit===u||(!form.heightUnit&&u==="cm")?"#C9A84C":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700,letterSpacing:0.5}}>
                 {u==="ft"?"ft / in":"cm"}
               </button>
             ))}
@@ -845,10 +849,10 @@ function Onboarding({ onComplete }) {
       <div style={{marginBottom:22}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:10}}>Sex</div>
         <div style={{display:"flex",gap:10}}>
-          {["male","female"].map(s=><button key={s} onClick={()=>set("sex",s)} style={{flex:1,background:form.sex===s?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.05)",border:"1px solid "+(form.sex===s?"#e05c2a":"rgba(255,255,255,0.1)"),borderRadius:13,padding:"13px",color:form.sex===s?"#e05c2a":"rgba(240,237,232,0.5)",cursor:"pointer",fontSize:15}}>{s==="male"?"Male":"Female"}</button>)}
+          {["male","female"].map(s=><button key={s} onClick={()=>set("sex",s)} style={{flex:1,background:form.sex===s?"rgba(201,168,76,0.2)":"rgba(255,255,255,0.05)",border:"1px solid "+(form.sex===s?"#C9A84C":"rgba(255,255,255,0.1)"),borderRadius:13,padding:"13px",color:form.sex===s?"#C9A84C":"rgba(240,237,232,0.5)",cursor:"pointer",fontSize:15}}>{s==="male"?"Male":"Female"}</button>)}
         </div>
       </div>
-      <button onClick={()=>setStep(3)} style={{width:"100%",background:"#e05c2a",border:"none",borderRadius:14,padding:"16px",color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer"}}>Continue</button>
+      <button onClick={()=>setStep(3)} style={{width:"100%",background:"#C9A84C",border:"none",borderRadius:14,padding:"16px",color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer"}}>Continue</button>
     </div>,
 
     <div key="g">
@@ -856,7 +860,7 @@ function Onboarding({ onComplete }) {
       <div style={{fontSize:14,color:"rgba(240,237,232,0.45)",marginBottom:22}}>Fine-tune your daily calorie target</div>
       <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:11}}>Activity Level</div>
       {[{id:"sedentary",l:"Sedentary",d:"Little or no exercise"},{id:"light",l:"Lightly Active",d:"1-3 days/week"},{id:"moderate",l:"Moderately Active",d:"3-5 days/week"},{id:"active",l:"Very Active",d:"6-7 days/week"}].map(a=>(
-        <button key={a.id} onClick={()=>set("activity",a.id)} style={{width:"100%",background:form.activity===a.id?"rgba(224,92,42,0.15)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.activity===a.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:13,padding:"12px 16px",marginBottom:9,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",color:"#f0ede8"}}>
+        <button key={a.id} onClick={()=>set("activity",a.id)} style={{width:"100%",background:form.activity===a.id?"rgba(201,168,76,0.15)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.activity===a.id?"#C9A84C":"rgba(255,255,255,0.08)"),borderRadius:13,padding:"12px 16px",marginBottom:9,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",color:"#f0ede8"}}>
           <span style={{fontWeight:700,fontSize:14}}>{a.l}</span><span style={{fontSize:12,color:"rgba(240,237,232,0.4)"}}>{a.d}</span>
         </button>
       ))}
@@ -866,33 +870,33 @@ function Onboarding({ onComplete }) {
           const suggested = SPIRIT_ANIMALS.find(a=>a.goal===g.id);
           return (
             <button key={g.id} onClick={()=>{ set("goal",g.id); if(!form.spiritAnimal) set("avatar",(suggested&&suggested.id)||"eagle"); }}
-              style={{background:form.goal===g.id?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.goal===g.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:15,padding:"16px 8px",cursor:"pointer",textAlign:"center"}}>
+              style={{background:form.goal===g.id?"rgba(201,168,76,0.2)":"rgba(255,255,255,0.0)",border:"1px solid "+(form.goal===g.id?"#C9A84C":"rgba(255,255,255,0.08)"),borderRadius:15,padding:"16px 8px",cursor:"pointer",textAlign:"center"}}>
               <div style={{fontSize:28,marginBottom:6}}>{g.icon}</div>
-              <div style={{fontSize:12,fontWeight:700,color:form.goal===g.id?"#e05c2a":"#f0ede8"}}>{g.label}</div>
+              <div style={{fontSize:12,fontWeight:700,color:form.goal===g.id?"#C9A84C":"#f0ede8"}}>{g.label}</div>
               {suggested&&<div style={{fontSize:9,color:suggested.color,marginTop:4,fontWeight:700,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:0.5}}>{suggested.emoji} {suggested.trait}</div>}
             </button>
           );
         })}
       </div>
-      <div style={{background:"rgba(224,92,42,0.1)",borderLeft:"3px solid #e05c2a",borderRadius:14,padding:"14px 18px",marginBottom:22,textAlign:"center"}}>
+      <div style={{background:"rgba(201,168,76,0.1)",borderLeft:"3px solid #C9A84C",borderRadius:14,padding:"14px 18px",marginBottom:22,textAlign:"center"}}>
         <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginBottom:4}}>YOUR ESTIMATED DAILY CALORIE GOAL</div>
-        <div style={{fontSize:30,fontWeight:900,color:"#e05c2a"}}>{calcCalGoal(form)} <span style={{fontSize:15,fontWeight:400}}>kcal</span></div>
+        <div style={{fontSize:30,fontWeight:900,color:"#C9A84C"}}>{calcCalGoal(form)} <span style={{fontSize:15,fontWeight:400}}>kcal</span></div>
       </div>
-      <button onClick={finish} style={{width:"100%",background:"#e05c2a",border:"none",borderRadius:16,padding:"18px",color:"#fff",fontWeight:900,fontSize:18,cursor:"pointer"}}>Start My Journey</button>
+      <button onClick={finish} style={{width:"100%",background:"#C9A84C",border:"none",borderRadius:16,padding:"18px",color:"#fff",fontWeight:900,fontSize:18,cursor:"pointer"}}>Start My Journey</button>
     </div>
   ];
 
   return (
-    <div style={{minHeight:"100vh",background:"#0d1117",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"Georgia,serif",color:"#f0ede8"}}>
+    <div style={{minHeight:"100vh",background:"#0a0f1e",display:"flex",alignItems:"center",justifyContent:"center",padding:"24px",fontFamily:"Georgia,serif",color:"#f0ede8"}}>
       <div style={{width:"100%",maxWidth:480}}>
         {step>0 && (
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:30}}>
             <button onClick={()=>setStep(s=>s-1)} style={{background:"none",border:"none",color:"rgba(240,237,232,0.4)",cursor:"pointer",fontSize:14,padding:0}}>Back</button>
-            <div style={{display:"flex",gap:6}}>{[1,2,3].map(i=><div key={i} style={{width:i===step?24:8,height:8,borderRadius:4,background:i<=step?"#e05c2a":"rgba(255,255,255,0.1)",transition:"all 0.3s"}}/>)}</div>
+            <div style={{display:"flex",gap:6}}>{[1,2,3].map(i=><div key={i} style={{width:i===step?24:8,height:8,borderRadius:4,background:i<=step?"#C9A84C":"rgba(255,255,255,0.1)",transition:"all 0.3s"}}/>)}</div>
           </div>
         )}
         {steps[step]}
-        <div style={{textAlign:"center",marginTop:32,fontSize:11,color:"rgba(240,237,232,0.2)",letterSpacing:1}}>BUILT BY JOACHIM - KHIMFIT v2.0</div>
+        <div style={{textAlign:"center",marginTop:32,fontSize:11,color:"rgba(240,237,232,0.2)",letterSpacing:1}}>BUILT BY JOACHIM - JHIMFIT v2.0</div>
       </div>
     </div>
   );
@@ -914,7 +918,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
   const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"none", borderRadius:11, padding:"12px 15px", color:"#f0ede8", fontSize:15, outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:600,display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"Georgia,serif"}}>
-      <div style={{background:"#141820",borderRadius:22,padding:28,width:"100%",maxWidth:460,maxHeight:"90vh",overflowY:"auto",color:"#f0ede8"}}>
+      <div style={{background:"#0d1320",borderRadius:22,padding:28,width:"100%",maxWidth:460,maxHeight:"90vh",overflowY:"auto",color:"#f0ede8"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
           <div style={{fontSize:22,fontWeight:900}}>Edit Profile</div>
           <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(240,237,232,0.4)",fontSize:24,cursor:"pointer"}}>X</button>
@@ -947,7 +951,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
                   if(u==="lbs" && form.weightUnit!=="lbs") set("weight", cur ? Math.round(cur*2.2046*10)/10 : "");
                   if(u==="kg"  && form.weightUnit==="lbs") set("weight", cur ? Math.round(cur/2.2046*10)/10 : "");
                   set("weightUnit",u);
-                }} style={{background:(form.weightUnit||"kg")===u?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700}}>
+                }} style={{background:(form.weightUnit||"kg")===u?"#C9A84C":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700}}>
                   {u}
                 </button>
               ))}
@@ -980,7 +984,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
                     set("height",cm||"");
                   }
                   set("heightUnit",u);
-                }} style={{background:(form.heightUnit||"cm")===u?"#e05c2a":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700}}>
+                }} style={{background:(form.heightUnit||"cm")===u?"#C9A84C":"rgba(255,255,255,0.08)",border:"none",borderRadius:6,padding:"3px 10px",fontSize:11,color:"white",cursor:"pointer",fontWeight:700}}>
                   {u==="ft"?"ft / in":"cm"}
                 </button>
               ))}
@@ -1016,16 +1020,16 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
         <div style={{marginBottom:18}}>
           <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:10}}>Goal</div>
           <div style={{display:"flex",gap:9}}>
-            {GOALS.map(g=><button key={g.id} onClick={()=>set("goal",g.id)} style={{flex:1,background:form.goal===g.id?"rgba(224,92,42,0.2)":"rgba(255,255,255,0.05)",border:"1px solid "+(form.goal===g.id?"#e05c2a":"rgba(255,255,255,0.08)"),borderRadius:11,padding:"10px 4px",cursor:"pointer",textAlign:"center"}}>
-              <div style={{fontSize:22}}>{g.icon}</div><div style={{fontSize:10,color:form.goal===g.id?"#e05c2a":"rgba(240,237,232,0.5)",marginTop:3}}>{g.label}</div>
+            {GOALS.map(g=><button key={g.id} onClick={()=>set("goal",g.id)} style={{flex:1,background:form.goal===g.id?"rgba(201,168,76,0.2)":"rgba(255,255,255,0.05)",border:"1px solid "+(form.goal===g.id?"#C9A84C":"rgba(255,255,255,0.08)"),borderRadius:11,padding:"10px 4px",cursor:"pointer",textAlign:"center"}}>
+              <div style={{fontSize:22}}>{g.icon}</div><div style={{fontSize:10,color:form.goal===g.id?"#C9A84C":"rgba(240,237,232,0.5)",marginTop:3}}>{g.label}</div>
             </button>)}
           </div>
         </div>
-        <div style={{background:"rgba(224,92,42,0.09)",borderLeft:"3px solid #e05c2a",borderRadius:12,padding:"11px 16px",marginBottom:18,textAlign:"center"}}>
+        <div style={{background:"rgba(201,168,76,0.09)",borderLeft:"3px solid #C9A84C",borderRadius:12,padding:"11px 16px",marginBottom:18,textAlign:"center"}}>
           <span style={{fontSize:12,color:"rgba(240,237,232,0.4)"}}>New calorie goal: </span>
-          <span style={{fontSize:18,fontWeight:900,color:"#e05c2a"}}>{calcCalGoal(form)} kcal/day</span>
+          <span style={{fontSize:18,fontWeight:900,color:"#C9A84C"}}>{calcCalGoal(form)} kcal/day</span>
         </div>
-        <button onClick={save} style={{width:"100%",background:"#e05c2a",border:"none",borderRadius:14,padding:"15px",color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer",marginBottom:10}}>Save Changes</button>
+        <button onClick={save} style={{width:"100%",background:"#C9A84C",border:"none",borderRadius:14,padding:"15px",color:"#fff",fontWeight:800,fontSize:16,cursor:"pointer",marginBottom:10}}>Save Changes</button>
         <button onClick={onDelete} style={{width:"100%",background:"rgba(255,50,50,0.08)",borderRadius:14,padding:"12px",color:"rgba(255,110,110,0.75)",cursor:"pointer",fontSize:13}}>Delete This Profile</button>
       </div>
     </div>
@@ -1055,7 +1059,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
         </div>
       </div>
       <div style={{display:"flex",borderTop:"none"}}>
-        {[{l:"Protein",v:meal.protein,c:"#4fc3a1"},{l:"Carbs",v:meal.carbs,c:"#f0a500"},{l:"Fat",v:meal.fat,c:"#e05c2a"}].map((m,i)=>(
+        {[{l:"Protein",v:meal.protein,c:"#4db89a"},{l:"Carbs",v:meal.carbs,c:"#f0a500"},{l:"Fat",v:meal.fat,c:"#C9A84C"}].map((m,i)=>(
           <div key={m.l} style={{flex:1,padding:"9px 0",textAlign:"center",borderRight:i<2?"1px solid transparent":undefined}}>
             <div style={{fontSize:14,fontWeight:800,color:m.c}}>{m.v}g</div>
             <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,textTransform:"uppercase"}}>{m.l}</div>
@@ -1075,7 +1079,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
 }
 
 const StatCard = ({label,val,unit,color}) => (
-  <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"16px 18px"}}>
+  <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4db89a",borderRadius:16,padding:"16px 18px"}}>
     <div style={{fontSize:26,fontWeight:900,color}}>{val}</div>
     <div style={{fontSize:10,color,opacity:0.7,marginTop:1}}>{unit}</div>
     <div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:5}}>{label}</div>
@@ -1083,7 +1087,7 @@ const StatCard = ({label,val,unit,color}) => (
 );
 
 const DiffBadge = ({level}) => {
-  const c = level==="Beginner"?"#1a7a4a":level==="Intermediate"?"#f0a500":"#e05c2a";
+  const c = level==="Beginner"?"#1a6e5a":level==="Intermediate"?"#f0a500":"#C9A84C";
   return <span style={{background:c+"22",border:"1px solid "+c+"55",color:c,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>{level}</span>;
 };
 
@@ -1092,9 +1096,9 @@ function HelpContent() {
   const [openSection, setOpenSec] = useState(null);
   const sections = [
     {
-      id:"start", icon:"🚀", title:"Getting Started",color:"#e05c2a",
+      id:"start", icon:"🚀", title:"Getting Started",color:"#C9A84C",
       steps:[
-        { num:1, title:"Create your profile", body:"When you first open KhimFit, tap Get Started. Enter your name, pick an avatar, then fill in your age, weight, height and sex. This lets us calculate your personal daily calorie goal using the BMR formula." },
+        { num:1, title:"Create your profile", body:"When you first open JhimFit, tap Get Started. Enter your name, pick an avatar, then fill in your age, weight, height and sex. This lets us calculate your personal daily calorie goal using the BMR formula." },
         { num:2, title:"Pick your activity level", body:"Choose how active you are: Sedentary (desk job, no exercise), Lightly Active (1-3 days/week), Moderately Active (3-5 days/week), or Very Active (6-7 days/week). Be honest - this directly affects your calorie target." },
         { num:3, title:"Set your goal", body:"Choose Lose Weight (we subtract 300 kcal from your target), Stay Fit (maintenance), or Build Muscle (we add 300 kcal). You can always change this later from Edit Profile." },
         { num:4, title:"Your dashboard is ready", body:"You will land on the Home tab showing your calorie ring, macros, water tracker and today's meals. All your data is saved automatically on this device." },
@@ -1111,7 +1115,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"workout", icon:"🏋", title:"Tracking Workouts",color:"#1a7a4a",
+      id:"workout", icon:"🏋", title:"Tracking Workouts",color:"#1a6e5a",
       steps:[
         { num:1, title:"Quick Log - fast activity logging", body:"Go to Workout and make sure the Quick Log tab is selected. You will see 14 activity cards (Jog, HIIT, Football, etc). Simply tap any card to instantly log it - the calories burned are added to your daily total." },
         { num:2, title:"Lose Weight programme", body:"Tap the Lose Weight tab. This is an 8-week, 4-days-per-week fat-burning programme. You will see 4 weekly sessions: HIIT Cardio, Full-Body Fat Burn, Jump Rope and Core, and Steady-State Cardio." },
@@ -1122,7 +1126,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"home", icon:"⌂", title:"Home Tab Features",color:"#4fc3a1",
+      id:"home", icon:"⌂", title:"Home Tab Features",color:"#4db89a",
       steps:[
         { num:1, title:"Calorie ring", body:"The circle on the left fills up as you eat. Orange means within goal, red means you have exceeded your calorie target for the day. The number in the centre is total kcal eaten today." },
         { num:2, title:"Stats grid", body:"The 4 boxes show: Goal (your daily calorie target), Burned (calories from workouts), Net (eaten minus burned), and Protein (grams eaten today)." },
@@ -1132,7 +1136,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"stats", icon:"📊", title:"Stats and Records",color:"#e05c2a",
+      id:"stats", icon:"📊", title:"Stats and Records",color:"#C9A84C",
       steps:[
         { num:1, title:"7-day calorie chart", body:"The bar chart shows your calorie intake (orange) and calories burned (green) for each day of the past week. Red bars mean you went over your goal that day." },
         { num:2, title:"Summary cards", body:"Below the chart you will see: Average Daily Calories, Total Burned this week, Active Days (days you logged a workout), and Total Meals logged across all time." },
@@ -1143,7 +1147,7 @@ function HelpContent() {
     {
       id:"profiles", icon:"👤", title:"Managing Profiles",color:"#f0a500",
       steps:[
-        { num:1, title:"Multiple profiles", body:"KhimFit supports multiple user profiles on the same device - perfect for families. Each profile has completely separate data, goals and history." },
+        { num:1, title:"Multiple profiles", body:"JhimFit supports multiple user profiles on the same device - perfect for families. Each profile has completely separate data, goals and history." },
         { num:2, title:"Switch profiles", body:"On desktop, click Switch Profile at the top right. On mobile, tap Switch in the header. Select any existing profile to switch to it instantly." },
         { num:3, title:"Edit your profile", body:"Click your avatar/name in the sidebar (desktop) or tap your avatar in the mobile header. Change your name, avatar, stats or goal. Your new calorie target is recalculated automatically." },
         { num:4, title:"Delete a profile", body:"Open Edit Profile, scroll to the bottom and tap Delete This Profile. This permanently removes all data for that profile." },
@@ -1151,7 +1155,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"tips", icon:"💡", title:"Tips for Best Results",color:"#1a7a4a",
+      id:"tips", icon:"💡", title:"Tips for Best Results",color:"#1a6e5a",
       steps:[
         { num:1, title:"Log meals before or right after eating", body:"The sooner you log, the more accurate your daily totals will be. Use the Diet tab filter to quickly find the meal category you are eating from." },
         { num:2, title:"Be consistent with weight logging", body:"Log your weight at the same time each day - ideally in the morning before eating. This gives the most accurate trend in your Stats history." },
@@ -1165,7 +1169,7 @@ function HelpContent() {
   return (
     <div>
       <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Help and User Guide</div>
-      <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:28}}>Everything you need to know to get the most out of KhimFit</div>
+      <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:28}}>Everything you need to know to get the most out of JhimFit</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:10,marginBottom:28}}>
         {sections.map(s=>(
           <button key={s.id} onClick={()=>setOpenSec(openSection===s.id?null:s.id)}
@@ -1197,16 +1201,16 @@ function HelpContent() {
           </div>
         )
       ))}
-      <div style={{background:"rgba(224,92,42,0.07)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"16px 20px",marginTop:8}}>
+      <div style={{background:"rgba(201,168,76,0.07)",borderLeft:"3px solid #C9A84C",borderRadius:16,padding:"16px 20px",marginTop:8}}>
         <div style={{fontSize:13,color:"rgba(240,237,232,0.6)",lineHeight:1.8}}>
-          Still have questions? Tap <strong style={{color:"#e05c2a"}}>Contact</strong> in the menu to reach Joachim directly - we reply within 24 hours.
+          Still have questions? Tap <strong style={{color:"#C9A84C"}}>Contact</strong> in the menu to reach Joachim directly - we reply within 24 hours.
         </div>
       </div>
     </div>
   );
 };
 
-export default function KhimFitness() {
+export default function JhimFitness() {
   const isMobile = useIsMobile();
   useEffect(()=>injectStyles(),[]);
 
@@ -1264,7 +1268,7 @@ export default function KhimFitness() {
     if (!installPrompt) return;
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
-    if (outcome === "accepted") { setIsInstalled(true); setShowInstallBanner(false); toast_("KhimFit installed! Ready to go","#1a7a4a"); }
+    if (outcome === "accepted") { setIsInstalled(true); setShowInstallBanner(false); toast_("JhimFit installed! Ready to go","#1a6e5a"); }
     setInstallPrompt(null);
   };
 
@@ -1323,7 +1327,7 @@ export default function KhimFitness() {
     if (secs > 0) { setRestSecs(secs); setRestRun(true); }
   };
 
-  const toast_ = (msg, color="#1a7a4a") => { setToast({msg,color}); setTimeout(()=>setToast(null),2500); };
+  const toast_ = (msg, color="#1a6e5a") => { setToast({msg,color}); setTimeout(()=>setToast(null),2500); };
   if (!profile) return <Onboarding onComplete={p=>{ setProfile(p); setTab("home"); }}/>;
 
 
@@ -1344,7 +1348,7 @@ export default function KhimFitness() {
   const upd    = (k,v) => setData(d=>({...d,[k]:v}));
   const addM   = m  => { upd("log",{...log,[TODAY]:[...(log[TODAY]||[]),{...m,logId:Date.now()}]}); toast_(m.emoji+" "+m.name+" added!"); setSM(null); };
   const rmM    = id => upd("log",{...log,[TODAY]:(log[TODAY]||[]).filter(m=>m.logId!==id)});
-  const addQW  = w  => { upd("workoutLog",{...workoutLog,[TODAY]:[...(workoutLog[TODAY]||[]),{...w,logId:Date.now()}]}); toast_(w.icon+" "+w.name+" logged!","#e05c2a"); };
+  const addQW  = w  => { upd("workoutLog",{...workoutLog,[TODAY]:[...(workoutLog[TODAY]||[]),{...w,logId:Date.now()}]}); toast_(w.icon+" "+w.name+" logged!","#C9A84C"); };
   const addWater = () => { upd("water",{...water,[TODAY]:(water[TODAY]||0)+1}); toast_("Water +250ml logged!","#1e90ff"); };
   const saveWt   = () => { if(!weightInput) return; upd("weightLog",{...weightLog,[TODAY]:parseFloat(weightInput)}); toast_("Weight "+weightInput+"kg saved!"); setWI(""); };
 
@@ -1383,20 +1387,20 @@ export default function KhimFitness() {
   ];
 
   const Sidebar = () => (
-    <div style={{width:260,flexShrink:0,background:"#0d1117",borderRight:"none",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
+    <div style={{width:260,flexShrink:0,background:"#0a0f1e",borderRight:"none",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
       <div style={{padding:"28px 24px 20px"}}>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:4}}>Fitness and Nutrition</div>
-        <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Khim<span style={{color:"#e05c2a"}}>Fit</span></div>
+        <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Khim<span style={{color:"#C9A84C"}}>Fit</span></div>
       </div>
-      <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(224,92,42,0.1)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
+      <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(201,168,76,0.1)",borderLeft:"3px solid #C9A84C",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
         <SpiritAvatar animalId={profile.spiritAnimal||profile.avatar||"eagle"} seed={profile.name} size={40} ring={true}/>
-        <div style={{flex:1,minWidth:0}}><div style={{fontWeight:800,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile.name}</div><div style={{fontSize:11,color:"#e05c2a",marginTop:2}}>{calGoal} kcal goal</div></div>
+        <div style={{flex:1,minWidth:0}}><div style={{fontWeight:800,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile.name}</div><div style={{fontSize:11,color:"#C9A84C",marginTop:2}}>{calGoal} kcal goal</div></div>
         <span style={{fontSize:12,color:"rgba(240,237,232,0.3)"}}>edit</span>
       </button>
       {others.length>0 && <button onClick={()=>setShowSw(true)} style={{margin:"0 14px 20px",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:12,padding:"9px 14px",cursor:"pointer",color:"rgba(240,237,232,0.5)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8}}>Switch Profile ({others.length})</button>}
       <nav style={{flex:1,padding:"0 14px"}}>
         {navItems.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(224,92,42,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(224,92,42,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#e05c2a":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
             <span style={{fontSize:20}}>{t.icon}</span>{t.label}
           </button>
         ))}
@@ -1406,7 +1410,7 @@ export default function KhimFitness() {
           <span>🏠</span> Welcome Screen
         </button>
         <div style={{padding:"0 10px 16px",fontSize:10,color:"rgba(240,237,232,0.2)",letterSpacing:1,lineHeight:1.9}}>
-          KHIMFIT v2.0<br/>BUILT BY JOACHIM<br/>ACCRA, GHANA
+          JHIMFIT v2.0<br/>BUILT BY JOACHIM<br/>ACCRA, GHANA
         </div>
       </div>
     </div>
@@ -1417,8 +1421,8 @@ export default function KhimFitness() {
       {navItems.map(t=>(
         <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
           <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
-          <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#e05c2a":"rgba(240,237,232,0.3)"}}>{t.label}</span>
-          {tab===t.id&&<div style={{width:16,height:2,background:"#e05c2a",borderRadius:2}}/>}
+          <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.3)"}}>{t.label}</span>
+          {tab===t.id&&<div style={{width:16,height:2,background:"#C9A84C",borderRadius:2}}/>}
         </button>
       ))}
     </div>
@@ -1471,26 +1475,26 @@ export default function KhimFitness() {
           const totalWorkouts = Object.values(workoutLog).flat().length;
           const lvl = calcLevel(totalLogged, streakDays, totalWorkouts);
           const animal = SPIRIT_ANIMALS.find(a=>a.id===(profile.spiritAnimal||"eagle"));
-          return <LevelBadge level={lvl.level} xpInLevel={lvl.xpInLevel} xpToNext={lvl.xpToNext} color={(animal&&animal.color)||"#e05c2a"}/>;
+          return <LevelBadge level={lvl.level} xpInLevel={lvl.xpInLevel} xpToNext={lvl.xpToNext} color={(animal&&animal.color)||"#C9A84C"}/>;
         })()}
       </div>
 
       {/* HERO — calorie ring + big stats */}
-      <div className="bento-card" style={{background:"linear-gradient(135deg,#1a1f2e,#0f1318)",borderLeft:"4px solid #e05c2a",borderRadius:22,padding:"20px 22px",marginBottom:12}}>
+      <div className="bento-card" style={{background:"linear-gradient(135deg,#111827,#090d16)",borderLeft:"4px solid #C9A84C",borderRadius:22,padding:"20px 22px",marginBottom:12}}>
         <div style={{display:"flex",alignItems:"center",gap:20,flexWrap:"wrap"}}>
           <div style={{position:"relative",flexShrink:0}}>
             <svg width={110} height={110}>
               <circle cx={55} cy={55} r={46} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={10}/>
-              <circle cx={55} cy={55} r={46} fill="none" stroke={calPct>=100?"#e03030":"#e05c2a"} strokeWidth={10}
+              <circle cx={55} cy={55} r={46} fill="none" stroke={calPct>=100?"#e03030":"#C9A84C"} strokeWidth={10}
                 strokeDasharray={String(2*Math.PI*46)} strokeDashoffset={String(2*Math.PI*46*(1-Math.min(calPct,100)/100))}
                 strokeLinecap="round" transform="rotate(-90 55 55)" style={{transition:"stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1)"}}/>
               <text x={55} y={50} textAnchor="middle" fill="#f0ede8" fontSize={20} fontWeight="900" fontFamily={SPORT_FONT}>{totCal}</text>
               <text x={55} y={65} textAnchor="middle" fill="rgba(240,237,232,0.35)" fontSize={9} fontFamily={BODY_FONT}>kcal eaten</text>
-              <text x={55} y={78} textAnchor="middle" fill={calPct>=100?"#e03030":"rgba(224,92,42,0.7)"} fontSize={9} fontFamily={BODY_FONT}>{Math.round(calPct)}% of goal</text>
+              <text x={55} y={78} textAnchor="middle" fill={calPct>=100?"#e03030":"rgba(201,168,76,0.7)"} fontSize={9} fontFamily={BODY_FONT}>{Math.round(calPct)}% of goal</text>
             </svg>
           </div>
           <div style={{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,minWidth:160}}>
-            {[{l:"Goal",v:calGoal,u:"kcal",c:"#e05c2a"},{l:"Burned",v:burned,u:"kcal",c:"#1a7a4a"},{l:"Net",v:netCal,u:"kcal",c:netCal>calGoal?"#e03030":"#4fc3a1"},{l:"Protein",v:totPro,u:"g",c:"#f0a500"}].map(s=>(
+            {[{l:"Goal",v:calGoal,u:"kcal",c:"#C9A84C"},{l:"Burned",v:burned,u:"kcal",c:"#1a6e5a"},{l:"Net",v:netCal,u:"kcal",c:netCal>calGoal?"#e03030":"#4db89a"},{l:"Protein",v:totPro,u:"g",c:"#f0a500"}].map(s=>(
               <div key={s.l} className="stat-tile" style={{background:"rgba(255,255,255,0.04)",borderRadius:12,padding:"10px 12px",cursor:"default"}}>
                 <div style={{fontFamily:SPORT_FONT,fontSize:22,color:s.c,letterSpacing:1,lineHeight:1}}>{s.v}<span style={{fontSize:11,fontFamily:BODY_FONT,fontWeight:400,opacity:0.7}}> {s.u}</span></div>
                 <div style={{fontSize:10,color:"rgba(240,237,232,0.4)",marginTop:4,letterSpacing:0.5}}>{s.l.toUpperCase()}</div>
@@ -1502,15 +1506,15 @@ export default function KhimFitness() {
 
       {/* BENTO ROW 1 — Goal mode (wide) + Streak tile (narrow) */}
       <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:10,marginBottom:10}}>
-        <div className="bento-card" style={{background:"rgba(224,92,42,0.08)",borderLeft:"3px solid #e05c2a",borderRadius:16,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,animationDelay:"0.05s"}}>
+        <div className="bento-card" style={{background:"rgba(201,168,76,0.08)",borderLeft:"3px solid #C9A84C",borderRadius:16,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,animationDelay:"0.05s"}}>
           <CalorieFlamSprite net={netCal} goal={calGoal}/>
           <div>
-            <div style={{fontFamily:SPORT_FONT,fontSize:18,letterSpacing:1,color:"#e05c2a"}}>{(GOALS.find(g=>g.id===profile.goal)||{label:""}).label} Mode</div>
+            <div style={{fontFamily:SPORT_FONT,fontSize:18,letterSpacing:1,color:"#C9A84C"}}>{(GOALS.find(g=>g.id===profile.goal)||{label:""}).label} Mode</div>
             <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:1}}>{calGoal} kcal/day target</div>
           </div>
         </div>
-        <div className="bento-card" style={{background:"rgba(26,122,74,0.1)",borderLeft:"3px solid #1a7a4a",borderRadius:16,padding:"12px 16px",textAlign:"center",animationDelay:"0.08s",minWidth:72}}>
-          <div style={{fontFamily:SPORT_FONT,fontSize:28,color:"#4fc3a1",letterSpacing:1,lineHeight:1}}>{tMeals.length}</div>
+        <div className="bento-card" style={{background:"rgba(26,122,74,0.1)",borderLeft:"3px solid #1a6e5a",borderRadius:16,padding:"12px 16px",textAlign:"center",animationDelay:"0.08s",minWidth:72}}>
+          <div style={{fontFamily:SPORT_FONT,fontSize:28,color:"#4db89a",letterSpacing:1,lineHeight:1}}>{tMeals.length}</div>
           <div style={{fontSize:9,color:"rgba(240,237,232,0.4)",marginTop:4,letterSpacing:0.5}}>MEALS</div>
         </div>
       </div>
@@ -1520,7 +1524,7 @@ export default function KhimFitness() {
         {/* Macros tile */}
         <div className="bento-card" style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #f0a500",borderRadius:16,padding:"14px 16px",animationDelay:"0.1s"}}>
           <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#f0a500",marginBottom:12}}>MACROS</div>
-          {[{l:"Carbs",v:totCarb,max:250,c:"#e05c2a"},{l:"Protein",v:totPro,max:profile.goal==="gain"?120:80,c:"#1a7a4a"},{l:"Fat",v:totFat,max:65,c:"#f0a500"}].map(m=>(
+          {[{l:"Carbs",v:totCarb,max:250,c:"#C9A84C"},{l:"Protein",v:totPro,max:profile.goal==="gain"?120:80,c:"#1a6e5a"},{l:"Fat",v:totFat,max:65,c:"#f0a500"}].map(m=>(
             <div key={m.l} style={{marginBottom:10}}>
               <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:4}}>
                 <span style={{color:"rgba(240,237,232,0.5)"}}>{m.l}</span>
@@ -1568,23 +1572,23 @@ export default function KhimFitness() {
         {tMeals.length===0
           ? <div style={{borderRadius:14,padding:"20px 0",textAlign:"center",color:"rgba(240,237,232,0.25)",fontSize:13}}>Nothing logged yet — head to the Diet tab</div>
           : tMeals.map(m=>(
-            <div key={m.logId} style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:13,padding:"10px 14px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div key={m.logId} style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #C9A84C",borderRadius:13,padding:"10px 14px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{display:"flex",gap:10,alignItems:"center"}}>
-                <div style={{width:38,height:38,borderRadius:10,background:(m.color||"#e05c2a")+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{m.emoji}</div>
+                <div style={{width:38,height:38,borderRadius:10,background:(m.color||"#C9A84C")+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{m.emoji}</div>
                 <div>
                   <div style={{fontSize:13,fontWeight:700}}>{m.name}</div>
                   <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:1}}>{m.calories} kcal · {m.protein}g protein</div>
                 </div>
               </div>
-              <button onClick={()=>rmM(m.logId)} style={{background:"rgba(224,92,42,0.1)",color:"#e05c2a",borderRadius:8,padding:"4px 10px",cursor:"pointer",fontSize:12,flexShrink:0,border:"none",fontWeight:700}}>✕</button>
+              <button onClick={()=>rmM(m.logId)} style={{background:"rgba(201,168,76,0.1)",color:"#C9A84C",borderRadius:8,padding:"4px 10px",cursor:"pointer",fontSize:12,flexShrink:0,border:"none",fontWeight:700}}>✕</button>
             </div>
           ))}
       </div>
 
       {/* Weight logger */}
-      <div className="bento-card" style={{background:"rgba(79,195,161,0.06)",borderLeft:"3px solid #4fc3a1",borderRadius:16,padding:"14px 18px",animationDelay:"0.2s"}}>
+      <div className="bento-card" style={{background:"rgba(79,195,161,0.06)",borderLeft:"3px solid #4db89a",borderRadius:16,padding:"14px 18px",animationDelay:"0.2s"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4fc3a1"}}>LOG WEIGHT</div>
+          <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4db89a"}}>LOG WEIGHT</div>
           <span style={{fontSize:10,color:"rgba(240,237,232,0.3)",letterSpacing:1}}>stored in kg</span>
         </div>
         <div style={{display:"flex",gap:8}}>
@@ -1593,9 +1597,9 @@ export default function KhimFitness() {
               style={{width:"100%",background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"10px 44px 10px 14px",color:"#f0ede8",fontSize:14,outline:"none",fontFamily:BODY_FONT}}/>
             <span style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",color:"rgba(240,237,232,0.35)",fontSize:12}}>kg</span>
           </div>
-          <button onClick={saveWt} style={{background:"#e05c2a",border:"none",borderRadius:10,padding:"10px 18px",color:"#fff",cursor:"pointer",fontWeight:800,fontSize:13,flexShrink:0,fontFamily:SPORT_FONT,letterSpacing:1}}>SAVE</button>
+          <button onClick={saveWt} style={{background:"#C9A84C",border:"none",borderRadius:10,padding:"10px 18px",color:"#fff",cursor:"pointer",fontWeight:800,fontSize:13,flexShrink:0,fontFamily:SPORT_FONT,letterSpacing:1}}>SAVE</button>
         </div>
-        {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4fc3a1",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
+        {weightLog[TODAY]&&<div style={{marginTop:8,fontSize:12,color:"#4db89a",fontWeight:600}}>Logged today: {weightLog[TODAY]} kg ✓</div>}
       </div>
     </div>
   ))();
@@ -1604,7 +1608,7 @@ export default function KhimFitness() {
     <div>
       <div style={{marginBottom:20}}><div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Ghanaian Diet Guide</div><div style={{fontSize:13,color:"rgba(240,237,232,0.45)"}}>Tap any meal to expand details and log it</div></div>
       <div style={{display:"flex",gap:8,marginBottom:20,overflowX:"auto",paddingBottom:4}}>
-        {CATS.map(c=><button key={c} onClick={()=>setFC(c)} style={{background:filterCat===c?"#e05c2a":"rgba(255,255,255,0.06)",border:filterCat===c?"none":"1px solid transparent",color:filterCat===c?"#fff":"rgba(240,237,232,0.6)",borderRadius:22,padding:"7px 18px",cursor:"pointer",fontSize:13,whiteSpace:"nowrap",fontWeight:filterCat===c?700:400,transition:"all 0.2s"}}>{c}</button>)}
+        {CATS.map(c=><button key={c} onClick={()=>setFC(c)} style={{background:filterCat===c?"#C9A84C":"rgba(255,255,255,0.06)",border:filterCat===c?"none":"1px solid transparent",color:filterCat===c?"#fff":"rgba(240,237,232,0.6)",borderRadius:22,padding:"7px 18px",cursor:"pointer",fontSize:13,whiteSpace:"nowrap",fontWeight:filterCat===c?700:400,transition:"all 0.2s"}}>{c}</button>)}
       </div>
       <div style={{fontSize:11,color:"rgba(240,237,232,0.3)",marginBottom:14,letterSpacing:1}}>{filtered.length} MEALS</div>
       {filtered.map(meal=><MealCard key={meal.id} meal={meal} isSelected={selectedMeal&&selectedMeal.id===meal.id} onSelect={()=>setSM(selectedMeal&&selectedMeal.id===meal.id?null:meal)} onLog={()=>addM(meal)}/>)}
@@ -1626,7 +1630,7 @@ export default function KhimFitness() {
           {/* ── Sticky Live Timer Bar ── */}
           <div style={{
             position:"sticky", top:0, zIndex:100,
-            background:"linear-gradient(135deg,#141820,#0f1318)",
+            background:"linear-gradient(135deg,#0d1320,#090d16)",
             border:"1px solid rgba(255,255,255,0.08)",
             borderRadius:16, padding:"12px 18px", marginBottom:16,
             display:"flex", alignItems:"center", justifyContent:"space-between", gap:12,
@@ -1636,13 +1640,13 @@ export default function KhimFitness() {
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <div style={{
                 width:40, height:40, borderRadius:12,
-                background: timerRunning ? "rgba(224,92,42,0.2)" : "rgba(255,255,255,0.06)",
-                border:`1px solid ${timerRunning ? "#e05c2a88" : "rgba(255,255,255,0.1)"}`,
+                background: timerRunning ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)",
+                border:`1px solid ${timerRunning ? "#C9A84C88" : "rgba(255,255,255,0.1)"}`,
                 display:"flex", alignItems:"center", justifyContent:"center", fontSize:18,
                 animation: timerRunning ? "pulse 2s ease-in-out infinite" : "none",
               }}>⏱</div>
               <div>
-                <div style={{fontFamily:SPORT_FONT,fontSize:26,letterSpacing:2,color:timerRunning?"#e05c2a":"rgba(240,237,232,0.5)",lineHeight:1}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:26,letterSpacing:2,color:timerRunning?"#C9A84C":"rgba(240,237,232,0.5)",lineHeight:1}}>
                   {fmtTime(timerSecs)}
                 </div>
                 <div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:1,marginTop:2}}>
@@ -1665,11 +1669,11 @@ export default function KhimFitness() {
             {/* Controls */}
             <div style={{display:"flex",gap:8,flexShrink:0}}>
               <button onClick={()=>setTimerRun(r=>!r)} style={{
-                background: timerRunning ? "rgba(224,92,42,0.2)" : "rgba(16,185,129,0.2)",
-                border:`1px solid ${timerRunning ? "#e05c2a66" : "#10B98166"}`,
+                background: timerRunning ? "rgba(201,168,76,0.2)" : "rgba(16,185,129,0.2)",
+                border:`1px solid ${timerRunning ? "#C9A84C66" : "#10B98166"}`,
                 borderRadius:10, padding:"8px 14px", cursor:"pointer",
                 fontFamily:SPORT_FONT, fontSize:12, letterSpacing:1,
-                color: timerRunning ? "#e05c2a" : "#10B981",
+                color: timerRunning ? "#C9A84C" : "#10B981",
               }}>
                 {timerRunning ? "⏸ PAUSE" : "▶ START"}
               </button>
@@ -1679,7 +1683,7 @@ export default function KhimFitness() {
               }}>↺</button>
             </div>
           </div>
-          <button onClick={()=>setOpenSess(null)} style={{background:"rgba(224,92,42,0.1)",border:"none",borderLeft:"3px solid #e05c2a",borderRadius:10,color:"#e05c2a",cursor:"pointer",fontSize:14,padding:"10px 18px",marginBottom:18,display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontFamily:"Georgia"}}>&#8592; Back to {plan.title}</button>
+          <button onClick={()=>setOpenSess(null)} style={{background:"rgba(201,168,76,0.1)",border:"none",borderLeft:"3px solid #C9A84C",borderRadius:10,color:"#C9A84C",cursor:"pointer",fontSize:14,padding:"10px 18px",marginBottom:18,display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontFamily:"Georgia"}}>&#8592; Back to {plan.title}</button>
           <div style={{background:plan.bgColor,border:"1px solid "+plan.borderColor,borderRadius:20,padding:"20px 22px",marginBottom:20}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:10}}>
               <div><div style={{fontSize:11,letterSpacing:2,color:plan.color,textTransform:"uppercase",marginBottom:4}}>{plan.icon+" "+plan.title+" - "+sess.day}</div><div style={{fontSize:22,fontWeight:900}}>{sess.name}</div></div>
@@ -1699,7 +1703,7 @@ export default function KhimFitness() {
             <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"rgba(240,237,232,0.35)",marginBottom:12}}>EXERCISES — WATCH & FOLLOW</div>
             {sess.exercises.map((ex,ei)=>{
               const allDone = Array.from({length:ex.sets}).every((_,si)=>completedSets[plan.id+"-"+openSession.idx+"-"+ei+"-"+si]);
-              const ac = allDone ? "#1a7a4a" : plan.color;
+              const ac = allDone ? "#1a6e5a" : plan.color;
               return (
                 <div key={ei} style={{background:allDone?"rgba(26,122,74,0.07)":"rgba(255,255,255,0.03)",borderLeft:"3px solid "+ac,borderRadius:18,marginBottom:16,overflow:"hidden",opacity:allDone?0.5:1,transition:"all 0.4s"}}>
 
@@ -1725,7 +1729,7 @@ export default function KhimFitness() {
                       borderRadius:10, padding:"7px 14px", cursor:"pointer",
                       marginBottom:12, transition:"all 0.2s",
                     }}
-                      onMouseEnter={e=>{e.currentTarget.style.background="rgba(224,92,42,0.18)"; e.currentTarget.style.borderColor="rgba(224,92,42,0.5)";}}
+                      onMouseEnter={e=>{e.currentTarget.style.background="rgba(201,168,76,0.18)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.5)";}}
                       onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.1)";}}>
                       <span style={{fontSize:15}}>▶️</span>
                       <span style={{fontFamily:SPORT_FONT,fontSize:12,letterSpacing:1,color:"#f0ede8"}}>WATCH DRILL</span>
@@ -1748,7 +1752,7 @@ export default function KhimFitness() {
                           </button>
                         );
                       })}
-                      {allDone&&<span style={{fontSize:12,color:"#4fc3a1",fontWeight:700,marginLeft:4}}>Complete! 🎯</span>}
+                      {allDone&&<span style={{fontSize:12,color:"#4db89a",fontWeight:700,marginLeft:4}}>Complete! 🎯</span>}
                     </div>
                   </div>
 
@@ -1768,7 +1772,7 @@ export default function KhimFitness() {
           {!alreadyLogged && timerSecs > 0 && (
             <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 18px",marginBottom:12,display:"flex",justifyContent:"space-around"}}>
               <div style={{textAlign:"center"}}>
-                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#e05c2a",letterSpacing:1}}>{fmtTime(timerSecs)}</div>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#C9A84C",letterSpacing:1}}>{fmtTime(timerSecs)}</div>
                 <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>TIME ELAPSED</div>
               </div>
               <div style={{width:1,background:"rgba(255,255,255,0.07)"}}/>
@@ -1797,23 +1801,23 @@ export default function KhimFitness() {
         <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:20}}>Log activities, follow guided plans, and track records</div>
         <div style={{display:"flex",gap:8,marginBottom:24,background:"rgba(255,255,255,0.0)",borderRadius:16,padding:5}}>
           {[{id:"log",label:"Quick Log",icon:"⚡"},{id:"lose",label:"Lose Weight",icon:"🔥"},{id:"gain",label:"Build Muscle",icon:"💪"}].map(t=>(
-            <button key={t.id} onClick={()=>setWTab(t.id)} style={{flex:1,background:wTab===t.id?"#e05c2a":"transparent",border:"none",borderRadius:12,padding:"10px 6px",cursor:"pointer",color:wTab===t.id?"#fff":"rgba(240,237,232,0.5)",fontSize:12,fontWeight:wTab===t.id?800:400,transition:"all 0.2s"}}>
+            <button key={t.id} onClick={()=>setWTab(t.id)} style={{flex:1,background:wTab===t.id?"#C9A84C":"transparent",border:"none",borderRadius:12,padding:"10px 6px",cursor:"pointer",color:wTab===t.id?"#fff":"rgba(240,237,232,0.5)",fontSize:12,fontWeight:wTab===t.id?800:400,transition:"all 0.2s"}}>
               {t.icon+" "+t.label}
             </button>
           ))}
         </div>
         {tWorkouts.length>0 && (
-          <div style={{background:"rgba(26,122,74,0.1)",borderLeft:"3px solid #1a7a4a",borderRadius:16,padding:"16px 18px",marginBottom:20}}>
-            <div style={{fontSize:11,letterSpacing:2,color:"#1a7a4a",textTransform:"uppercase",marginBottom:12}}>Logged Today</div>
+          <div style={{background:"rgba(26,122,74,0.1)",borderLeft:"3px solid #1a6e5a",borderRadius:16,padding:"16px 18px",marginBottom:20}}>
+            <div style={{fontSize:11,letterSpacing:2,color:"#1a6e5a",textTransform:"uppercase",marginBottom:12}}>Logged Today</div>
             {tWorkouts.map(w=>(
               <div key={w.logId} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7,fontSize:14}}>
                 <span>{(w.icon||"🏋")+" "+w.name}</span>
-                <span style={{color:"#4fc3a1",fontWeight:700}}>-{w.calories} kcal - {w.duration}min</span>
+                <span style={{color:"#4db89a",fontWeight:700}}>-{w.calories} kcal - {w.duration}min</span>
               </div>
             ))}
             <div style={{borderTop:"1px solid rgba(26,122,74,0.2)",marginTop:10,paddingTop:10,display:"flex",justifyContent:"space-between"}}>
               <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>Total burned today</span>
-              <span style={{fontSize:17,color:"#4fc3a1",fontWeight:900}}>{burned} kcal</span>
+              <span style={{fontSize:17,color:"#4db89a",fontWeight:900}}>{burned} kcal</span>
             </div>
           </div>
         )}
@@ -1825,9 +1829,9 @@ export default function KhimFitness() {
                 <div key={w.id} onClick={()=>addQW(w)} style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:16,padding:"18px 12px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
                   <div style={{fontSize:36,marginBottom:8}}>{w.icon}</div>
                   <div style={{fontWeight:800,fontSize:13,marginBottom:4}}>{w.name}</div>
-                  <div style={{fontSize:12,color:"#e05c2a",fontWeight:600}}>{w.calories} kcal</div>
+                  <div style={{fontSize:12,color:"#C9A84C",fontWeight:600}}>{w.calories} kcal</div>
                   <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginBottom:10}}>{w.duration} min</div>
-                  <div style={{background:"rgba(26,122,74,0.15)",borderLeft:"3px solid #1a7a4a",borderRadius:8,padding:"5px 0",fontSize:12,color:"#4fc3a1",fontWeight:600}}>+ Log</div>
+                  <div style={{background:"rgba(26,122,74,0.15)",borderLeft:"3px solid #1a6e5a",borderRadius:8,padding:"5px 0",fontSize:12,color:"#4db89a",fontWeight:600}}>+ Log</div>
                 </div>
               ))}
             </div>
@@ -1893,7 +1897,7 @@ export default function KhimFitness() {
                       <div><div style={{fontSize:11,letterSpacing:2,color:activePlan.color,textTransform:"uppercase",marginBottom:3}}>{sess.day}</div><div style={{fontSize:17,fontWeight:900}}>{sess.name}</div></div>
                       <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                         <DiffBadge level={sess.difficulty}/>
-                        {alreadyLogged&&<span style={{background:"rgba(26,122,74,0.2)",color:"#4fc3a1",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>Logged</span>}
+                        {alreadyLogged&&<span style={{background:"rgba(26,122,74,0.2)",color:"#4db89a",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>Logged</span>}
                       </div>
                     </div>
                     <div style={{display:"flex",gap:16,marginBottom:12,flexWrap:"wrap"}}>
@@ -1946,43 +1950,43 @@ export default function KhimFitness() {
     <div>
       <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Weekly Stats</div>
       <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:22}}>7-day overview for {profile.name}</div>
-      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #C9A84C",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Calories vs Goal ({calGoal} kcal)</div>
         <div style={{display:"flex",gap:6,alignItems:"flex-end",height:110}}>
           {weekStats.map((s,i)=>(
             <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
               <div style={{width:"100%",height:90,display:"flex",flexDirection:"column",justifyContent:"flex-end",gap:2}}>
                 {s.burned>0&&<div style={{width:"100%",background:"rgba(26,122,74,0.55)",height:(s.burned/maxCals)*90+"px",borderRadius:"5px 5px 0 0",minHeight:4}}/>}
-                <div style={{width:"100%",background:s.cals>0?(s.cals>calGoal?"#e03030":"#e05c2a99"):"rgba(255,255,255,0.06)",height:(s.cals/maxCals)*90+"px",borderRadius:"5px 5px 0 0",minHeight:s.cals>0?5:2}}/>
+                <div style={{width:"100%",background:s.cals>0?(s.cals>calGoal?"#e03030":"#C9A84C99"):"rgba(255,255,255,0.06)",height:(s.cals/maxCals)*90+"px",borderRadius:"5px 5px 0 0",minHeight:s.cals>0?5:2}}/>
               </div>
               <div style={{fontSize:9,color:"rgba(240,237,232,0.4)"}}>{s.day}</div>
             </div>
           ))}
         </div>
         <div style={{display:"flex",gap:16,marginTop:12}}>
-          {[{c:"#e05c2a99",l:"Eaten"},{c:"rgba(26,122,74,0.55)",l:"Burned"},{c:"#e03030",l:"Over goal"}].map(x=>(
+          {[{c:"#C9A84C99",l:"Eaten"},{c:"rgba(26,122,74,0.55)",l:"Burned"},{c:"#e03030",l:"Over goal"}].map(x=>(
             <div key={x.l} style={{display:"flex",alignItems:"center",gap:5}}><div style={{width:11,height:11,background:x.c,borderRadius:3}}/><span style={{fontSize:11,color:"rgba(240,237,232,0.4)"}}>{x.l}</span></div>
           ))}
         </div>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:10,marginBottom:16}}>
-        <StatCard label="Avg Daily Cals" val={Math.round(weekStats.reduce((s,d)=>s+d.cals,0)/7)} unit="kcal" color="#e05c2a"/>
-        <StatCard label="Total Burned"   val={weekStats.reduce((s,d)=>s+d.burned,0)} unit="kcal" color="#4fc3a1"/>
-        <StatCard label="Active Days"    val={weekStats.filter(d=>d.burned>0).length} unit="/ 7 days" color="#1a7a4a"/>
+        <StatCard label="Avg Daily Cals" val={Math.round(weekStats.reduce((s,d)=>s+d.cals,0)/7)} unit="kcal" color="#C9A84C"/>
+        <StatCard label="Total Burned"   val={weekStats.reduce((s,d)=>s+d.burned,0)} unit="kcal" color="#4db89a"/>
+        <StatCard label="Active Days"    val={weekStats.filter(d=>d.burned>0).length} unit="/ 7 days" color="#1a6e5a"/>
         <StatCard label="Meals Logged"   val={Object.values(log).flat().length} unit="total" color="#f0a500"/>
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #C9A84C",borderRadius:18,padding:"18px 20px",marginBottom:16}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Weight History</div>
         {weekStats.every(d=>d.w===null)
           ? <div style={{textAlign:"center",color:"rgba(240,237,232,0.3)",fontSize:14,padding:"16px 0"}}>Log your weight on the Home tab</div>
           : weekStats.filter(d=>d.w!==null).map((d,i)=>(
             <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"none"}}>
               <span style={{fontSize:14,color:"rgba(240,237,232,0.6)"}}>{d.day}</span>
-              <span style={{fontSize:14,fontWeight:800,color:"#4fc3a1"}}>{d.w} kg</span>
+              <span style={{fontSize:14,fontWeight:800,color:"#4db89a"}}>{d.w} kg</span>
             </div>
           ))}
       </div>
-      <div style={{background:"rgba(224,92,42,0.06)",borderLeft:"3px solid #e05c2a",borderRadius:18,padding:"18px 20px"}}>
+      <div style={{background:"rgba(201,168,76,0.06)",borderLeft:"3px solid #C9A84C",borderRadius:18,padding:"18px 20px"}}>
         <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18}}>
           <SpiritAvatar animalId={profile.spiritAnimal||"eagle"} seed={profile.name} size={64} ring={true}/>
           <div><div style={{fontWeight:900,fontSize:20}}>{profile.name}</div><div style={{fontSize:12,color:"rgba(240,237,232,0.4)",marginTop:2}}>Member since {profile.createdAt||TODAY}</div></div>
@@ -1992,7 +1996,7 @@ export default function KhimFitness() {
             <span style={{fontSize:13,color:"rgba(240,237,232,0.4)"}}>{r.l}</span><span style={{fontSize:13,fontWeight:700,textTransform:"capitalize"}}>{r.v}</span>
           </div>
         ))}
-        <button onClick={()=>setShowEdit(true)} style={{width:"100%",background:"rgba(224,92,42,0.15)",borderLeft:"3px solid #e05c2a",borderRadius:13,padding:"12px",color:"#e05c2a",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:16}}>Edit Profile</button>
+        <button onClick={()=>setShowEdit(true)} style={{width:"100%",background:"rgba(201,168,76,0.15)",borderLeft:"3px solid #C9A84C",borderRadius:13,padding:"12px",color:"#C9A84C",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:16}}>Edit Profile</button>
       </div>
     </div>
   );
@@ -2001,13 +2005,13 @@ export default function KhimFitness() {
     <div>
       <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Contact Us</div>
       <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:28}}>Questions, feedback, or partnerships - we would love to hear from you</div>
-      <div style={{background:"linear-gradient(135deg,rgba(224,92,42,0.18),rgba(26,122,74,0.12))",borderRadius:22,padding:"28px 26px",marginBottom:24,textAlign:"center"}}>
+      <div style={{background:"linear-gradient(135deg,rgba(201,168,76,0.18),rgba(26,122,74,0.12))",borderRadius:22,padding:"28px 26px",marginBottom:24,textAlign:"center"}}>
         <div style={{marginBottom:12,display:"flex",justifyContent:"center"}}>
           <svg width="72" height="72" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="bgG2" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#e05c2a"/>
-                <stop offset="100%" stopColor="#1a7a4a"/>
+                <stop offset="0%" stopColor="#C9A84C"/>
+                <stop offset="100%" stopColor="#1a6e5a"/>
               </linearGradient>
               <linearGradient id="shG2" x1="0" y1="0" x2="0" y2="96" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stopColor="rgba(255,255,255,0.18)"/>
@@ -2022,13 +2026,13 @@ export default function KhimFitness() {
           </svg>
         </div>
         <div style={{fontSize:20,fontWeight:900,marginBottom:6}}>Joachim Naakureh</div>
-        <div style={{fontSize:13,color:"rgba(240,237,232,0.5)",marginBottom:4}}>Developer and Founder - KhimFit</div>
+        <div style={{fontSize:13,color:"rgba(240,237,232,0.5)",marginBottom:4}}>Developer and Founder - JhimFit</div>
         <div style={{fontSize:12,color:"rgba(240,237,232,0.35)"}}>Based in Accra, Ghana</div>
       </div>
       {[
-        { icon:"📱", label:"Phone / WhatsApp", value:"+233 53 111 3498",  href:"tel:+233531113498",                        color:"#1a7a4a" },
-        { icon:"📱", label:"Phone / WhatsApp", value:"+233 55 198 5225",  href:"tel:+233551985225",                        color:"#1a7a4a" },
-        { icon:"✉️", label:"Email",            value:"joachimnaakureh07@gmail.com", href:"mailto:joachimnaakureh07@gmail.com", color:"#e05c2a" },
+        { icon:"📱", label:"Phone / WhatsApp", value:"+233 53 111 3498",  href:"tel:+233531113498",                        color:"#1a6e5a" },
+        { icon:"📱", label:"Phone / WhatsApp", value:"+233 55 198 5225",  href:"tel:+233551985225",                        color:"#1a6e5a" },
+        { icon:"✉️", label:"Email",            value:"joachimnaakureh07@gmail.com", href:"mailto:joachimnaakureh07@gmail.com", color:"#C9A84C" },
       ].map((c,i)=>(
         <a key={i} href={c.href} style={{display:"flex",alignItems:"center",gap:18,background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",color:"#f0ede8",transition:"all 0.2s"}}>
           <div style={{width:52,height:52,borderRadius:15,background:c.color+"22",border:"1px solid "+c.color+"44",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{c.icon}</div>
@@ -2039,12 +2043,12 @@ export default function KhimFitness() {
           <span style={{color:c.color,fontSize:20,flexShrink:0}}>&#x2192;</span>
         </a>
       ))}
-      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4fc3a1",borderRadius:18,padding:"20px 22px",marginBottom:16,marginTop:8}}>
+      <div style={{background:"rgba(255,255,255,0.03)",borderLeft:"3px solid #4db89a",borderRadius:18,padding:"20px 22px",marginBottom:16,marginTop:8}}>
         <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:16}}>Availability</div>
         {[{d:"Monday - Friday",t:"8:00 AM - 6:00 PM"},{d:"Saturday",t:"9:00 AM - 2:00 PM"},{d:"Sunday",t:"Closed"}].map(r=>(
           <div key={r.d} style={{display:"flex",justifyContent:"space-between",padding:"9px 0",borderBottom:"none"}}>
             <span style={{fontSize:13,color:"rgba(240,237,232,0.6)"}}>{r.d}</span>
-            <span style={{fontSize:13,fontWeight:700,color:r.t==="Closed"?"rgba(240,237,232,0.3)":"#4fc3a1"}}>{r.t}</span>
+            <span style={{fontSize:13,fontWeight:700,color:r.t==="Closed"?"rgba(240,237,232,0.3)":"#4db89a"}}>{r.t}</span>
           </div>
         ))}
       </div>
@@ -2068,22 +2072,22 @@ export default function KhimFitness() {
   const pageTitle  = { home:"Good "+(new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening")+", "+profile.name+" "+profile.avatar, diet:"Diet Guide", workout:"Workouts", stats:"Stats and Records", contact:"Contact Us", help:"Help and User Guide" };
 
   return (
-    <div style={{minHeight:"100vh",background:"#0d1117",color:"#f0ede8",fontFamily:"Georgia,'Times New Roman',serif",display:"flex",position:"relative"}}>
-      <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",background:"radial-gradient(ellipse at 15% 10%,rgba(224,92,42,0.1),transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(26,122,74,0.08),transparent 55%)"}}/>
+    <div style={{minHeight:"100vh",background:"#0a0f1e",color:"#f0ede8",fontFamily:"Georgia,'Times New Roman',serif",display:"flex",position:"relative"}}>
+      <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",background:"radial-gradient(ellipse at 15% 10%,rgba(201,168,76,0.1),transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(26,122,74,0.08),transparent 55%)"}}/>
       {/* PWA Install Banner */}
       {showInstallBanner && !isInstalled && (
         <div style={{position:"fixed",bottom:isMobile?80:24,left:"50%",transform:"translateX(-50%)",zIndex:9998,
-          background:"linear-gradient(135deg,#1a1f2e,#141820)",border:"1px solid rgba(224,92,42,0.35)",
+          background:"linear-gradient(135deg,#111827,#0d1320)",border:"1px solid rgba(201,168,76,0.35)",
           borderRadius:20,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,
           boxShadow:"0 12px 40px rgba(0,0,0,0.7)",maxWidth:380,width:"calc(100vw - 32px)"}}>
-          <div style={{width:46,height:46,borderRadius:13,background:"rgba(224,92,42,0.2)",border:"1px solid rgba(224,92,42,0.4)",
+          <div style={{width:46,height:46,borderRadius:13,background:"rgba(201,168,76,0.2)",border:"1px solid rgba(201,168,76,0.4)",
             display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>💪</div>
           <div style={{flex:1}}>
-            <div style={{fontFamily:SPORT_FONT,fontSize:13,color:"#f0ede8",letterSpacing:1,lineHeight:1}}>INSTALL KHIMFIT</div>
+            <div style={{fontFamily:SPORT_FONT,fontSize:13,color:"#f0ede8",letterSpacing:1,lineHeight:1}}>INSTALL JHIMFIT</div>
             <div style={{fontSize:10,color:"rgba(240,237,232,0.45)",marginTop:4,lineHeight:1.4}}>Add to home screen for the full app experience</div>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:5,flexShrink:0}}>
-            <button onClick={handleInstall} style={{background:"#e05c2a",border:"none",borderRadius:10,
+            <button onClick={handleInstall} style={{background:"#C9A84C",border:"none",borderRadius:10,
               padding:"8px 14px",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",
               fontFamily:SPORT_FONT,letterSpacing:1}}>INSTALL</button>
             <button onClick={()=>setShowInstallBanner(false)} style={{background:"transparent",border:"none",
@@ -2095,7 +2099,7 @@ export default function KhimFitness() {
       {showEdit && <EditProfile profile={profile} onSave={p=>{setProfile(p);setShowEdit(false);toast_("Profile updated!");}} onClose={()=>setShowEdit(false)} onDelete={delProfile}/>}
       {showSwitch && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:600,display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"Georgia,serif"}}>
-          <div style={{background:"#141820",borderRadius:22,padding:28,width:"100%",maxWidth:440,color:"#f0ede8"}}>
+          <div style={{background:"#0d1320",borderRadius:22,padding:28,width:"100%",maxWidth:440,color:"#f0ede8"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
               <div style={{fontSize:22,fontWeight:900}}>Switch Profile</div>
               <button onClick={()=>setShowSw(false)} style={{background:"none",border:"none",color:"rgba(240,237,232,0.4)",fontSize:24,cursor:"pointer"}}>X</button>
@@ -2104,10 +2108,10 @@ export default function KhimFitness() {
               <button key={p.id} onClick={()=>{setProfile(p);setShowSw(false);setTab("home");toast_("Welcome back, "+p.name+"! "+p.avatar);}} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:"#f0ede8",textAlign:"left"}}>
                 <SpiritAvatar animalId={p.spiritAnimal||p.avatar||"eagle"} seed={p.name} size={36} ring={true}/>
                 <div style={{flex:1}}><div style={{fontWeight:800,fontSize:15}}>{p.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{p.calorieGoal} kcal goal - {(GOALS.find(g=>g.id===p.goal)||{label:""}).label}</div></div>
-                <span style={{color:"#e05c2a",fontSize:20}}>&#x2192;</span>
+                <span style={{color:"#C9A84C",fontSize:20}}>&#x2192;</span>
               </button>
             ))}
-            <button onClick={()=>{setProfile(null);setShowSw(false);}} style={{width:"100%",background:"rgba(224,92,42,0.1)",borderRadius:14,padding:"14px",color:"#e05c2a",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:4}}>+ Create New Profile</button>
+            <button onClick={()=>{setProfile(null);setShowSw(false);}} style={{width:"100%",background:"rgba(201,168,76,0.1)",borderRadius:14,padding:"14px",color:"#C9A84C",cursor:"pointer",fontSize:14,fontWeight:700,marginTop:4}}>+ Create New Profile</button>
           </div>
         </div>
       )}
@@ -2120,7 +2124,7 @@ export default function KhimFitness() {
             <div><div style={{fontSize:10,color:"rgba(240,237,232,0.4)",letterSpacing:2,textTransform:"uppercase",lineHeight:1}}>Welcome back</div><div style={{fontSize:17,fontWeight:900,letterSpacing:-0.5}}>{profile.name}</div></div>
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            <div style={{textAlign:"right"}}><div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:2}}>GOAL</div><div style={{fontSize:14,fontWeight:900,color:"#e05c2a"}}>{calGoal} kcal</div></div>
+            <div style={{textAlign:"right"}}><div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:2}}>GOAL</div><div style={{fontSize:14,fontWeight:900,color:"#C9A84C"}}>{calGoal} kcal</div></div>
             {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"6px 10px",cursor:"pointer",fontSize:11,color:"rgba(240,237,232,0.5)"}}>Switch</button>}
           </div>
         </div>
