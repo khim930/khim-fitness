@@ -560,7 +560,7 @@ const SPIRIT_ANIMALS = [
   { id:"owl",        name:"Wise Owl",    emoji:"🦉", element:"🌙", trait:"Wellness",   color:"#4A9EFF", bg:"rgba(74,158,255,0.15)", goal:"maintain", desc:"Balance, recovery & longevity. The long game." },
   { id:"panther",    name:"Panther",     emoji:"🐆", element:"⚡", trait:"Agility",    color:"#F59E0B", bg:"rgba(245,158,11,0.15)", goal:"lose",     desc:"Explosive speed & precision. Always hunting." },
   { id:"bear",       name:"Bear",        emoji:"🐻", element:"🌲", trait:"Resilience", color:"#EF4444", bg:"rgba(239,68,68,0.15)",  goal:"gain",     desc:"Endure anything. Come back stronger every time." },
-  { id:"eagle",      name:"Eagle",       emoji:"🦅", element:"☀️", trait:"Vision",     color:"#E05C2A", bg:"rgba(201,168,76,0.15)", goal:"maintain", desc:"See the bigger picture. Discipline above all." },
+  { id:"eagle",      name:"Eagle",       emoji:"🦅", element:"☀️", trait:"Vision",     color:"#C9A84C", bg:"rgba(201,168,76,0.15)", goal:"maintain", desc:"See the bigger picture. Discipline above all." },
   { id:"wolf",       name:"Wolf",        emoji:"🐺", element:"🌕", trait:"Pack",       color:"#6366F1", bg:"rgba(99,102,241,0.15)", goal:"gain",     desc:"Strength through consistency. Run with purpose." },
   { id:"dolphin",    name:"Dolphin",     emoji:"🐬", element:"🌊", trait:"Flow",       color:"#06B6D4", bg:"rgba(6,182,212,0.15)",  goal:"maintain", desc:"Effortless movement & mental clarity." },
 ];
@@ -721,7 +721,7 @@ const CalorieFlamSprite = ({ net, goal }) => {
   const level = pct <= 0 ? "crushed" : pct < 0.6 ? "burning" : pct < 0.9 ? "steady" : pct < 1.1 ? "balanced" : "over";
   const states = {
     crushed:  { emoji:"🌟", color:"#10B981", label:"Crushed it!", pulse:true  },
-    burning:  { emoji:"🔥", color:"#E05C2A", label:"On fire!",    pulse:true  },
+    burning:  { emoji:"🔥", color:"#C9A84C", label:"On fire!",    pulse:true  },
     steady:   { emoji:"✨", color:"#F59E0B", label:"Steady",      pulse:false },
     balanced: { emoji:"⚖️",  color:"#4A9EFF", label:"Balanced",   pulse:false },
     over:     { emoji:"⚠️",  color:"#EF4444", label:"Over goal",  pulse:true  },
@@ -745,7 +745,7 @@ const StreakBeast = ({ days }) => {
   const beasts = [
     { emoji:"😴", label:"Sleeping",   color:"#666",    title:"Start your streak!" },
     { emoji:"🐣", label:"Hatching",   color:"#F59E0B", title:"Just woke up" },
-    { emoji:"🦊", label:"Awakening",  color:"#E05C2A", title:"Getting warmed up" },
+    { emoji:"🦊", label:"Awakening",  color:"#C9A84C", title:"Getting warmed up" },
     { emoji:"🐺", label:"Unleashed",  color:"#8B5CF6", title:"Week streak unlocked" },
     { emoji:"🦁", label:"Dominant",   color:"#10B981", title:"2-week warrior" },
     { emoji:"🐉", label:"LEGENDARY",  color:"#F59E0B", title:"30-day BEAST MODE" },
@@ -857,8 +857,7 @@ function Onboarding({ onComplete }) {
           <circle cx="48" cy="48" r="46" fill="url(#bgGrad)"/>
           <circle cx="48" cy="48" r="46" fill="url(#shineGrad)"/>
           <circle cx="48" cy="48" r="46" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
-          <text x="48" y="58" textAnchor="middle" fontFamily="Georgia,serif" fontWeight="900" fontSize="46" fill="white" style={{letterSpacing:"-2px"}}>K</text>
-          <text x="72" y="30" textAnchor="middle" fontSize="18">🔥</text>
+          <text x="48" y="58" textAnchor="middle" fontFamily="Georgia,serif" fontWeight="900" fontSize="46" fill="white" style={{letterSpacing:"-2px"}}>J</text>
         </svg>
       </div>
       <div style={{marginBottom:8}}><JhimFitLogo size="lg" /></div>
@@ -2327,8 +2326,7 @@ export default function JhimFitness() {
             <circle cx="48" cy="48" r="46" fill="url(#bgG2)"/>
             <circle cx="48" cy="48" r="46" fill="url(#shG2)"/>
             <circle cx="48" cy="48" r="46" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
-            <text x="48" y="58" textAnchor="middle" fontFamily="Georgia,serif" fontWeight="900" fontSize="46" fill="white">K</text>
-            <text x="72" y="30" textAnchor="middle" fontSize="18">🔥</text>
+            <text x="48" y="58" textAnchor="middle" fontFamily="Georgia,serif" fontWeight="900" fontSize="46" fill="white">J</text>
           </svg>
         </div>
         <div style={{fontSize:20,fontWeight:900,marginBottom:6}}>Joachim Naakureh</div>
