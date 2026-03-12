@@ -8,21 +8,21 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="KhimFit" />
-    <meta name="application-name" content="KhimFit" />
-    <meta name="theme-color" content="#e05c2a" />
-    <meta name="msapplication-TileColor" content="#0d1117" />
+    <meta name="apple-mobile-web-app-title" content="JhimFit" />
+    <meta name="application-name" content="JhimFit" />
+    <meta name="theme-color" content="#C9A84C" />
+    <meta name="msapplication-TileColor" content="#0a0f1e" />
     <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
     <meta name="msapplication-config" content="none" />
 
     <!-- SEO -->
-    <meta name="description" content="KhimFit — Ghana's personal fitness and nutrition tracker. Track calories, log Ghanaian meals, follow guided workout programmes, and hit your goals." />
-    <meta name="keywords" content="Ghana fitness app, calorie tracker Ghana, workout app, Ghanaian food calories, KhimFit" />
+    <meta name="description" content="JhimFit — Ghana's personal fitness and nutrition tracker. Track calories, log Ghanaian meals, follow guided workout programmes, and hit your goals." />
+    <meta name="keywords" content="Ghana fitness app, calorie tracker Ghana, workout app, Ghanaian food calories, JhimFit" />
     <meta name="author" content="Joachim Naakureh" />
     <meta name="robots" content="index, follow" />
 
     <!-- Open Graph (WhatsApp / Facebook previews) -->
-    <meta property="og:title" content="KhimFit — Ghana Fitness Tracker" />
+    <meta property="og:title" content="JhimFit — Ghana Fitness Tracker" />
     <meta property="og:description" content="Track calories, log Ghanaian meals, and follow guided workout plans. Free fitness app built for Ghana." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://khim-fitness.vercel.app" />
@@ -32,7 +32,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="KhimFit — Ghana Fitness Tracker" />
+    <meta name="twitter:title" content="JhimFit — Ghana Fitness Tracker" />
     <meta name="twitter:description" content="Free fitness tracker with Ghanaian meal plans and guided workouts." />
     <meta name="twitter:image" content="/icons/icon-512x512.png" />
 
@@ -51,12 +51,12 @@
     <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png" />
     <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png" />
 
-    <title>KhimFit — Ghana Fitness Tracker</title>
+    <title>JhimFit — Ghana Fitness Tracker</title>
 
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       html, body {
-        background: #0d1117;
+        background: #0a0f1e;
         color: #f0ede8;
         height: 100%;
         -webkit-tap-highlight-color: transparent;
@@ -75,7 +75,7 @@
       /* Splash screen while app loads */
       #splash {
         position: fixed; inset: 0;
-        background: #0d1117;
+        background: #0a0f1e;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
         gap: 18px; z-index: 9999;
@@ -84,11 +84,11 @@
       #splash.hidden { opacity: 0; pointer-events: none; }
       #splash-logo {
         width: 96px; height: 96px; border-radius: 22px;
-        background: linear-gradient(135deg, #1a1f2e, #0d1117);
-        border: 2px solid #e05c2a44;
+        background: linear-gradient(135deg, #111827, #0a0f1e);
+        border: 2px solid #C9A84C44;
         display: flex; align-items: center; justify-content: center;
         font-family: Impact, sans-serif; font-size: 52px; color: white;
-        box-shadow: 0 0 40px #e05c2a33;
+        box-shadow: 0 0 40px #C9A84C33;
       }
       #splash-name {
         font-family: Impact, sans-serif; font-size: 32px;
@@ -103,7 +103,7 @@
         border-radius: 2px; overflow: hidden; margin-top: 8px;
       }
       #splash-fill {
-        height: 100%; width: 0%; background: #e05c2a;
+        height: 100%; width: 0%; background: #C9A84C;
         border-radius: 2px;
         animation: splashLoad 1.2s ease forwards;
       }
@@ -117,8 +117,8 @@
   <body>
     <!-- Splash screen -->
     <div id="splash">
-      <div id="splash-logo">K</div>
-      <div id="splash-name">KHIMFIT</div>
+      <div id="splash-logo">J</div>
+      <div id="splash-name">JHIMFIT</div>
       <div id="splash-sub">Ghana Fitness Tracker</div>
       <div id="splash-bar"><div id="splash-fill"></div></div>
     </div>
@@ -139,7 +139,7 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('✓ KhimFit SW registered'))
+            .then(reg => console.log('✓ JhimFit SW registered'))
             .catch(err => console.log('SW failed:', err));
         });
       }
