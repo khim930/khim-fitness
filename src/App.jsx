@@ -10,45 +10,20 @@ const JhimFitLogo = ({ size = "md" }) => {
   const s = scales[size] || scales.md;
   const gold = "#C9A84C";
   const white = "#F0EDE8";
-  const dim = "rgba(240,237,232,0.45)";
-
+  const boxSize = 38 * s;
   return (
-    <div style={{ display:"flex", alignItems:"center", gap: 6 * s, lineHeight:1 }}>
-      {/* SVG mark: J-that-looks-like-G + barbell bridge */}
-      <svg width={48*s} height={36*s} viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* J shaped like a G — curved bottom with inward serif */}
-        <path
-          d={`M28 4 L28 22 Q28 30 20 30 Q12 30 12 23 L12 20`}
-          stroke={gold} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"
-        />
-        {/* The horizontal bar that makes J look like G */}
-        <path d="M20 23 L28 23" stroke={gold} strokeWidth="3.5" strokeLinecap="round"/>
-
-        {/* Barbell bridging J to h */}
-        {/* Left weight plate */}
-        <rect x="30" y="13" width="3" height="10" rx="1.5" fill={gold}/>
-        {/* Bar */}
-        <rect x="33" y="16.5" width="6" height="3" rx="1.5" fill={gold}/>
-        {/* Right weight plate */}
-        <rect x="39" y="13" width="3" height="10" rx="1.5" fill={gold}/>
+    <div style={{ display:"flex", alignItems:"center", gap: 7*s, lineHeight:1 }}>
+      <svg width={boxSize} height={boxSize} viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="38" height="38" rx="7" fill="#0d1320"/>
+        <rect width="38" height="6" rx="3" fill={gold}/>
+        <rect y="3" width="38" height="3" fill={gold}/>
+        <rect x="20" y="5" width="8" height="20" rx="1" fill={white}/>
+        <path d="M28 24 Q28 34 19 34 Q10 34 10 26" stroke={white} strokeWidth="7" strokeLinecap="round" fill="none"/>
+        <line x1="28" y1="5" x2="34" y2="5" stroke={gold} strokeWidth="3" strokeLinecap="round"/>
       </svg>
-
-      {/* Wordmark */}
-      <div style={{ display:"flex", alignItems:"baseline", gap: 1 }}>
-        <span style={{
-          fontFamily: "'Bebas Neue', Impact, sans-serif",
-          fontSize: 26 * s,
-          letterSpacing: 1,
-          color: white,
-          lineHeight: 1,
-        }}>him</span>
-        <span style={{
-          fontFamily: "'Bebas Neue', Impact, sans-serif",
-          fontSize: 26 * s,
-          letterSpacing: 1,
-          color: gold,
-          lineHeight: 1,
-        }}>Fit</span>
+      <div style={{ display:"flex", alignItems:"baseline" }}>
+        <span style={{ fontFamily:"'Bebas Neue',Impact,sans-serif", fontSize:26*s, letterSpacing:1.5, color:white, lineHeight:1 }}>him</span>
+        <span style={{ fontFamily:"'Bebas Neue',Impact,sans-serif", fontSize:26*s, letterSpacing:1.5, color:gold, lineHeight:1 }}>Fit</span>
       </div>
     </div>
   );
