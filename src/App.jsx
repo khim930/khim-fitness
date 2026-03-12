@@ -1497,8 +1497,8 @@ export default function JhimFitness() {
         </div>
       )}
       {/* Main tab bar */}
-      <div style={{background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"grid",gridTemplateColumns:"repeat(5,1fr)"}}>
-        {navItems.filter(t=>t.id!=="help").map(t=>(
+      <div style={{background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"grid",gridTemplateColumns:"repeat(6,1fr)"}}>
+        {navItems.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
             <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
             <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.3)"}}>{t.label}</span>
