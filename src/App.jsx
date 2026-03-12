@@ -14,12 +14,17 @@ const JhimFitLogo = ({ size = "md" }) => {
   return (
     <div style={{ display:"flex", alignItems:"center", gap: 7*s, lineHeight:1 }}>
       <svg width={boxSize} height={boxSize} viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Dark bg */}
         <rect width="38" height="38" rx="7" fill="#0d1320"/>
-        <rect width="38" height="6" rx="3" fill={gold}/>
-        <rect y="3" width="38" height="3" fill={gold}/>
-        <rect x="20" y="5" width="8" height="20" rx="1" fill={white}/>
-        <path d="M28 24 Q28 34 19 34 Q10 34 10 26" stroke={white} strokeWidth="7" strokeLinecap="round" fill="none"/>
-        <line x1="28" y1="5" x2="34" y2="5" stroke={gold} strokeWidth="3" strokeLinecap="round"/>
+        {/* Gold top bar — same as K logo orange bar */}
+        <rect width="38" height="7" rx="3" fill={gold}/>
+        <rect y="4" width="38" height="3" fill={gold}/>
+        {/* Bold J — thick filled stem */}
+        <rect x="19" y="6" width="10" height="19" fill={white}/>
+        {/* Bold J — bottom hook as thick filled path */}
+        <path d="M19 25 L29 25 Q29 35 19 35 Q9 35 9 26 L9 23 L15 23 L15 26 Q15 29 19 29 Q23 29 23 25 Z" fill={white}/>
+        {/* Gold diagonal cut at top right — like K's sharp diagonal */}
+        <polygon points="29,6 38,6 38,11 29,6" fill={gold}/>
       </svg>
       <div style={{ display:"flex", alignItems:"baseline" }}>
         <span style={{ fontFamily:"'Bebas Neue',Impact,sans-serif", fontSize:26*s, letterSpacing:1.5, color:white, lineHeight:1 }}>him</span>
@@ -575,36 +580,7 @@ const setAvatarCache = (cache) => {
 };
 
 const generateAnimalImage = async (animalId) => {
-  const cache = getAvatarCache();
-  if (cache[animalId]) return cache[animalId];
-
-  const prompt = ANIMAL_PROMPTS[animalId];
-  if (!prompt) return null;
-
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-opus-4-5",
-        max_tokens: 1024,
-        messages: [{
-          role: "user",
-          content: [{
-            type: "text",
-            text: `Generate an image based on this description and return ONLY a base64-encoded PNG data URL (starting with data:image/png;base64,). No explanation, no markdown, just the raw data URL.\n\nDescription: ${prompt}`
-          }]
-        }]
-      })
-    });
-    const data = await res.json();
-    const text = data?.content?.[0]?.text?.trim();
-    if (text && text.startsWith("data:image")) {
-      const newCache = { ...getAvatarCache(), [animalId]: text };
-      setAvatarCache(newCache);
-      return text;
-    }
-  } catch {}
+  // API calls to Anthropic are blocked by CORS on deployed sites — use emoji avatars
   return null;
 };
 
@@ -1401,17 +1377,6 @@ function HelpContent() {
 export default function JhimFitness() {
   const isMobile = useIsMobile();
   useEffect(()=>injectStyles(),[]);
-
-  // Pre-generate all animal avatars in background on first load
-  useEffect(() => {
-    const cache = getAvatarCache();
-    const missing = SPIRIT_ANIMALS.filter(a => !cache[a.id]);
-    if (missing.length === 0) return;
-    // Stagger requests to avoid rate limits
-    missing.forEach((a, i) => {
-      setTimeout(() => generateAnimalImage(a.id), i * 1500);
-    });
-  }, []);
 
   // Hide splash screen once app mounts
   useEffect(() => {
