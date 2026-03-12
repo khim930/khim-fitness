@@ -1,6 +1,59 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 
+/* ── JhimFit Brand Logo ────────────────────────────────────────────────────
+   The "J" curves into a "G" shape to echo the "Gym" sound visually.
+   A barbell icon bridges the J and h, reinforcing the fitness brand.
+────────────────────────────────────────────────────────────────────────── */
+const JhimFitLogo = ({ size = "md" }) => {
+  const scales = { sm: 0.55, md: 0.85, lg: 1.2 };
+  const s = scales[size] || scales.md;
+  const gold = "#C9A84C";
+  const white = "#F0EDE8";
+  const dim = "rgba(240,237,232,0.45)";
+
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap: 6 * s, lineHeight:1 }}>
+      {/* SVG mark: J-that-looks-like-G + barbell bridge */}
+      <svg width={48*s} height={36*s} viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* J shaped like a G — curved bottom with inward serif */}
+        <path
+          d={`M28 4 L28 22 Q28 30 20 30 Q12 30 12 23 L12 20`}
+          stroke={gold} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"
+        />
+        {/* The horizontal bar that makes J look like G */}
+        <path d="M20 23 L28 23" stroke={gold} strokeWidth="3.5" strokeLinecap="round"/>
+
+        {/* Barbell bridging J to h */}
+        {/* Left weight plate */}
+        <rect x="30" y="13" width="3" height="10" rx="1.5" fill={gold}/>
+        {/* Bar */}
+        <rect x="33" y="16.5" width="6" height="3" rx="1.5" fill={gold}/>
+        {/* Right weight plate */}
+        <rect x="39" y="13" width="3" height="10" rx="1.5" fill={gold}/>
+      </svg>
+
+      {/* Wordmark */}
+      <div style={{ display:"flex", alignItems:"baseline", gap: 1 }}>
+        <span style={{
+          fontFamily: "'Bebas Neue', Impact, sans-serif",
+          fontSize: 26 * s,
+          letterSpacing: 1,
+          color: white,
+          lineHeight: 1,
+        }}>him</span>
+        <span style={{
+          fontFamily: "'Bebas Neue', Impact, sans-serif",
+          fontSize: 26 * s,
+          letterSpacing: 1,
+          color: gold,
+          lineHeight: 1,
+        }}>Fit</span>
+      </div>
+    </div>
+  );
+};
+
 const SPORT_FONT = "'Bebas Neue', 'Impact', sans-serif";
 const BODY_FONT  = "Georgia, 'Times New Roman', serif";
 
@@ -808,7 +861,7 @@ function Onboarding({ onComplete }) {
           <text x="72" y="30" textAnchor="middle" fontSize="18">🔥</text>
         </svg>
       </div>
-      <div style={{fontSize:36,fontWeight:900,letterSpacing:-1.5,marginBottom:8}}>Khim<span style={{color:"#C9A84C"}}>Fit</span></div>
+      <div style={{marginBottom:8}}><JhimFitLogo size="lg" /></div>
       <div style={{fontSize:15,color:"rgba(240,237,232,0.5)",lineHeight:1.8,marginBottom:36}}>Your personal Ghanaian fitness and nutrition tracker</div>
       {existing.length > 0 && <>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:14}}>Existing Profiles</div>
@@ -1601,7 +1654,7 @@ export default function JhimFitness() {
     <div style={{width:260,flexShrink:0,background:"#0a0f1e",borderRight:"none",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
       <div style={{padding:"28px 24px 20px"}}>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:4}}>Fitness and Nutrition</div>
-        <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Jhim<span style={{color:"#C9A84C"}}>Fit</span></div>
+        <JhimFitLogo size="md" />
       </div>
       <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(201,168,76,0.1)",borderLeft:"3px solid #C9A84C",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
         <SpiritAvatar animalId={profile.spiritAnimal||profile.avatar||"eagle"} seed={profile.name} size={40} ring={true}/>
@@ -2370,11 +2423,11 @@ export default function JhimFitness() {
       )}
       {!isMobile && <Sidebar/>}
       {isMobile && (
-        <div style={{position:"fixed",top:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderBottom:"none",padding:"13px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:100}}>
+        <div style={{position:"fixed",top:0,left:0,right:0,background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(201,168,76,0.1)",padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:100}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <button onClick={()=>setShowEdit(true)} style={{background:"transparent",border:"none",borderRadius:12,width:44,height:44,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,padding:2}}>
-              <SpiritAvatar animalId={profile.spiritAnimal||"eagle"} seed={profile.name} size={40} ring={true}/></button>
-            <div><div style={{fontSize:10,color:"rgba(240,237,232,0.4)",letterSpacing:2,textTransform:"uppercase",lineHeight:1}}>Welcome back</div><div style={{fontSize:17,fontWeight:900,letterSpacing:-0.5}}>{profile.name}</div></div>
+            <button onClick={()=>setShowEdit(true)} style={{background:"transparent",border:"none",borderRadius:12,width:40,height:40,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,padding:2}}>
+              <SpiritAvatar animalId={profile.spiritAnimal||"eagle"} seed={profile.name} size={36} ring={true}/></button>
+            <JhimFitLogo size="sm" />
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             <div style={{textAlign:"right"}}><div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:2}}>GOAL</div><div style={{fontSize:14,fontWeight:900,color:"#C9A84C"}}>{calGoal} kcal</div></div>
