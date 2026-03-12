@@ -1386,11 +1386,50 @@ export default function JhimFitness() {
     {id:"help",    icon:"❓",  label:"Help"},
   ];
 
+  // ── Context-aware quick actions per tab ──────────────────────────────────
+  const CTX_ACTIONS = {
+    home: [
+      { label:"Log Water",      icon:"💧", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
+      { label:"Today's Stats",  icon:"📈", action:()=>setTab("stats") },
+      { label:"Quick Workout",  icon:"⚡", action:()=>setTab("workout") },
+    ],
+    diet: [
+      { label:"Log a Meal",     icon:"➕", action:()=>{ setTab("diet"); } },
+      { label:"Nutrition Summary", icon:"🥗", action:()=>setTab("stats") },
+      { label:"Add Water",      icon:"💧", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
+    ],
+    workout: openSession ? [
+      { label: timerRunning ? "Pause Timer" : "Resume Timer", icon: timerRunning ? "⏸" : "▶", action:()=>setTimerRun(r=>!r) },
+      { label:"Reset Timer",    icon:"↺",  action:()=>{ setTimerSecs(0); setTimerRun(false); } },
+      { label:"Back to Plan",   icon:"◀",  action:()=>setOpenSess(null) },
+    ] : [
+      { label:"Lose Weight Plan", icon:"🔥", action:()=>{ setWTab("lose"); setTab("workout"); } },
+      { label:"Build Muscle Plan",icon:"💪", action:()=>{ setWTab("gain"); setTab("workout"); } },
+      { label:"Quick Log",        icon:"⚡", action:()=>{ setWTab("log"); setTab("workout"); } },
+    ],
+    stats: [
+      { label:"This Week",      icon:"📅", action:()=>setTab("stats") },
+      { label:"Log Weight",     icon:"⚖️", action:()=>setTab("home") },
+      { label:"View Diet",      icon:"🍽", action:()=>setTab("diet") },
+    ],
+    contact: [
+      { label:"Call Now",       icon:"📞", action:()=>window.open("tel:+233531113498") },
+      { label:"Send Email",     icon:"✉️", action:()=>window.open("mailto:joachimnaakureh07@gmail.com") },
+      { label:"WhatsApp",       icon:"💬", action:()=>window.open("https://wa.me/233531113498") },
+    ],
+    help: [
+      { label:"How to Log Meals",  icon:"🍽", action:()=>setTab("diet") },
+      { label:"Start a Workout",   icon:"🏋", action:()=>setTab("workout") },
+      { label:"View Progress",     icon:"📊", action:()=>setTab("stats") },
+    ],
+  };
+  const ctxActions = CTX_ACTIONS[tab] || [];
+
   const Sidebar = () => (
     <div style={{width:260,flexShrink:0,background:"#0a0f1e",borderRight:"none",display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0}}>
       <div style={{padding:"28px 24px 20px"}}>
         <div style={{fontSize:11,letterSpacing:3,color:"rgba(240,237,232,0.35)",textTransform:"uppercase",marginBottom:4}}>Fitness and Nutrition</div>
-        <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Khim<span style={{color:"#C9A84C"}}>Fit</span></div>
+        <div style={{fontSize:28,fontWeight:900,letterSpacing:-1}}>Jhim<span style={{color:"#C9A84C"}}>Fit</span></div>
       </div>
       <button onClick={()=>setShowEdit(true)} style={{margin:"0 14px",background:"rgba(201,168,76,0.1)",borderLeft:"3px solid #C9A84C",borderRadius:16,padding:"14px 16px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:12,color:"#f0ede8",marginBottom:10}}>
         <SpiritAvatar animalId={profile.spiritAnimal||profile.avatar||"eagle"} seed={profile.name} size={40} ring={true}/>
@@ -1400,9 +1439,25 @@ export default function JhimFitness() {
       {others.length>0 && <button onClick={()=>setShowSw(true)} style={{margin:"0 14px 20px",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:12,padding:"9px 14px",cursor:"pointer",color:"rgba(240,237,232,0.5)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8}}>Switch Profile ({others.length})</button>}
       <nav style={{flex:1,padding:"0 14px"}}>
         {navItems.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
-            <span style={{fontSize:20}}>{t.icon}</span>{t.label}
-          </button>
+          <div key={t.id}>
+            <button onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:tab===t.id?4:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
+              <span style={{fontSize:20}}>{t.icon}</span>{t.label}
+            </button>
+            {/* Context actions — only shown under active tab */}
+            {tab===t.id && ctxActions.length>0 && (
+              <div style={{marginBottom:8,marginLeft:8,padding:"8px 0 4px",borderLeft:"2px solid rgba(201,168,76,0.2)",paddingLeft:12}}>
+                <div style={{fontSize:9,letterSpacing:2,color:"rgba(201,168,76,0.5)",textTransform:"uppercase",marginBottom:6}}>Quick Actions</div>
+                {ctxActions.map((a,i)=>(
+                  <button key={i} onClick={a.action} style={{width:"100%",background:"transparent",border:"none",borderRadius:9,padding:"7px 10px",marginBottom:2,cursor:"pointer",display:"flex",alignItems:"center",gap:10,color:"rgba(240,237,232,0.65)",fontSize:13,textAlign:"left",transition:"all 0.15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.background="rgba(201,168,76,0.08)"}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                    <span style={{fontSize:14,width:20,textAlign:"center"}}>{a.icon}</span>
+                    <span>{a.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
       </nav>
       <div style={{padding:"12px 14px 0",borderTop:"none"}}>
@@ -1417,14 +1472,40 @@ export default function JhimFitness() {
   );
 
   const BottomNav = () => (
-    <div style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(13,17,23,0.97)",backdropFilter:"blur(20px)",borderTop:"none",display:"grid",gridTemplateColumns:"repeat(5,1fr)",zIndex:100}}>
-      {navItems.map(t=>(
-        <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-          <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
-          <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.3)"}}>{t.label}</span>
-          {tab===t.id&&<div style={{width:16,height:2,background:"#C9A84C",borderRadius:2}}/>}
-        </button>
-      ))}
+    <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:100}}>
+      {/* Context action strip above bottom nav */}
+      {ctxActions.length>0 && (
+        <div style={{
+          background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",
+          borderTop:"1px solid rgba(201,168,76,0.15)",
+          display:"flex", overflowX:"auto", gap:8,
+          padding:"8px 12px", scrollbarWidth:"none",
+        }}>
+          <div style={{fontSize:9,letterSpacing:2,color:"rgba(201,168,76,0.6)",textTransform:"uppercase",alignSelf:"center",flexShrink:0,marginRight:4}}>Quick:</div>
+          {ctxActions.map((a,i)=>(
+            <button key={i} onClick={a.action} style={{
+              flexShrink:0, background:"rgba(201,168,76,0.08)",
+              border:"1px solid rgba(201,168,76,0.2)",
+              borderRadius:20, padding:"6px 14px",
+              color:"#f0ede8", fontSize:12, cursor:"pointer",
+              display:"flex", alignItems:"center", gap:6, whiteSpace:"nowrap",
+              fontFamily:BODY_FONT,
+            }}>
+              <span style={{fontSize:13}}>{a.icon}</span>{a.label}
+            </button>
+          ))}
+        </div>
+      )}
+      {/* Main tab bar */}
+      <div style={{background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"grid",gridTemplateColumns:"repeat(5,1fr)"}}>
+        {navItems.filter(t=>t.id!=="help").map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+            <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
+            <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.3)"}}>{t.label}</span>
+            {tab===t.id&&<div style={{width:16,height:2,background:"#C9A84C",borderRadius:2}}/>}
+          </button>
+        ))}
+      </div>
     </div>
   );
 
