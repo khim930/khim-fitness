@@ -377,7 +377,7 @@ export default function JhimFitness() {
           <span>☁️</span><span>Sign in to sync data across devices</span>
         </button>
       )}
-      <nav style={{flex:1,padding:"0 14px"}}>
+      <nav style={{flex:1,padding:"0 14px",overflowY:"auto",scrollbarWidth:"none"}}>
         {navItems.map(t=>(
           <div key={t.id}>
             <button onClick={()=>navigateTo(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:tab===t.id?4:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
