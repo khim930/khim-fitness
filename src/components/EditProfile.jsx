@@ -181,7 +181,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
 
 /* ── Stick Figure Exercise Animations ──────────────────────────────────────── */
 /* ═══════════════════════════════════════════════════════════════════════════
-   AI-POWERED EXERCISE VISUALS
+   EXERCISE VISUALS
    • Calls Anthropic API to generate a real instructional fitness image
    • Shows animated human SVG figure while loading / as fallback
    • Caches per session so each exercise only generates once
