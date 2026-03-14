@@ -233,7 +233,7 @@ const GHANAIAN_MEALS = [
 ];
 
 const QUICK_WORKOUTS = [
-  { id:1,  name:"Morning Jog",       icon:"run", calories:280, duration:30 },
+  { id:1,  name:"Morning Jog",       icon:"🏃", calories:280, duration:30 },
   { id:2,  name:"Strength Training", icon:"💪", calories:350, duration:45 },
   { id:3,  name:"Dance Aerobics",    icon:"💃", calories:320, duration:40 },
   { id:4,  name:"Cycling",           icon:"🚴", calories:400, duration:45 },
@@ -242,8 +242,8 @@ const QUICK_WORKOUTS = [
   { id:7,  name:"Football",          icon:"⚽", calories:500, duration:60 },
   { id:8,  name:"Jump Rope",         icon:"🪢", calories:370, duration:30 },
   { id:9,  name:"HIIT Circuit",      icon:"🔥", calories:480, duration:30 },
-  { id:10, name:"Bench Press",       icon:"dumbbell", calories:220, duration:40 },
-  { id:11, name:"Deadlift",          icon:"bolt", calories:250, duration:40 },
+  { id:10, name:"Bench Press",       icon:"🏋", calories:220, duration:40 },
+  { id:11, name:"Deadlift",          icon:"⚡", calories:250, duration:40 },
   { id:12, name:"Burpees",           icon:"🤸", calories:350, duration:25 },
   { id:13, name:"Walking",           icon:"🚶", calories:160, duration:45 },
   { id:14, name:"Pull-ups",          icon:"💥", calories:200, duration:30 },
@@ -652,17 +652,20 @@ const HydrationSprite = ({ current, goal }) => {
   const pct = Math.min(current / goal, 1);
   const level = pct === 0 ? "empty" : pct < 0.4 ? "low" : pct < 0.75 ? "mid" : "full";
   const states = {
-    empty: { color:"#555",    label:"Dehydrated" },
-    low:   { color:"#F59E0B", label:"Drink up!" },
-    mid:   { color:"#4A9EFF", label:"Hydrating" },
-    full:  { color:"#10B981", label:"Hydrated!" },
+    empty: { emoji:"💀", color:"#666",    label:"Dehydrated!", pulse:false },
+    low:   { emoji:"😰", color:"#F59E0B", label:"Drink up!",   pulse:true  },
+    mid:   { emoji:"💧", color:"#4A9EFF", label:"Hydrating",   pulse:false },
+    full:  { emoji:"⚡", color:"#10B981", label:"Hydrated!",   pulse:true  },
   };
   const s = states[level];
   return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={s.color} style={{filter:`drop-shadow(0 0 5px ${s.color}77)`}}>
-        <path d="M12 2L6 10a6 6 0 1 0 12 0L12 2z"/>
-      </svg>
+      <span style={{
+        fontSize:22, lineHeight:1,
+        display:"block",
+        animation: s.pulse ? "pulse 1.2s ease-in-out infinite" : "none",
+        filter: `drop-shadow(0 0 6px ${s.color}88)`,
+      }}>{s.emoji}</span>
       <span style={{fontSize:8,color:s.color,fontWeight:700,letterSpacing:0.5,fontFamily:"'Bebas Neue',sans-serif"}}>{s.label}</span>
     </div>
   );
@@ -673,18 +676,20 @@ const CalorieFlamSprite = ({ net, goal }) => {
   const pct = net / goal;
   const level = pct <= 0 ? "crushed" : pct < 0.6 ? "burning" : pct < 0.9 ? "steady" : pct < 1.1 ? "balanced" : "over";
   const states = {
-    crushed:  { color:"#10B981", label:"Crushed it!" },
-    burning:  { color:"#C9A84C", label:"On fire!"    },
-    steady:   { color:"#F59E0B", label:"Steady"      },
-    balanced: { color:"#4A9EFF", label:"Balanced"    },
-    over:     { color:"#EF4444", label:"Over goal"   },
+    crushed:  { emoji:"🌟", color:"#10B981", label:"Crushed it!", pulse:true  },
+    burning:  { emoji:"🔥", color:"#C9A84C", label:"On fire!",    pulse:true  },
+    steady:   { emoji:"✨", color:"#F59E0B", label:"Steady",      pulse:false },
+    balanced: { emoji:"⚖️",  color:"#4A9EFF", label:"Balanced",   pulse:false },
+    over:     { emoji:"⚠️",  color:"#EF4444", label:"Over goal",  pulse:true  },
   };
   const s = states[level];
   return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={s.color} style={{filter:`drop-shadow(0 0 5px ${s.color}77)`}}>
-        <path d="M12 2c0 0-5 5-5 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-3 3s-2-2-2-4c0-1 1-3 2-4z"/>
-      </svg>
+      <span style={{
+        fontSize:22, lineHeight:1,
+        animation: s.pulse ? "pulse 1s ease-in-out infinite" : "none",
+        filter: `drop-shadow(0 0 6px ${s.color}88)`,
+      }}>{s.emoji}</span>
       <span style={{fontSize:8,color:s.color,fontWeight:700,letterSpacing:0.5,fontFamily:"'Bebas Neue',sans-serif"}}>{s.label}</span>
     </div>
   );
@@ -694,20 +699,22 @@ const CalorieFlamSprite = ({ net, goal }) => {
 const StreakBeast = ({ days }) => {
   const tier = days === 0 ? 0 : days < 3 ? 1 : days < 7 ? 2 : days < 14 ? 3 : days < 30 ? 4 : 5;
   const beasts = [
-    { label:"Sleeping",   color:"#555",    bar:0 },
-    { label:"Starting",   color:"#F59E0B", bar:10 },
-    { label:"Warming Up", color:"#C9A84C", bar:30 },
-    { label:"Unleashed",  color:"#8B5CF6", bar:50 },
-    { label:"Dominant",   color:"#10B981", bar:75 },
-    { label:"LEGENDARY",  color:"#F59E0B", bar:100 },
+    { emoji:"😴", label:"Sleeping",   color:"#666",    title:"Start your streak!" },
+    { emoji:"🐣", label:"Hatching",   color:"#F59E0B", title:"Just woke up" },
+    { emoji:"🦊", label:"Awakening",  color:"#C9A84C", title:"Getting warmed up" },
+    { emoji:"🐺", label:"Unleashed",  color:"#8B5CF6", title:"Week streak unlocked" },
+    { emoji:"🦁", label:"Dominant",   color:"#10B981", title:"2-week warrior" },
+    { emoji:"🐉", label:"LEGENDARY",  color:"#F59E0B", title:"30-day BEAST MODE" },
   ];
   const b = beasts[tier];
   return (
-    <div style={{display:"flex",alignItems:"center",gap:10}}>
-      {/* Flame icon SVG */}
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={b.color} style={{filter:`drop-shadow(0 0 6px ${b.color}88)`,flexShrink:0}}>
-        <path d="M12 2c0 0-5 5-5 10a5 5 0 0 0 10 0c0-2-1-4-2-5 0 2-1 3-3 3s-2-2-2-4c0-1 1-3 2-4z"/>
-      </svg>
+    <div style={{display:"flex",alignItems:"center",gap:8}}>
+      <span style={{
+        fontSize:26,
+        animation: days > 0 ? "pulse 1.4s ease-in-out infinite" : "none",
+        filter: `drop-shadow(0 0 8px ${b.color}99)`,
+        display:"block",
+      }}>{b.emoji}</span>
       <div>
         <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:b.color,letterSpacing:1,lineHeight:1}}>{days} DAY{days!==1?"S":""}</div>
         <div style={{fontSize:9,color:b.color,opacity:0.8,letterSpacing:1,fontWeight:700}}>{b.label.toUpperCase()}</div>
@@ -1286,7 +1293,7 @@ function MealCard({ meal, isSelected, onSelect, onLog }) {
   return (
     <div onClick={onSelect} style={{background:isSelected?"linear-gradient(135deg,"+meal.color+"1a,"+meal.color+"0d)":"rgba(255,255,255,0.0)",border:"1px solid "+(isSelected?meal.color+"88":"rgba(255,255,255,0.07)"),borderRadius:16,marginBottom:10,cursor:"pointer",overflow:"hidden",transition:"all 0.22s"}}>
       <div style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px"}}>
-        <div style={{width:48,height:48,borderRadius:13,background:meal.color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}><span style={{width:10,height:10,borderRadius:"50%",background:meal.color||"#C9A84C",display:"inline-block",flexShrink:0}}></span></div>
+        <div style={{width:48,height:48,borderRadius:13,background:meal.color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{meal.emoji}</div>
         <div style={{flex:1,minWidth:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
             <div><div style={{fontWeight:800,fontSize:15}}>{meal.name}</div><div style={{fontSize:10,color:meal.color,letterSpacing:2,marginTop:3,textTransform:"uppercase"}}>{meal.category}</div></div>
@@ -1342,7 +1349,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"diet", icon:"fork", title:"Logging Meals",color:"#f0a500",
+      id:"diet", icon:"🍽", title:"Logging Meals",color:"#f0a500",
       steps:[
         { num:1, title:"Go to the Diet tab", body:"Tap Diet in the bottom bar (mobile) or left sidebar (desktop). You will see 20 traditional Ghanaian meals organised by category: Breakfast, Lunch, Dinner and Snack." },
         { num:2, title:"Filter by meal type", body:"Use the category pills at the top (All, Breakfast, Lunch, Dinner, Snack) to quickly find the right meal for the time of day." },
@@ -1352,7 +1359,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"workout", icon:"dumbbell", title:"Tracking Workouts",color:"#1a6e5a",
+      id:"workout", icon:"🏋", title:"Tracking Workouts",color:"#1a6e5a",
       steps:[
         { num:1, title:"Quick Log - fast activity logging", body:"Go to Workout and make sure the Quick Log tab is selected. You will see 14 activity cards (Jog, HIIT, Football, etc). Simply tap any card to instantly log it - the calories burned are added to your daily total." },
         { num:2, title:"Lose Weight programme", body:"Tap the Lose Weight tab. This is an 8-week, 4-days-per-week fat-burning programme. You will see 4 weekly sessions: HIIT Cardio, Full-Body Fat Burn, Jump Rope and Core, and Steady-State Cardio." },
@@ -1373,7 +1380,7 @@ function HelpContent() {
       ]
     },
     {
-      id:"stats", icon:"bar", title:"Stats and Records",color:"#C9A84C",
+      id:"stats", icon:"📊", title:"Stats and Records",color:"#C9A84C",
       steps:[
         { num:1, title:"7-day calorie chart", body:"The bar chart shows your calorie intake (orange) and calories burned (green) for each day of the past week. Red bars mean you went over your goal that day." },
         { num:2, title:"Summary cards", body:"Below the chart you will see: Average Daily Calories, Total Burned this week, Active Days (days you logged a workout), and Total Meals logged across all time." },
@@ -1682,35 +1689,26 @@ export default function JhimFitness() {
   const goToWelcome = () => { localStorage.removeItem(SK); setProfile(null); };
 
   const cPad     = isMobile ? "16px" : "28px 32px";
-  // Clean SVG icons — no emojis
-  const NAV_ICONS = {
-    home:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    diet:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2"/><path d="M18 2v4h4"/><path d="M21 19a3 3 0 0 1-6 0 3 3 0 0 1 6 0z"/></svg>,
-    workout: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 4v16"/><path d="M18 4v16"/><path d="M3 8h3"/><path d="M3 16h3"/><path d="M18 8h3"/><path d="M18 16h3"/><path d="M6 12h12"/></svg>,
-    stats:   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
-    contact: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5.05a2 2 0 0 1 1.99-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.26-1.26a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
-    help:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-  };
   const navItems = [
-    {id:"home",    icon:NAV_ICONS.home,    label:"Home"},
-    {id:"diet",    icon:NAV_ICONS.diet,    label:"Diet"},
-    {id:"workout", icon:NAV_ICONS.workout, label:"Workout"},
-    {id:"stats",   icon:NAV_ICONS.stats,   label:"Stats"},
-    {id:"contact", icon:NAV_ICONS.contact, label:"Contact"},
-    {id:"help",    icon:NAV_ICONS.help,    label:"Help"},
+    {id:"home",    icon:"⌂",  label:"Home"},
+    {id:"diet",    icon:"🍽", label:"Diet"},
+    {id:"workout", icon:"🏋", label:"Workout"},
+    {id:"stats",   icon:"📊", label:"Stats"},
+    {id:"contact", icon:"📞", label:"Contact"},
+    {id:"help",    icon:"❓",  label:"Help"},
   ];
 
   // ── Context-aware quick actions per tab ──────────────────────────────────
   const CTX_ACTIONS = {
     home: [
-      { label:"Log Water",      icon:"water", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
-      { label:"Today's Stats",  icon:"chart", action:()=>setTab("stats") },
-      { label:"Quick Workout",  icon:"bolt", action:()=>setTab("workout") },
+      { label:"Log Water",      icon:"💧", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
+      { label:"Today's Stats",  icon:"📈", action:()=>setTab("stats") },
+      { label:"Quick Workout",  icon:"⚡", action:()=>setTab("workout") },
     ],
     diet: [
       { label:"Log a Meal",     icon:"➕", action:()=>{ setTab("diet"); } },
       { label:"Nutrition Summary", icon:"🥗", action:()=>setTab("stats") },
-      { label:"Add Water",      icon:"water", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
+      { label:"Add Water",      icon:"💧", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
     ],
     workout: openSession ? [
       { label: timerRunning ? "Pause Timer" : "Resume Timer", icon: timerRunning ? "⏸" : "▶", action:()=>setTimerRun(r=>!r) },
@@ -1719,22 +1717,22 @@ export default function JhimFitness() {
     ] : [
       { label:"Lose Weight Plan", icon:"🔥", action:()=>{ setWTab("lose"); setTab("workout"); } },
       { label:"Build Muscle Plan",icon:"💪", action:()=>{ setWTab("gain"); setTab("workout"); } },
-      { label:"Quick Log",        icon:"bolt", action:()=>{ setWTab("log"); setTab("workout"); } },
+      { label:"Quick Log",        icon:"⚡", action:()=>{ setWTab("log"); setTab("workout"); } },
     ],
     stats: [
       { label:"This Week",      icon:"📅", action:()=>setTab("stats") },
       { label:"Log Weight",     icon:"⚖️", action:()=>setTab("home") },
-      { label:"View Diet",      icon:"fork", action:()=>setTab("diet") },
+      { label:"View Diet",      icon:"🍽", action:()=>setTab("diet") },
     ],
     contact: [
-      { label:"Call Now",       icon:"phone", action:()=>window.open("tel:+233531113498") },
+      { label:"Call Now",       icon:"📞", action:()=>window.open("tel:+233531113498") },
       { label:"Send Email",     icon:"✉️", action:()=>window.open("mailto:joachimnaakureh07@gmail.com") },
       { label:"WhatsApp",       icon:"💬", action:()=>window.open("https://wa.me/233531113498") },
     ],
     help: [
-      { label:"How to Log Meals",  icon:"fork", action:()=>setTab("diet") },
-      { label:"Start a Workout",   icon:"dumbbell", action:()=>setTab("workout") },
-      { label:"View Progress",     icon:"bar", action:()=>setTab("stats") },
+      { label:"How to Log Meals",  icon:"🍽", action:()=>setTab("diet") },
+      { label:"Start a Workout",   icon:"🏋", action:()=>setTab("workout") },
+      { label:"View Progress",     icon:"📊", action:()=>setTab("stats") },
     ],
   };
   const ctxActions = CTX_ACTIONS[tab] || [];
@@ -1767,7 +1765,7 @@ export default function JhimFitness() {
         {navItems.map(t=>(
           <div key={t.id}>
             <button onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:tab===t.id?4:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
-              <span style={{display:"flex",alignItems:"center",width:20,height:20,flexShrink:0}}>{t.icon}</span>{t.label}
+              <span style={{fontSize:20}}>{t.icon}</span>{t.label}
             </button>
             {/* Context actions — only shown under active tab */}
             {tab===t.id && ctxActions.length>0 && (
@@ -1826,7 +1824,7 @@ export default function JhimFitness() {
       <div style={{background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"grid",gridTemplateColumns:"repeat(6,1fr)"}}>
         {navItems.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-            <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:22,height:22,opacity:tab===t.id?1:0.38}}>{t.icon}</span>
+            <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
             <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.3)"}}>{t.label}</span>
             {tab===t.id&&<div style={{width:16,height:2,background:"#C9A84C",borderRadius:2}}/>}
           </button>
@@ -2207,7 +2205,7 @@ export default function JhimFitness() {
         <div style={{fontSize:22,fontWeight:900,marginBottom:4}}>Workouts</div>
         <div style={{fontSize:13,color:"rgba(240,237,232,0.45)",marginBottom:20}}>Log activities, follow guided plans, and track records</div>
         <div style={{display:"flex",gap:8,marginBottom:24,background:"rgba(255,255,255,0.0)",borderRadius:16,padding:5}}>
-          {[{id:"log",label:"Quick Log",icon:"bolt"},{id:"lose",label:"Lose Weight",icon:"🔥"},{id:"gain",label:"Build Muscle",icon:"💪"}].map(t=>(
+          {[{id:"log",label:"Quick Log",icon:"⚡"},{id:"lose",label:"Lose Weight",icon:"🔥"},{id:"gain",label:"Build Muscle",icon:"💪"}].map(t=>(
             <button key={t.id} onClick={()=>setWTab(t.id)} style={{flex:1,background:wTab===t.id?"#C9A84C":"transparent",border:"none",borderRadius:12,padding:"10px 6px",cursor:"pointer",color:wTab===t.id?"#fff":"rgba(240,237,232,0.5)",fontSize:12,fontWeight:wTab===t.id?800:400,transition:"all 0.2s"}}>
               {t.icon+" "+t.label}
             </button>
@@ -2436,8 +2434,8 @@ export default function JhimFitness() {
         <div style={{fontSize:12,color:"rgba(240,237,232,0.35)"}}>Based in Accra, Ghana</div>
       </div>
       {[
-        { icon:"📞", label:"Phone / WhatsApp", value:"+233 53 111 3498",  href:"tel:+233531113498",                        color:"#1a6e5a" },
-        { icon:"📞", label:"Phone / WhatsApp", value:"+233 55 198 5225",  href:"tel:+233551985225",                        color:"#1a6e5a" },
+        { icon:"📲", label:"Phone / WhatsApp", value:"+233 53 111 3498",  href:"tel:+233531113498",                        color:"#1a6e5a" },
+        { icon:"📲", label:"Phone / WhatsApp", value:"+233 55 198 5225",  href:"tel:+233551985225",                        color:"#1a6e5a" },
         { icon:"✉️", label:"Email",            value:"joachimnaakureh07@gmail.com", href:"mailto:joachimnaakureh07@gmail.com", color:"#C9A84C" },
       ].map((c,i)=>(
         <a key={i} href={c.href} style={{display:"flex",alignItems:"center",gap:18,background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",color:"#f0ede8",transition:"all 0.2s"}}>
