@@ -2530,6 +2530,18 @@ export default function JhimFitness() {
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             <div style={{textAlign:"right"}}><div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:2}}>GOAL</div><div style={{fontSize:14,fontWeight:900,color:"#C9A84C"}}>{calGoal} kcal</div></div>
             {others.length>0&&<button onClick={()=>setShowSw(true)} style={{background:"rgba(255,255,255,0.06)",border:"none",borderRadius:10,padding:"6px 10px",cursor:"pointer",fontSize:11,color:"rgba(240,237,232,0.5)"}}>Switch</button>}
+            {/* Cloud sync button — mobile */}
+            {authUser ? (
+              <button onClick={()=>{ signOut(); setAuthUser(null); toast_("Signed out","#666"); }}
+                style={{background:"rgba(16,185,129,0.12)",border:"1px solid rgba(16,185,129,0.3)",borderRadius:10,padding:"5px 9px",cursor:"pointer",fontSize:11,color:"#10B981",fontWeight:700,display:"flex",alignItems:"center",gap:4}}>
+                ☁️
+              </button>
+            ) : (
+              <button onClick={()=>setShowAuth(true)}
+                style={{background:"rgba(201,168,76,0.12)",border:"1px solid rgba(201,168,76,0.3)",borderRadius:10,padding:"5px 9px",cursor:"pointer",fontSize:11,color:"#C9A84C",fontWeight:700,display:"flex",alignItems:"center",gap:4}}>
+                ☁️
+              </button>
+            )}
           </div>
         </div>
       )}
