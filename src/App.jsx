@@ -1048,11 +1048,14 @@ export default function JhimFitness() {
         <div style={{fontSize:12,color:"rgba(240,237,232,0.35)"}}>Based in Accra, Ghana</div>
       </div>
       {[
-        { icon:"📲", label:"Phone / WhatsApp", value:"+233 53 111 3498",  href:"tel:+233531113498",                        color:"#1a6e5a" },
-        { icon:"📲", label:"Phone / WhatsApp", value:"+233 55 198 5225",  href:"tel:+233551985225",                        color:"#1a6e5a" },
-        { icon:"✉️", label:"Email",            value:"joachimnaakureh07@gmail.com", href:"mailto:joachimnaakureh07@gmail.com", color:"#C9A84C" },
+        { icon:"📞", label:"Call",      value:"+233 53 111 3498", href:"tel:+233531113498",                              color:"#1a6e5a" },
+        { icon:"💬", label:"WhatsApp",  value:"+233 53 111 3498", href:"https://wa.me/233531113498?text=Hi%20Joachim%2C%20I%20am%20reaching%20out%20from%20JhimFit!", color:"#25D366" },
+        { icon:"📞", label:"Call",      value:"+233 55 198 5225", href:"tel:+233551985225",                              color:"#1a6e5a" },
+        { icon:"💬", label:"WhatsApp",  value:"+233 55 198 5225", href:"https://wa.me/233551985225?text=Hi%20Joachim%2C%20I%20am%20reaching%20out%20from%20JhimFit!", color:"#25D366" },
+        { icon:"✉️", label:"Email",     value:"joachimnaakureh07@gmail.com", href:"mailto:joachimnaakureh07@gmail.com",   color:"#C9A84C" },
       ].map((c,i)=>(
-        <a key={i} href={c.href} style={{display:"flex",alignItems:"center",gap:18,background:"rgba(255,255,255,0.0)",border:"none",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",color:"#f0ede8",transition:"all 0.2s"}}>
+        <a key={i} href={c.href} target={c.label==="WhatsApp"?"_blank":"_self"} rel="noopener noreferrer"
+          style={{display:"flex",alignItems:"center",gap:18,background:"rgba(255,255,255,0.0)",border:"1px solid "+c.color+"22",borderRadius:18,padding:"18px 20px",marginBottom:12,textDecoration:"none",color:"#f0ede8",transition:"all 0.2s"}}>
           <div style={{width:52,height:52,borderRadius:15,background:c.color+"22",border:"1px solid "+c.color+"44",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{c.icon}</div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:4}}>{c.label}</div>
