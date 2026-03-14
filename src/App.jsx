@@ -1491,13 +1491,26 @@ export default function JhimFitness() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ── Restore session from localStorage on first load ──
-  const _sess = lsess();
+  // ── Session restore logic ────────────────────────────────────────────────
+  // sessionStorage clears when app is fully closed/swiped away from background
+  // localStorage persists across full closes
+  // Rules:
+  //   • App killed & reopened   → always go to "home"
+  //   • App still in background → React state is alive, tab stays where it was
+  //   • First ever open         → go to "home" (onboarding if no profile)
+  const _sess     = lsess();
   const _profiles = lp();
   const _restoredProfile = _sess.profileName ? (_profiles[_sess.profileName]||null) : null;
 
+  // Use sessionStorage to detect if this is a fresh app launch vs background resume
+  const _isFreshLaunch = !sessionStorage.getItem("jhimfit_active");
+  if (!sessionStorage.getItem("jhimfit_active")) {
+    sessionStorage.setItem("jhimfit_active", "1");
+  }
+
+  // Fresh launch always starts on home; background resume keeps React state (no re-init needed)
   const [profile, setProfile]   = useState(_restoredProfile);
-  const [tab, setTab]           = useState(_restoredProfile ? (_sess.tab||"home") : "home");
+  const [tab, setTab]           = useState("home");  // always start on home
   const [data, setData]         = useState({ log:{}, workoutLog:{}, water:{}, weightLog:{} });
   const [weightInput, setWI]    = useState("");
   const [selectedMeal, setSM]   = useState(null);
@@ -1544,6 +1557,53 @@ export default function JhimFitness() {
     setInstallPrompt(null);
   };
 
+  // ── Back button / swipe-back navigation ──────────────────────────────────
+  // Push a history state for each tab so the browser back button navigates
+  // within the app instead of closing it or going to a previous URL.
+  const tabHistory = React.useRef(["home"]);
+
+  const navigateTo = useCallback((newTab) => {
+    if (newTab === tab) return;
+    tabHistory.current = [...tabHistory.current, newTab];
+    window.history.pushState({ tab: newTab }, "", "");
+    setTab(newTab);
+    // Close any open modals
+    setShowEdit(false);
+    setShowSw(false);
+  }, [tab]);
+
+  useEffect(() => {
+    // Push initial state so the first back press doesn't exit
+    window.history.replaceState({ tab: "home" }, "", "");
+
+    const handlePopState = (e) => {
+      const hist = tabHistory.current;
+      if (hist.length > 1) {
+        // Go back to previous tab
+        const prev = hist[hist.length - 2];
+        tabHistory.current = hist.slice(0, -1);
+        setTab(prev);
+        // Push a new state so next back still works
+        window.history.pushState({ tab: prev }, "", "");
+      } else {
+        // Already at home — push state again to prevent app exit
+        setTab("home");
+        window.history.pushState({ tab: "home" }, "", "");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  // Keep tab history in sync when tab changes via navigateTo
+  // (direct setTab calls from other parts of the app also update history)
+  const prevTabRef = React.useRef(tab);
+  useEffect(() => {
+    if (tab !== prevTabRef.current) {
+      prevTabRef.current = tab;
+    }
+  }, [tab]);
 
   // Save active profile + tab to localStorage whenever they change
   useEffect(() => {
@@ -1712,12 +1772,12 @@ export default function JhimFitness() {
   const CTX_ACTIONS = {
     home: [
       { label:"Log Water",      icon:"💧", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
-      { label:"Today's Stats",  icon:"📈", action:()=>setTab("stats") },
-      { label:"Quick Workout",  icon:"⚡", action:()=>setTab("workout") },
+      { label:"Today's Stats",  icon:"📈", action:()=>navigateTo("stats") },
+      { label:"Quick Workout",  icon:"⚡", action:()=>navigateTo("workout") },
     ],
     diet: [
-      { label:"Log a Meal",     icon:"➕", action:()=>{ setTab("diet"); } },
-      { label:"Nutrition Summary", icon:"🥗", action:()=>setTab("stats") },
+      { label:"Log a Meal",     icon:"➕", action:()=>{ navigateTo("diet"); } },
+      { label:"Nutrition Summary", icon:"🥗", action:()=>navigateTo("stats") },
       { label:"Add Water",      icon:"💧", action:()=>{ addWater(); toast_("💧 Water logged!","#4a9eff"); } },
     ],
     workout: openSession ? [
@@ -1725,14 +1785,14 @@ export default function JhimFitness() {
       { label:"Reset Timer",    icon:"↺",  action:()=>{ setTimerSecs(0); setTimerRun(false); } },
       { label:"Back to Plan",   icon:"◀",  action:()=>setOpenSess(null) },
     ] : [
-      { label:"Lose Weight Plan", icon:"🔥", action:()=>{ setWTab("lose"); setTab("workout"); } },
-      { label:"Build Muscle Plan",icon:"💪", action:()=>{ setWTab("gain"); setTab("workout"); } },
-      { label:"Quick Log",        icon:"⚡", action:()=>{ setWTab("log"); setTab("workout"); } },
+      { label:"Lose Weight Plan", icon:"🔥", action:()=>{ setWTab("lose"); navigateTo("workout"); } },
+      { label:"Build Muscle Plan",icon:"💪", action:()=>{ setWTab("gain"); navigateTo("workout"); } },
+      { label:"Quick Log",        icon:"⚡", action:()=>{ setWTab("log");  navigateTo("workout"); } },
     ],
     stats: [
-      { label:"This Week",      icon:"📅", action:()=>setTab("stats") },
-      { label:"Log Weight",     icon:"⚖️", action:()=>setTab("home") },
-      { label:"View Diet",      icon:"🍽", action:()=>setTab("diet") },
+      { label:"This Week",      icon:"📅", action:()=>navigateTo("stats") },
+      { label:"Log Weight",     icon:"⚖️", action:()=>navigateTo("home") },
+      { label:"View Diet",      icon:"🍽", action:()=>navigateTo("diet") },
     ],
     contact: [
       { label:"Call Now",       icon:"📞", action:()=>window.open("tel:+233531113498") },
@@ -1740,9 +1800,9 @@ export default function JhimFitness() {
       { label:"WhatsApp",       icon:"💬", action:()=>window.open("https://wa.me/233531113498") },
     ],
     help: [
-      { label:"How to Log Meals",  icon:"🍽", action:()=>setTab("diet") },
-      { label:"Start a Workout",   icon:"🏋", action:()=>setTab("workout") },
-      { label:"View Progress",     icon:"📊", action:()=>setTab("stats") },
+      { label:"How to Log Meals",  icon:"🍽", action:()=>navigateTo("diet") },
+      { label:"Start a Workout",   icon:"🏋", action:()=>navigateTo("workout") },
+      { label:"View Progress",     icon:"📊", action:()=>navigateTo("stats") },
     ],
   };
   const ctxActions = CTX_ACTIONS[tab] || [];
@@ -1774,7 +1834,7 @@ export default function JhimFitness() {
       <nav style={{flex:1,padding:"0 14px"}}>
         {navItems.map(t=>(
           <div key={t.id}>
-            <button onClick={()=>setTab(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:tab===t.id?4:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
+            <button onClick={()=>navigateTo(t.id)} style={{width:"100%",background:tab===t.id?"rgba(201,168,76,0.15)":"transparent",border:"1px solid "+(tab===t.id?"rgba(201,168,76,0.4)":"transparent"),borderRadius:13,padding:"13px 16px",marginBottom:tab===t.id?4:6,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.55)",fontSize:15,textAlign:"left",fontWeight:tab===t.id?700:400,transition:"all 0.2s"}}>
               <span style={{fontSize:20}}>{t.icon}</span>{t.label}
             </button>
             {/* Context actions — only shown under active tab */}
@@ -1833,7 +1893,7 @@ export default function JhimFitness() {
       {/* Main tab bar */}
       <div style={{background:"rgba(10,15,30,0.97)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"grid",gridTemplateColumns:"repeat(6,1fr)"}}>
         {navItems.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+          <button key={t.id} onClick={()=>navigateTo(t.id)} style={{background:"none",border:"none",cursor:"pointer",padding:"10px 0 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
             <span style={{fontSize:18,filter:tab===t.id?"none":"grayscale(1) opacity(0.38)"}}>{t.icon}</span>
             <span style={{fontSize:7,letterSpacing:0.3,textTransform:"uppercase",color:tab===t.id?"#C9A84C":"rgba(240,237,232,0.3)"}}>{t.label}</span>
             {tab===t.id&&<div style={{width:16,height:2,background:"#C9A84C",borderRadius:2}}/>}
@@ -2519,7 +2579,7 @@ export default function JhimFitness() {
               <button onClick={()=>setShowSw(false)} style={{background:"none",border:"none",color:"rgba(240,237,232,0.4)",fontSize:24,cursor:"pointer"}}>X</button>
             </div>
             {others.map(p=>(
-              <button key={p.id} onClick={()=>{setProfile(p);setShowSw(false);setTab("home");toast_("Welcome back, "+p.name+"! "+p.avatar);}} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:"#f0ede8",textAlign:"left"}}>
+              <button key={p.id} onClick={()=>{setProfile(p);setShowSw(false);navigateTo("home");toast_("Welcome back, "+p.name+"! "+p.avatar);}} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:14,color:"#f0ede8",textAlign:"left"}}>
                 <SpiritAvatar animalId={p.spiritAnimal||p.avatar||"eagle"} seed={p.name} size={36} ring={true}/>
                 <div style={{flex:1}}><div style={{fontWeight:800,fontSize:15}}>{p.name}</div><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>{p.calorieGoal} kcal goal - {(GOALS.find(g=>g.id===p.goal)||{label:""}).label}</div></div>
                 <span style={{color:"#C9A84C",fontSize:20}}>&#x2192;</span>
