@@ -59,7 +59,7 @@ export default function JhimFitness() {
   //   • App killed & reopened   → always go to "home"
   //   • App still in background → React state is alive, tab stays where it was
   //   • First ever open         → go to "home" (onboarding if no profile)
-  const _sess     = lsess();
+  const _sess     = getSession();
   const _profiles = getProfiles();
   const _restoredProfile = _sess.profileName ? (_profiles[_sess.profileName]||null) : null;
 
@@ -182,7 +182,7 @@ export default function JhimFitness() {
 
   useEffect(() => {
     if (!profile) return;
-    setUserData(profile.id, {...ld(profile.id), ...data, workoutRecords, completedSets});
+    setUserData(profile.id, {...getUserData(profile.id), ...data, workoutRecords, completedSets});
     // Sync profile to Supabase if logged in
     if (authUser) saveProfile(authUser.id, profile).catch(()=>{});
   }, [data, workoutRecords, completedSets, profile&&profile.id]);
@@ -300,9 +300,9 @@ export default function JhimFitness() {
   const weekStats = DAYS.map((d,i)=>{ const dt=new Date(); dt.setDate(dt.getDate()-(6-i)); const k=fmt(dt); const ms=log[k]||[]; const ws=workoutLog[k]||[]; return {day:d,cals:ms.reduce((s,m)=>s+m.calories,0),burned:ws.reduce((s,w)=>s+w.calories,0),w:weightLog[k]||null}; });
   const maxCals   = Math.max(...weekStats.map(s=>s.cals),calGoal,1);
   const filtered  = filterCat==="All"?GHANAIAN_MEALS:GHANAIAN_MEALS.filter(m=>m.category===filterCat);
-  const others    = Object.values(lp()).filter(p=>p.id!==profile.id);
-  const delProfile = () => { const a=lp(); delete a[profile.name]; sp(a); localStorage.removeItem("kfd_"+profile.id); setProfile(null); setShowEdit(false); localStorage.removeItem(SK); };
-  const goToWelcome = () => { localStorage.removeItem(SK); setProfile(null); };
+  const others    = Object.values(getProfiles()).filter(p=>p.id!==profile.id);
+  const delProfile = () => { const a=getProfiles(); delete a[profile.name]; setProfiles(a); localStorage.removeItem("kfd_"+profile.id); setProfile(null); setShowEdit(false); localStorage.removeItem("jhimfit_session"); };
+  const goToWelcome = () => { localStorage.removeItem("jhimfit_session"); setProfile(null); };
 
   const cPad     = isMobile ? "16px" : "28px 32px";
   const navItems = [
