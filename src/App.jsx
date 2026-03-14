@@ -13,7 +13,7 @@ import Onboarding from "./components/Onboarding";
 import EditProfile from "./components/EditProfile";
 import { MealCard, StatCard, DiffBadge } from "./components/Cards";
 import HelpContent from "./components/HelpContent";
-import ExerciseDrillModal from "./components/ExerciseDrillModal";
+import ExerciseDrillModal, { EXERCISE_VIDEOS } from "./components/ExerciseDrillModal";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 import { GHANAIAN_MEALS } from "./data/meals";

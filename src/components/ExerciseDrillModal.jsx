@@ -139,4 +139,5 @@ const ExerciseDrillModal = React.memo(({ exercise, onClose }) => {
   );
 });
 
+export { EXERCISE_VIDEOS };
 export default ExerciseDrillModal;
