@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { supabase, signUp, signIn, signOut, saveProfile, loadProfile,
+         logFood, loadFoodLogs, deleteFoodLog,
+         logWorkout, loadWorkoutLogs,
+         logWeight, loadWeightLogs,
+         logWater, loadWaterLog } from "./supabase.js";
 
 /* ── JhimFit Brand Logo ────────────────────────────────────────────────────
    The "J" curves into a "G" shape to echo the "Gym" sound visually.
@@ -770,6 +775,81 @@ const sd    = (uid,v) => localStorage.setItem("kfd_"+uid, JSON.stringify(v));
 const lsess = () => { try { return JSON.parse(localStorage.getItem(SK)||"{}"); } catch { return {}; } };
 const ssess = (v) => localStorage.setItem(SK, JSON.stringify(v));
 
+/* ── Supabase Auth Component ──────────────────────────────────────────────────
+   Login/Signup screen shown when no Supabase session exists.
+   Falls back gracefully — if offline, still uses localStorage.
+────────────────────────────────────────────────────────────────────────────── */
+function AuthScreen({ onAuth }) {
+  const [mode, setMode]   = useState("login"); // "login" | "signup"
+  const [email, setEmail] = useState("");
+  const [pass, setPass]   = useState("");
+  const [name, setName]   = useState("");
+  const [err, setErr]     = useState("");
+  const [loading, setLoading] = useState(false);
+  const gold = "#C9A84C";
+  const inp  = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:14, padding:"15px 18px", color:"#f0ede8", outline:"none", fontFamily:"Georgia", boxSizing:"border-box", fontSize:16, marginBottom:14 };
+
+  const handle = async () => {
+    setErr(""); setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { data, error } = await signUp(email, pass);
+        if (error) { setErr(error.message); setLoading(false); return; }
+        if (data.user) onAuth(data.user, name);
+      } else {
+        const { data, error } = await signIn(email, pass);
+        if (error) { setErr(error.message); setLoading(false); return; }
+        if (data.user) onAuth(data.user, null);
+      }
+    } catch(e) { setErr("Network error — check your connection"); }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0f1e",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"Georgia,serif"}}>
+      <div style={{width:"100%",maxWidth:420,color:"#f0ede8"}}>
+        <div style={{textAlign:"center",marginBottom:36}}>
+          <JhimFitLogo size="lg"/>
+          <div style={{fontSize:13,color:"rgba(240,237,232,0.4)",marginTop:12,letterSpacing:1}}>GHANA FITNESS TRACKER</div>
+        </div>
+
+        {/* Toggle */}
+        <div style={{display:"flex",background:"rgba(255,255,255,0.05)",borderRadius:14,padding:4,marginBottom:28}}>
+          {["login","signup"].map(m=>(
+            <button key={m} onClick={()=>{setMode(m);setErr("");}}
+              style={{flex:1,background:mode===m?gold:"transparent",border:"none",borderRadius:11,padding:"11px",color:mode===m?"#0a0f1e":"rgba(240,237,232,0.5)",fontWeight:800,fontSize:15,cursor:"pointer",transition:"all 0.2s"}}>
+              {m==="login"?"Sign In":"Create Account"}
+            </button>
+          ))}
+        </div>
+
+        {mode==="signup" && (
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" style={inp}/>
+        )}
+        <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email address" style={inp}/>
+        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Password" style={{...inp,marginBottom:6}}
+          onKeyDown={e=>e.key==="Enter"&&handle()}/>
+
+        {err && <div style={{color:"#EF4444",fontSize:13,marginBottom:14,padding:"10px 14px",background:"rgba(239,68,68,0.1)",borderRadius:10}}>{err}</div>}
+
+        <button onClick={handle} disabled={loading||!email||!pass}
+          style={{width:"100%",background:(!loading&&email&&pass)?gold:"rgba(255,255,255,0.08)",border:"none",borderRadius:14,padding:"16px",color:(!loading&&email&&pass)?"#0a0f1e":"rgba(255,255,255,0.25)",fontWeight:900,fontSize:17,cursor:"pointer",marginBottom:20}}>
+          {loading ? "Please wait..." : mode==="login" ? "Sign In" : "Create Account"}
+        </button>
+
+        {/* Skip / use offline */}
+        <button onClick={()=>onAuth(null,"offline")}
+          style={{width:"100%",background:"transparent",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,padding:"13px",color:"rgba(240,237,232,0.35)",fontSize:14,cursor:"pointer"}}>
+          Continue without account (offline)
+        </button>
+        <div style={{textAlign:"center",fontSize:11,color:"rgba(240,237,232,0.2)",marginTop:12}}>
+          Your data syncs across all your devices when signed in
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function useIsMobile() {
   const [mob, setMob] = useState(window.innerWidth < 768);
   useEffect(() => {
@@ -1383,6 +1463,24 @@ export default function JhimFitness() {
     if (window.__hideSplash) window.__hideSplash();
   }, []);
 
+  // ── Supabase auth state ──────────────────────────────────────────────────
+  const [authUser, setAuthUser]   = useState(null);   // Supabase user object
+  const [authReady, setAuthReady] = useState(false);  // finished checking session
+  const [showAuth, setShowAuth]   = useState(false);  // show auth screen
+
+  useEffect(() => {
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthUser(session?.user || null);
+      setAuthReady(true);
+    });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user || null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
   // ── Restore session from localStorage on first load ──
   const _sess = lsess();
   const _profiles = lp();
@@ -1448,11 +1546,29 @@ export default function JhimFitness() {
     setData({ log:s.log||{}, workoutLog:s.workoutLog||{}, water:s.water||{}, weightLog:s.weightLog||{} });
     setWRec(s.workoutRecords||{});
     setCS(s.completedSets||{});
+    // If logged in, try to load profile from Supabase
+    if (authUser) {
+      loadProfile(authUser.id).then(({ data: sbProfile }) => {
+        if (sbProfile && sbProfile.name) {
+          // Merge Supabase profile data into local profile
+          const merged = { ...profile, ...{
+            name: sbProfile.name, avatar: sbProfile.spirit_animal || sbProfile.avatar || profile.avatar,
+            age: sbProfile.age, sex: sbProfile.sex, weight: sbProfile.weight_kg,
+            height: sbProfile.height_cm, activity: sbProfile.activity, goal: sbProfile.goal,
+            spiritAnimal: sbProfile.spirit_animal,
+          }};
+          setProfile(merged);
+          const all = lp(); all[merged.name] = merged; sp(all);
+        }
+      });
+    }
   }, [profile&&profile.id]);
 
   useEffect(() => {
     if (!profile) return;
     sd(profile.id, {...ld(profile.id), ...data, workoutRecords, completedSets});
+    // Sync profile to Supabase if logged in
+    if (authUser) saveProfile(authUser.id, profile).catch(()=>{});
   }, [data, workoutRecords, completedSets, profile&&profile.id]);
 
   // ── Session stopwatch ──────────────────────────────────────────────────
@@ -1492,7 +1608,39 @@ export default function JhimFitness() {
   };
 
   const toast_ = (msg, color="#1a6e5a") => { setToast({msg,color}); setTimeout(()=>setToast(null),2500); };
-  if (!profile) return <Onboarding onComplete={p=>{ setProfile(p); setTab("home"); }}/>;
+
+  // ── Auth gate: show auth screen if requested ──
+  if (showAuth) return (
+    <AuthScreen onAuth={(user, nameHint) => {
+      setShowAuth(false);
+      if (user) {
+        setAuthUser(user);
+        // Try to load existing Supabase profile
+        loadProfile(user.id).then(({ data: sbProfile }) => {
+          if (sbProfile && sbProfile.name) {
+            const p = {
+              id: user.id, name: sbProfile.name,
+              avatar: sbProfile.spirit_animal || "eagle",
+              spiritAnimal: sbProfile.spirit_animal || "eagle",
+              age: sbProfile.age, sex: sbProfile.sex,
+              weight: sbProfile.weight_kg, height: sbProfile.height_cm,
+              activity: sbProfile.activity, goal: sbProfile.goal,
+              calorieGoal: calcCalGoal({ weight:sbProfile.weight_kg, height:sbProfile.height_cm, age:sbProfile.age, sex:sbProfile.sex, activity:sbProfile.activity, goal:sbProfile.goal }),
+            };
+            const all = lp(); all[p.name] = p; sp(all);
+            setProfile(p); setTab("home");
+            toast_("Welcome back, " + p.name + "! ☁️ Data synced", "#C9A84C");
+          }
+        });
+      }
+    }}/>
+  );
+
+  if (!profile) return <Onboarding onComplete={p=>{
+    setProfile(p); setTab("home");
+    // Save to Supabase if logged in
+    if (authUser) saveProfile(authUser.id, p).then(()=>toast_("Profile saved to cloud ☁️","#C9A84C"));
+  }}/>;
 
 
   const { log, workoutLog, water, weightLog } = data;
@@ -1600,7 +1748,19 @@ export default function JhimFitness() {
         <div style={{flex:1,minWidth:0}}><div style={{fontWeight:800,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{profile.name}</div><div style={{fontSize:11,color:"#C9A84C",marginTop:2}}>{calGoal} kcal goal</div></div>
         <span style={{fontSize:12,color:"rgba(240,237,232,0.3)"}}>edit</span>
       </button>
-      {others.length>0 && <button onClick={()=>setShowSw(true)} style={{margin:"0 14px 20px",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:12,padding:"9px 14px",cursor:"pointer",color:"rgba(240,237,232,0.5)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8}}>Switch Profile ({others.length})</button>}
+      {others.length>0 && <button onClick={()=>setShowSw(true)} style={{margin:"0 14px 8px",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:12,padding:"9px 14px",cursor:"pointer",color:"rgba(240,237,232,0.5)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8}}>Switch Profile ({others.length})</button>}
+      {/* Cloud sync / auth button */}
+      {authUser ? (
+        <button onClick={()=>{ signOut(); setAuthUser(null); toast_("Signed out","#666"); }}
+          style={{margin:"0 14px 16px",background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.2)",borderRadius:12,padding:"8px 14px",cursor:"pointer",color:"#10B981",fontSize:11,textAlign:"left",display:"flex",alignItems:"center",gap:8,width:"calc(100% - 28px)"}}>
+          <span>☁️</span><span style={{flex:1}}>Synced to cloud</span><span style={{opacity:0.5}}>Sign out</span>
+        </button>
+      ) : (
+        <button onClick={()=>setShowAuth(true)}
+          style={{margin:"0 14px 16px",background:"rgba(201,168,76,0.08)",border:"1px solid rgba(201,168,76,0.2)",borderRadius:12,padding:"8px 14px",cursor:"pointer",color:"#C9A84C",fontSize:11,textAlign:"left",display:"flex",alignItems:"center",gap:8,width:"calc(100% - 28px)"}}>
+          <span>☁️</span><span>Sign in to sync data across devices</span>
+        </button>
+      )}
       <nav style={{flex:1,padding:"0 14px"}}>
         {navItems.map(t=>(
           <div key={t.id}>
