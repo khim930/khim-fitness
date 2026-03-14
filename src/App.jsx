@@ -786,6 +786,7 @@ function AuthScreen({ onAuth }) {
   const [name, setName]   = useState("");
   const [err, setErr]     = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const gold = "#C9A84C";
   const inp  = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:14, padding:"15px 18px", color:"#f0ede8", outline:"none", fontFamily:"Georgia", boxSizing:"border-box", fontSize:16, marginBottom:14 };
 
@@ -827,8 +828,17 @@ function AuthScreen({ onAuth }) {
           <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" style={inp}/>
         )}
         <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email address" style={inp}/>
-        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Password" style={{...inp,marginBottom:6}}
-          onKeyDown={e=>e.key==="Enter"&&handle()}/>
+        {/* Password with show/hide toggle */}
+        <div style={{position:"relative",marginBottom:6}}>
+          <input type={showPass?"text":"password"} value={pass} onChange={e=>setPass(e.target.value)}
+            placeholder="Password"
+            style={{...inp, marginBottom:0, paddingRight:52}}
+            onKeyDown={e=>e.key==="Enter"&&handle()}/>
+          <button onClick={()=>setShowPass(v=>!v)}
+            style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"rgba(240,237,232,0.4)",fontSize:13,fontWeight:700,padding:4}}>
+            {showPass ? "HIDE" : "SHOW"}
+          </button>
+        </div>
 
         {err && <div style={{color:"#EF4444",fontSize:13,marginBottom:14,padding:"10px 14px",background:"rgba(239,68,68,0.1)",borderRadius:10}}>{err}</div>}
 
