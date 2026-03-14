@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { GOALS, SPIRIT_ANIMALS } from "../data/constants";
-import { calcCalGoal } from "../utils/helpers";
+import { calcCalGoal, getProfiles, setProfiles } from "../utils/helpers";
 import SpiritAvatar from "./SpiritAvatar";
 
 function EditProfile({ profile, onSave, onClose, onDelete }) {
@@ -14,7 +14,7 @@ function EditProfile({ profile, onSave, onClose, onDelete }) {
       saveForm.weightUnit = "kg";
     }
     const u={...saveForm,calorieGoal:calcCalGoal(saveForm)};
-    const a=lp(); if(form.name!==profile.name) delete a[profile.name]; a[u.name]=u; sp(a); onSave(u);
+    const a=getProfiles(); if(form.name!==profile.name) delete a[profile.name]; a[u.name]=u; setProfiles(a); onSave(u);
   };
   const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"none", borderRadius:11, padding:"12px 15px", color:"#f0ede8", fontSize:15, outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
   return (

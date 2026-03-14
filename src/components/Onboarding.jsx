@@ -7,11 +7,11 @@ import SpiritAvatar from "./SpiritAvatar";
 function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ name:"", avatar:"🦁", age:"", sex:"male", weight:"", height:"", heightFt:"", heightIn:"", weightUnit:"kg", heightUnit:"cm", activity:"moderate", goal:"maintain" });
-  const existing = Object.values(lp());
+  const existing = Object.values(getProfiles());
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
   const finish = () => {
     const p = { ...form, name:form.name.trim(), id:form.name.trim().toLowerCase().replace(/\s+/g,"_")+"_"+Date.now(), calorieGoal:calcCalGoal(form), createdAt:TODAY };
-    const all = lp(); all[p.name] = p; sp(all); onComplete(p);
+    const all = getProfiles(); all[p.name] = p; setProfiles(all); onComplete(p);
   };
   const inp = { width:"100%", background:"rgba(255,255,255,0.08)", border:"none", borderRadius:14, padding:"15px 18px", color:"#f0ede8", outline:"none", fontFamily:"Georgia", boxSizing:"border-box" };
 
