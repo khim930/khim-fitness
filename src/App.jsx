@@ -401,9 +401,7 @@ export default function JhimFitness() {
         ))}
       </nav>
       <div style={{padding:"12px 14px 0",borderTop:"none"}}>
-        <button onClick={goToWelcome} style={{width:"100%",background:"rgba(255,255,255,0.0)",border:"none",borderRadius:11,padding:"10px 14px",cursor:"pointer",color:"rgba(240,237,232,0.4)",fontSize:12,textAlign:"left",display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-          <span>🏠</span> Welcome Screen
-        </button>
+
         <div style={{padding:"0 10px 16px",fontSize:10,color:"rgba(240,237,232,0.2)",letterSpacing:1,lineHeight:1.9}}>
           JHIMFIT v2.0<br/>BUILT BY JOACHIM<br/>ACCRA, GHANA
         </div>
