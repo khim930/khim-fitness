@@ -1,33 +1,105 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { signUp, signIn } from "../supabase.js";
 import JhimFitLogo from "./JhimFitLogo";
 
+// ── Rate limiting constants ────────────────────────────────────────────────
+const MAX_ATTEMPTS   = 5;    // max failed attempts before lockout
+const LOCKOUT_MS     = 5 * 60 * 1000; // 5 minute lockout
+const ATTEMPT_WINDOW = 10 * 60 * 1000; // reset attempt count after 10 mins
+
 function AuthScreen({ onAuth }) {
-  const [mode, setMode]   = useState("login"); // "login" | "signup"
-  const [email, setEmail] = useState("");
-  const [pass, setPass]   = useState("");
-  const [name, setName]   = useState("");
-  const [err, setErr]     = useState("");
+  const [mode, setMode]       = useState("login");
+  const [email, setEmail]     = useState("");
+  const [pass, setPass]       = useState("");
+  const [name, setName]       = useState("");
+  const [err, setErr]         = useState("");
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(null);
+  const [countdown, setCountdown] = useState(0);
+  const countdownRef = useRef(null);
   const gold = "#C9A84C";
   const inp  = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:14, padding:"15px 18px", color:"#f0ede8", outline:"none", fontFamily:"Georgia", boxSizing:"border-box", fontSize:16, marginBottom:14 };
 
+  // ── Input validation ────────────────────────────────────────────────────
+  const validateInputs = () => {
+    if (!email.trim())                          return "Please enter your email address.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
+    if (!pass)                                  return "Please enter your password.";
+    if (pass.length < 6)                        return "Password must be at least 6 characters.";
+    if (mode === "signup" && !name.trim())       return "Please enter your name.";
+    if (mode === "signup" && name.trim().length < 2) return "Name must be at least 2 characters.";
+    if (pass.length > 128)                      return "Password is too long.";
+    if (email.length > 254)                     return "Email address is too long.";
+    return null;
+  };
+
+  // ── Start lockout countdown ─────────────────────────────────────────────
+  const startLockout = (until) => {
+    setLockedUntil(until);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    countdownRef.current = setInterval(() => {
+      const remaining = Math.ceil((until - Date.now()) / 1000);
+      if (remaining <= 0) {
+        clearInterval(countdownRef.current);
+        setLockedUntil(null);
+        setAttempts(0);
+        setCountdown(0);
+        setErr("");
+      } else {
+        setCountdown(remaining);
+      }
+    }, 1000);
+  };
+
+  // ── Main handler ────────────────────────────────────────────────────────
   const handle = async () => {
+    // Check lockout
+    if (lockedUntil && Date.now() < lockedUntil) {
+      setErr(`Too many attempts. Try again in ${countdown} seconds.`);
+      return;
+    }
+
+    // Validate inputs
+    const validationError = validateInputs();
+    if (validationError) { setErr(validationError); return; }
+
     setErr(""); setLoading(true);
     try {
       if (mode === "signup") {
-        const { data, error } = await signUp(email, pass);
+        const { data, error } = await signUp(email.trim().toLowerCase(), pass);
         if (error) { setErr(error.message); setLoading(false); return; }
-        if (data.user) onAuth(data.user, name);
+        if (data.user) onAuth(data.user, name.trim());
       } else {
-        const { data, error } = await signIn(email, pass);
-        if (error) { setErr(error.message); setLoading(false); return; }
+        const { data, error } = await signIn(email.trim().toLowerCase(), pass);
+        if (error) {
+          // Increment failed attempt counter
+          const newAttempts = attempts + 1;
+          setAttempts(newAttempts);
+          if (newAttempts >= MAX_ATTEMPTS) {
+            const until = Date.now() + LOCKOUT_MS;
+            startLockout(until);
+            setErr(`Too many failed attempts. Locked for 5 minutes.`);
+          } else {
+            const remaining = MAX_ATTEMPTS - newAttempts;
+            setErr(`Incorrect email or password. ${remaining} attempt${remaining===1?"":"s"} remaining.`);
+          }
+          setLoading(false);
+          return;
+        }
+        // Success — reset attempts
+        setAttempts(0);
         if (data.user) onAuth(data.user, null);
       }
-    } catch(e) { setErr("Network error — check your connection"); }
+    } catch(e) {
+      setErr("Network error — check your connection and try again.");
+    }
     setLoading(false);
   };
+
+  const isLocked   = lockedUntil && Date.now() < lockedUntil;
+  const canSubmit  = !loading && !isLocked && email && pass;
 
   return (
     <div style={{minHeight:"100vh",background:"#0a0f1e",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"Georgia,serif"}}>
@@ -63,11 +135,32 @@ function AuthScreen({ onAuth }) {
           </button>
         </div>
 
-        {err && <div style={{color:"#EF4444",fontSize:13,marginBottom:14,padding:"10px 14px",background:"rgba(239,68,68,0.1)",borderRadius:10}}>{err}</div>}
+        {err && (
+          <div style={{color: isLocked?"#F59E0B":"#EF4444", fontSize:13, marginBottom:14, padding:"10px 14px",
+            background: isLocked?"rgba(245,158,11,0.1)":"rgba(239,68,68,0.1)", borderRadius:10,
+            display:"flex", alignItems:"center", gap:8}}>
+            {isLocked && <span style={{fontSize:16}}>🔒</span>}
+            {err}
+            {isLocked && countdown > 0 && <span style={{marginLeft:"auto",fontWeight:700,color:"#F59E0B"}}>{countdown}s</span>}
+          </div>
+        )}
 
-        <button onClick={handle} disabled={loading||!email||!pass}
-          style={{width:"100%",background:(!loading&&email&&pass)?gold:"rgba(255,255,255,0.08)",border:"none",borderRadius:14,padding:"16px",color:(!loading&&email&&pass)?"#0a0f1e":"rgba(255,255,255,0.25)",fontWeight:900,fontSize:17,cursor:"pointer",marginBottom:20}}>
-          {loading ? "Please wait..." : mode==="login" ? "Sign In" : "Create Account"}
+        {/* Attempt indicator dots */}
+        {attempts > 0 && !isLocked && (
+          <div style={{display:"flex",gap:6,marginBottom:14,justifyContent:"center"}}>
+            {Array.from({length:MAX_ATTEMPTS}).map((_,i)=>(
+              <div key={i} style={{width:8,height:8,borderRadius:"50%",
+                background: i < attempts ? "#EF4444" : "rgba(255,255,255,0.15)",
+                transition:"all 0.3s"}}/>
+            ))}
+          </div>
+        )}
+
+        <button onClick={handle} disabled={!canSubmit}
+          style={{width:"100%",background:canSubmit?gold:"rgba(255,255,255,0.08)",border:"none",borderRadius:14,padding:"16px",
+            color:canSubmit?"#0a0f1e":"rgba(255,255,255,0.25)",fontWeight:900,fontSize:17,
+            cursor:canSubmit?"pointer":"not-allowed",marginBottom:20,transition:"all 0.2s"}}>
+          {isLocked ? `🔒 Locked (${countdown}s)` : loading ? "Please wait..." : mode==="login" ? "Sign In" : "Create Account"}
         </button>
 
         {/* Skip / use offline */}
