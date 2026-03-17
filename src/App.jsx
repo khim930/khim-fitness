@@ -642,229 +642,174 @@ export default function JhimFitness() {
       const sess = plan&&plan.sessions[openSession.idx];
       if (!plan||!sess) return null;
       const alreadyLogged = (workoutRecords[TODAY]||[]).some(r=>r.planId===plan.id&&r.sessionName===sess.name);
-      // ── Gaming-style workout session ─────────────────────────────────────
-      const PURPLE = "#8E7CFF";
-      const TEAL   = "#45EBA5";
-      const BG     = "#1E1E2E";
-
       return (
-        <div style={{minHeight:"100vh", background:BG, margin:"-28px -32px", padding:"0 0 120px 0"}}>
+        <div>
           {drillEx && <ExerciseDrillModal exercise={drillEx} onClose={closeDrill}/>}
 
-          {/* ── Sticky Header ── */}
-          <div style={{position:"sticky",top:0,zIndex:200,background:"rgba(30,30,46,0.97)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(142,124,255,0.15)",padding:"14px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <button onClick={()=>setOpenSess(null)} style={{background:"rgba(142,124,255,0.12)",border:"1px solid rgba(142,124,255,0.25)",borderRadius:12,padding:"8px 14px",cursor:"pointer",color:PURPLE,fontSize:13,fontWeight:700,display:"flex",alignItems:"center",gap:6}}>
-              ← Back
-            </button>
-            <div style={{textAlign:"center"}}>
-              <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",letterSpacing:2,textTransform:"uppercase"}}>{plan.title}</div>
-              <div style={{fontSize:15,fontWeight:900,color:"#fff"}}>{sess.name}</div>
+          {/* ── Sticky Live Timer Bar ── */}
+          <div style={{
+            position:"sticky", top:0, zIndex:100,
+            background:"linear-gradient(135deg,#0d1320,#090d16)",
+            border:"1px solid rgba(255,255,255,0.08)",
+            borderRadius:16, padding:"12px 18px", marginBottom:16,
+            display:"flex", alignItems:"center", justifyContent:"space-between", gap:12,
+            boxShadow:"0 4px 24px rgba(0,0,0,0.5)",
+          }}>
+            {/* Elapsed time */}
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{
+                width:40, height:40, borderRadius:12,
+                background: timerRunning ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.06)",
+                border:`1px solid ${timerRunning ? "#C9A84C88" : "rgba(255,255,255,0.1)"}`,
+                display:"flex", alignItems:"center", justifyContent:"center", fontSize:18,
+                animation: timerRunning ? "pulse 2s ease-in-out infinite" : "none",
+              }}>⏱</div>
+              <div>
+                <div style={{fontFamily:SPORT_FONT,fontSize:26,letterSpacing:2,color:timerRunning?"#C9A84C":"rgba(240,237,232,0.5)",lineHeight:1}}>
+                  {fmtTime(timerSecs)}
+                </div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.3)",letterSpacing:1,marginTop:2}}>
+                  {timerRunning ? "SESSION RUNNING" : "PAUSED"}
+                </div>
+              </div>
             </div>
-            <div style={{background:"rgba(69,235,165,0.1)",border:"1px solid rgba(69,235,165,0.2)",borderRadius:12,padding:"8px 12px",textAlign:"center",minWidth:64}}>
-              <div style={{fontFamily:SPORT_FONT,fontSize:18,color:TEAL,letterSpacing:1,lineHeight:1}}>{fmtTime(timerSecs)}</div>
-              <div style={{fontSize:8,color:TEAL,letterSpacing:1,opacity:0.7}}>ELAPSED</div>
+
+            {/* Rest countdown (shown when active) */}
+            {restRunning && (
+              <div style={{
+                background:"rgba(74,158,255,0.15)", border:"1px solid rgba(74,158,255,0.4)",
+                borderRadius:12, padding:"8px 14px", textAlign:"center", animation:"pulse 1s ease-in-out infinite",
+              }}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:22,color:"#4a9eff",letterSpacing:1,lineHeight:1}}>{fmtTime(restSecs)}</div>
+                <div style={{fontSize:9,color:"#4a9eff",letterSpacing:1,marginTop:2}}>REST</div>
+              </div>
+            )}
+
+            {/* Controls */}
+            <div style={{display:"flex",gap:8,flexShrink:0}}>
+              <button onClick={()=>setTimerRun(r=>!r)} style={{
+                background: timerRunning ? "rgba(201,168,76,0.2)" : "rgba(16,185,129,0.2)",
+                border:`1px solid ${timerRunning ? "#C9A84C66" : "#10B98166"}`,
+                borderRadius:10, padding:"8px 14px", cursor:"pointer",
+                fontFamily:SPORT_FONT, fontSize:12, letterSpacing:1,
+                color: timerRunning ? "#C9A84C" : "#10B981",
+              }}>
+                {timerRunning ? "⏸ PAUSE" : "▶ START"}
+              </button>
+              <button onClick={()=>{setTimerSecs(0); setTimerRun(false); setRestSecs(0); setRestRun(false);}} style={{
+                background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)",
+                borderRadius:10, padding:"8px 10px", cursor:"pointer", fontSize:13, color:"rgba(240,237,232,0.4)",
+              }}>↺</button>
             </div>
           </div>
-
-          {/* ── Exercise Cards ── */}
-          <div style={{padding:"20px 16px 0"}}>
+          <button onClick={()=>setOpenSess(null)} style={{background:"rgba(201,168,76,0.1)",border:"none",borderLeft:"3px solid #C9A84C",borderRadius:10,color:"#C9A84C",cursor:"pointer",fontSize:14,padding:"10px 18px",marginBottom:18,display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontFamily:"Georgia"}}>&#8592; Back to {plan.title}</button>
+          <div style={{background:plan.bgColor,border:"1px solid "+plan.borderColor,borderRadius:20,padding:"20px 22px",marginBottom:20}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:10}}>
+              <div><div style={{fontSize:11,letterSpacing:2,color:plan.color,textTransform:"uppercase",marginBottom:4}}>{plan.icon+" "+plan.title+" - "+sess.day}</div><div style={{fontSize:22,fontWeight:900}}>{sess.name}</div></div>
+              <DiffBadge level={sess.difficulty}/>
+            </div>
+            <div style={{display:"flex",gap:20,marginBottom:16,flexWrap:"wrap"}}>
+              {[{l:"Duration",v:sess.duration+" min"},{l:"Calories Burned",v:"~"+sess.calories+" kcal"}].map(s=>(
+                <div key={s.l}><div style={{fontSize:11,color:"rgba(240,237,232,0.4)",letterSpacing:1}}>{s.l.toUpperCase()}</div><div style={{fontSize:16,fontWeight:800,color:plan.color,marginTop:2}}>{s.v}</div></div>
+              ))}
+            </div>
+            <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:"12px 16px"}}>
+              <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:5}}>Warm-up</div>
+              <div style={{fontSize:13,color:"rgba(240,237,232,0.75)"}}>{sess.warmup}</div>
+            </div>
+          </div>
+          <div style={{marginBottom:16}}>
+            <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"rgba(240,237,232,0.35)",marginBottom:12}}>EXERCISES — WATCH & FOLLOW</div>
             {sess.exercises.map((ex,ei)=>{
               const allDone = Array.from({length:ex.sets}).every((_,si)=>completedSets[plan.id+"-"+openSession.idx+"-"+ei+"-"+si]);
-              const isActive = !allDone;
-              const completedCount = Array.from({length:ex.sets}).filter((_,si)=>completedSets[plan.id+"-"+openSession.idx+"-"+ei+"-"+si]).length;
-
+              const ac = allDone ? "#1a6e5a" : plan.color;
               return (
-                <div key={ei} style={{
-                  background: allDone ? "rgba(69,235,165,0.05)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${allDone ? "rgba(69,235,165,0.3)" : "rgba(142,124,255,0.2)"}`,
-                  borderRadius:20, marginBottom:16, overflow:"hidden",
-                  transition:"all 0.3s",
-                  boxShadow: allDone ? "0 0 20px rgba(69,235,165,0.08)" : "0 4px 24px rgba(0,0,0,0.3)",
-                }}>
+                <div key={ei} style={{background:allDone?"rgba(26,122,74,0.07)":"rgba(255,255,255,0.03)",borderLeft:"3px solid "+ac,borderRadius:18,marginBottom:16,overflow:"hidden",opacity:allDone?0.5:1,transition:"all 0.4s"}}>
 
-                  {/* Animated exercise visual */}
-                  <div style={{
-                    background:`linear-gradient(135deg, rgba(142,124,255,0.15), rgba(69,235,165,0.08))`,
-                    padding:"24px 20px 16px",
-                    display:"flex", alignItems:"center", justifyContent:"space-between", gap:12,
-                  }}>
-                    {/* Stick figure animation */}
-                    <div style={{width:80,height:80,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                      <svg width="70" height="70" viewBox="0 0 70 70">
-                        {/* Head */}
-                        <circle cx="35" cy="10" r="7" fill={allDone?TEAL:PURPLE} opacity="0.9"/>
-                        {/* Body */}
-                        <line x1="35" y1="17" x2="35" y2="42" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round"/>
-                        {/* Arms - animated based on exercise type */}
-                        {(ex.anim==="curl"||ex.anim==="press"||ex.anim==="fly") ? <>
-                          <line x1="35" y1="24" x2="18" y2="30" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round" style={{transformOrigin:"35px 24px",animation:allDone?"none":"ex-curl 1.2s ease-in-out infinite"}}/>
-                          <line x1="35" y1="24" x2="52" y2="30" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round" style={{transformOrigin:"35px 24px",animation:allDone?"none":"ex-curl 1.2s ease-in-out infinite reverse"}}/>
-                        </> : (ex.anim==="squat"||ex.anim==="lunge") ? <>
-                          <line x1="35" y1="24" x2="18" y2="34" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round"/>
-                          <line x1="35" y1="24" x2="52" y2="34" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round"/>
-                        </> : <>
-                          <line x1="35" y1="24" x2="18" y2="36" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round" style={{animation:allDone?"none":"ex-arms-star 1.2s ease-in-out infinite"}}/>
-                          <line x1="35" y1="24" x2="52" y2="36" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round" style={{animation:allDone?"none":"ex-arms-star 1.2s ease-in-out infinite reverse"}}/>
-                        </>}
-                        {/* Legs */}
-                        <line x1="35" y1="42" x2="24" y2="60" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round"
-                          style={{transformOrigin:"35px 42px",animation:allDone?"none":`ex-${ex.anim||"bounce"} 1.2s ease-in-out infinite`}}/>
-                        <line x1="35" y1="42" x2="46" y2="60" stroke={allDone?TEAL:PURPLE} strokeWidth="3" strokeLinecap="round"
-                          style={{transformOrigin:"35px 42px",animation:allDone?"none":`ex-${ex.anim||"bounce"} 1.2s ease-in-out infinite reverse`}}/>
-                        {/* Done checkmark overlay */}
-                        {allDone && <text x="35" y="38" textAnchor="middle" fontSize="22" fill={TEAL}>✓</text>}
-                      </svg>
+                  {/* ── Exercise header row ── */}
+                  <div style={{padding:"14px 16px 0 16px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10,flex:1,minWidth:0}}>
+                      <div style={{fontFamily:SPORT_FONT,fontSize:20,letterSpacing:1,color:allDone?"rgba(240,237,232,0.4)":"#f0ede8",textDecoration:allDone?"line-through":"none",lineHeight:1.2}}>{ex.move}</div>
                     </div>
-
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontSize:18,fontWeight:900,color:allDone?"rgba(255,255,255,0.4)":"#fff",marginBottom:4,textDecoration:allDone?"line-through":"none"}}>{ex.move}</div>
-                      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                        <span style={{background:`rgba(142,124,255,0.15)`,border:`1px solid rgba(142,124,255,0.3)`,borderRadius:20,padding:"3px 10px",fontSize:11,color:PURPLE,fontWeight:700}}>{ex.sets} sets × {ex.reps}</span>
-                        {ex.rest!=="--"&&<span style={{background:"rgba(255,255,255,0.06)",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(255,255,255,0.5)"}}>⏱ {ex.rest}</span>}
-                      </div>
-                    </div>
-                    {/* Progress ring */}
-                    <div style={{position:"relative",width:48,height:48,flexShrink:0}}>
-                      <svg width="48" height="48" viewBox="0 0 48 48">
-                        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4"/>
-                        <circle cx="24" cy="24" r="20" fill="none" stroke={allDone?TEAL:PURPLE} strokeWidth="4"
-                          strokeDasharray={`${(completedCount/ex.sets)*125.6} 125.6`}
-                          strokeLinecap="round" transform="rotate(-90 24 24)"
-                          style={{transition:"stroke-dasharray 0.4s ease"}}/>
-                      </svg>
-                      <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                        <span style={{fontSize:11,fontWeight:900,color:allDone?TEAL:PURPLE}}>{completedCount}/{ex.sets}</span>
-                      </div>
+                    <div style={{display:"flex",gap:6,flexShrink:0,alignItems:"center"}}>
+                      <span style={{background:ac+"33",border:"1px solid "+ac+"55",borderRadius:20,padding:"3px 10px",fontSize:11,color:ac,fontWeight:700,fontFamily:SPORT_FONT,letterSpacing:0.5}}>{ex.sets}×{ex.reps}</span>
+                      {ex.rest!=="--"&&<span style={{background:"rgba(255,255,255,0.06)",borderRadius:20,padding:"3px 10px",fontSize:11,color:"rgba(240,237,232,0.5)"}}>⏱ {ex.rest}</span>}
+                      {allDone&&<span style={{fontSize:18}}>✅</span>}
                     </div>
                   </div>
 
-                  {/* Notes + desc */}
-                  <div style={{padding:"12px 20px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
-                    <div style={{fontSize:12,color:"rgba(255,255,255,0.45)",lineHeight:1.7,marginBottom:10}}>{ex.desc||""}</div>
+                  {/* ── Description + Watch Drill + tick buttons ── */}
+                  <div style={{padding:"10px 16px 14px"}}>
+                    <div style={{fontSize:12,color:"rgba(240,237,232,0.5)",lineHeight:1.75,marginBottom:10}}>{ex.desc||""}</div>
+                    {/* Watch Drill button */}
                     <button onClick={()=>openDrill(ex)} style={{
-                      display:"flex",alignItems:"center",gap:7,marginBottom:14,
-                      background:"rgba(142,124,255,0.1)",border:"1px solid rgba(142,124,255,0.2)",
-                      borderRadius:10,padding:"7px 14px",cursor:"pointer",
-                    }}>
-                      <span style={{fontSize:14}}>▶️</span>
-                      <span style={{fontSize:12,fontWeight:700,color:PURPLE,letterSpacing:1}}>WATCH DRILL</span>
-                      {!EXERCISE_VIDEOS[ex.move]&&<span style={{fontSize:9,color:"rgba(255,255,255,0.25)"}}>· coming soon</span>}
+                      display:"flex", alignItems:"center", gap:7,
+                      background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)",
+                      borderRadius:10, padding:"7px 14px", cursor:"pointer",
+                      marginBottom:12, transition:"all 0.2s",
+                    }}
+                      onMouseEnter={e=>{e.currentTarget.style.background="rgba(201,168,76,0.18)"; e.currentTarget.style.borderColor="rgba(201,168,76,0.5)";}}
+                      onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.1)";}}>
+                      <span style={{fontSize:15}}>▶️</span>
+                      <span style={{fontFamily:SPORT_FONT,fontSize:12,letterSpacing:1,color:"#f0ede8"}}>WATCH DRILL</span>
+                      {!EXERCISE_VIDEOS[ex.move] && <span style={{fontSize:9,color:"rgba(240,237,232,0.3)"}}>· coming soon</span>}
                     </button>
+                    <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                      <span style={{fontSize:11,color:"rgba(240,237,232,0.3)",letterSpacing:0.5,marginRight:2}}>SETS DONE:</span>
+                      {Array.from({length:ex.sets}).map((_,si)=>{
+                        const key=plan.id+"-"+openSession.idx+"-"+ei+"-"+si;
+                        return (
+                          <button key={si} onClick={()=>toggleSet(key, ex.rest)}
+                            style={{width:36,height:36,borderRadius:10,
+                              background:completedSets[key]?ac:"rgba(255,255,255,0.07)",
+                              border:"none",
+                              cursor:"pointer",fontSize:completedSets[key]?16:14,color:"#fff",fontWeight:900,
+                              transition:"all 0.2s cubic-bezier(.34,1.56,.64,1)",
+                              transform:completedSets[key]?"scale(1.1)":"scale(1)",
+                              fontFamily:SPORT_FONT}}>
+                            {completedSets[key]?"✓":si+1}
+                          </button>
+                        );
+                      })}
+                      {allDone&&<span style={{fontSize:12,color:"#4db89a",fontWeight:700,marginLeft:4}}>Complete! 🎯</span>}
+                    </div>
                   </div>
 
-                  {/* Set rows — gaming style */}
-                  <div style={{padding:"0 20px 20px"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,paddingBottom:6,borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
-                      <span style={{fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",flex:"0 0 28px"}}>SET</span>
-                      <span style={{fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",flex:1}}>WEIGHT (KG)</span>
-                      <span style={{fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",flex:1}}>REPS</span>
-                      <span style={{fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",width:32}}></span>
-                    </div>
-                    {Array.from({length:ex.sets}).map((_,si)=>{
-                      const key = plan.id+"-"+openSession.idx+"-"+ei+"-"+si;
-                      const done = !!completedSets[key];
-                      const repsNum = parseInt(ex.reps)||0;
-                      const wKey = `w_${key}`;
-                      const rKey = `r_${key}`;
-                      const wVal = completedSets[wKey] ?? (profile.weight||70);
-                      const rVal = completedSets[rKey] ?? repsNum;
-                      return (
-                        <div key={si} style={{
-                          display:"flex",alignItems:"center",gap:8,marginBottom:8,
-                          background: done ? "rgba(69,235,165,0.06)" : "rgba(255,255,255,0.03)",
-                          border: `1px solid ${done ? "rgba(69,235,165,0.2)" : "rgba(255,255,255,0.06)"}`,
-                          borderRadius:12,padding:"10px 12px",transition:"all 0.2s",
-                        }}>
-                          <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"rgba(255,255,255,0.4)",flex:"0 0 28px"}}>{si+1}</span>
-                          <div style={{flex:1,display:"flex",alignItems:"center",gap:4}}>
-                            <button onClick={()=>setCS(p=>({...p,[wKey]:Math.max(0,+(p[wKey]??wVal)-2.5)}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                            <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"#fff",minWidth:36,textAlign:"center"}}>{wVal}</span>
-                            <button onClick={()=>setCS(p=>({...p,[wKey]:+(p[wKey]??wVal)+2.5}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-                          </div>
-                          <div style={{flex:1,display:"flex",alignItems:"center",gap:4}}>
-                            <button onClick={()=>setCS(p=>({...p,[rKey]:Math.max(1,+(p[rKey]??rVal)-1)}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                            <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"#fff",minWidth:28,textAlign:"center"}}>{rVal}</span>
-                            <button onClick={()=>setCS(p=>({...p,[rKey]:+(p[rKey]??rVal)+1}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-                          </div>
-                          <button onClick={()=>toggleSet(key,ex.rest)} style={{
-                            width:32,height:32,borderRadius:"50%",flexShrink:0,
-                            background: done ? TEAL : "rgba(255,255,255,0.08)",
-                            border: `2px solid ${done ? TEAL : "rgba(255,255,255,0.15)"}`,
-                            cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
-                            transition:"all 0.25s cubic-bezier(.34,1.56,.64,1)",
-                            transform: done ? "scale(1.1)" : "scale(1)",
-                            boxShadow: done ? `0 0 12px ${TEAL}66` : "none",
-                          }}>
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                              <path d="M2 7l4 4 6-6" stroke={done?"#1E1E2E":"rgba(255,255,255,0.3)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </button>
-                        </div>
-                      );
-                    })}
-                    {allDone && (
-                      <div style={{textAlign:"center",padding:"8px 0",fontSize:13,color:TEAL,fontWeight:700}}>
-                        ✦ Exercise Complete ✦
-                      </div>
-                    )}
-                  </div>
                 </div>
               );
             })}
-
-            {/* Cool down + log */}
-            <div style={{background:"rgba(142,124,255,0.06)",border:"1px solid rgba(142,124,255,0.15)",borderRadius:16,padding:"16px 20px",marginBottom:16}}>
-              <div style={{fontSize:10,letterSpacing:2,color:PURPLE,textTransform:"uppercase",marginBottom:4}}>Cool-down</div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,0.6)",lineHeight:1.7}}>{sess.cooldown}</div>
-            </div>
-
-            {!alreadyLogged && timerSecs>0 && (
-              <div style={{background:"rgba(255,255,255,0.03)",borderRadius:14,padding:"14px 18px",marginBottom:12,display:"flex",justifyContent:"space-around"}}>
-                {[{v:fmtTime(timerSecs),l:"TIME",c:TEAL},{v:"~"+sess.calories,l:"KCAL",c:PURPLE},{v:sess.exercises.length,l:"EXERCISES",c:"#fff"}].map(s=>(
-                  <div key={s.l} style={{textAlign:"center"}}>
-                    <div style={{fontFamily:SPORT_FONT,fontSize:20,color:s.c,letterSpacing:1}}>{s.v}</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,0.3)",letterSpacing:1,marginTop:2}}>{s.l}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <button onClick={()=>{if(!alreadyLogged){setTimerRun(false);logPlanSession(plan,sess);}}} disabled={alreadyLogged}
-              style={{width:"100%",background:alreadyLogged?"rgba(255,255,255,0.05)":`linear-gradient(135deg,${PURPLE},#6c5ce7)`,
-                border:"none",borderRadius:16,padding:"17px",color:alreadyLogged?"rgba(255,255,255,0.25)":"#fff",
-                fontWeight:900,fontSize:16,cursor:alreadyLogged?"default":"pointer",marginBottom:8,
-                boxShadow:alreadyLogged?"none":"0 8px 24px rgba(142,124,255,0.4)"}}>
-              {alreadyLogged ? "✅ Session Logged" : "LOG SESSION  +" + sess.calories + " kcal"}
-            </button>
           </div>
-
-          {/* ── Floating Rest Timer Bar ── */}
-          {restRunning && (
-            <div style={{position:"fixed",bottom:isMobile?85:24,left:"50%",transform:"translateX(-50%)",zIndex:300,
-              background:"rgba(30,30,46,0.97)",backdropFilter:"blur(20px)",
-              border:`1px solid ${TEAL}44`,borderRadius:24,padding:"14px 24px",
-              display:"flex",alignItems:"center",gap:16,
-              boxShadow:`0 8px 32px rgba(69,235,165,0.25)`,
-              minWidth:240}}>
-              {/* Circular progress ring */}
-              <div style={{position:"relative",width:52,height:52,flexShrink:0}}>
-                <svg width="52" height="52" viewBox="0 0 52 52">
-                  <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4"/>
-                  <circle cx="26" cy="26" r="22" fill="none" stroke={TEAL} strokeWidth="4"
-                    strokeDasharray={`${(restSecs/60)*138.2} 138.2`}
-                    strokeLinecap="round" transform="rotate(-90 26 26)"
-                    style={{transition:"stroke-dasharray 1s linear"}}/>
-                </svg>
-                <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  <span style={{fontFamily:SPORT_FONT,fontSize:14,color:TEAL,letterSpacing:1}}>{restSecs}</span>
-                </div>
+          <div style={{background:"rgba(255,255,255,0.0)",border:"none",borderRadius:14,padding:"14px 18px",marginBottom:16}}>
+            <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:5}}>Cool-down</div>
+            <div style={{fontSize:13,color:"rgba(240,237,232,0.75)",marginBottom:12}}>{sess.cooldown}</div>
+            <div style={{background:plan.color+"15",border:"1px solid "+plan.color+"33",borderRadius:10,padding:"10px 14px"}}>
+              <div style={{fontSize:10,letterSpacing:2,color:plan.color,textTransform:"uppercase",marginBottom:4}}>Pro Tip</div>
+              <div style={{fontSize:13,color:"rgba(240,237,232,0.7)",lineHeight:1.6}}>{sess.tip}</div>
+            </div>
+          </div>
+          {/* Session summary before log */}
+          {!alreadyLogged && timerSecs > 0 && (
+            <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 18px",marginBottom:12,display:"flex",justifyContent:"space-around"}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#C9A84C",letterSpacing:1}}>{fmtTime(timerSecs)}</div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>TIME ELAPSED</div>
               </div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:11,color:"rgba(255,255,255,0.4)",letterSpacing:2,textTransform:"uppercase",marginBottom:2}}>Rest Timer</div>
-                <div style={{fontFamily:SPORT_FONT,fontSize:26,color:TEAL,letterSpacing:2,lineHeight:1}}>{fmtTime(restSecs)}</div>
+              <div style={{width:1,background:"rgba(255,255,255,0.07)"}}/>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#10B981",letterSpacing:1}}>~{sess.calories}</div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>KCAL BURNED</div>
               </div>
-              <button onClick={()=>{setRestRun(false);setRestSecs(0);}} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:12,padding:"8px 14px",cursor:"pointer",color:"rgba(255,255,255,0.5)",fontSize:12}}>Skip</button>
+              <div style={{width:1,background:"rgba(255,255,255,0.07)"}}/>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:SPORT_FONT,fontSize:20,color:"#4a9eff",letterSpacing:1}}>{sess.exercises.length}</div>
+                <div style={{fontSize:9,color:"rgba(240,237,232,0.35)",letterSpacing:1,marginTop:2}}>EXERCISES</div>
+              </div>
             </div>
           )}
+          <button onClick={()=>{ if(!alreadyLogged){ setTimerRun(false); logPlanSession(plan,sess); }}} disabled={alreadyLogged}
+            style={{width:"100%",background:alreadyLogged?"rgba(255,255,255,0.06)":plan.color,border:"none",borderRadius:16,padding:"16px",color:alreadyLogged?"rgba(240,237,232,0.3)":"#fff",fontWeight:900,fontSize:16,cursor:alreadyLogged?"default":"pointer",marginBottom:16}}>
+            {alreadyLogged?"✅ Session Already Logged Today":plan.icon+" Log This Session (+"+sess.calories+" kcal burned)"}
+          </button>
         </div>
       );
     }
