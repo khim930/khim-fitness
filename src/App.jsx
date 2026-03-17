@@ -867,6 +867,7 @@ export default function JhimFitness() {
           )}
         </div>
       );
+    }
 
     return (
       <div>
