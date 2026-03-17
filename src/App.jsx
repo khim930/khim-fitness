@@ -764,34 +764,28 @@ export default function JhimFitness() {
                       const key = plan.id+"-"+openSession.idx+"-"+ei+"-"+si;
                       const done = !!completedSets[key];
                       const repsNum = parseInt(ex.reps)||0;
-                      const [setWeight, setRepsVal] = [
-                        React.useState(profile.weight||70),
-                        React.useState(repsNum),
-                      ];
-
+                      const wKey = `w_${key}`;
+                      const rKey = `r_${key}`;
+                      const wVal = completedSets[wKey] ?? (profile.weight||70);
+                      const rVal = completedSets[rKey] ?? repsNum;
                       return (
                         <div key={si} style={{
                           display:"flex",alignItems:"center",gap:8,marginBottom:8,
                           background: done ? "rgba(69,235,165,0.06)" : "rgba(255,255,255,0.03)",
                           border: `1px solid ${done ? "rgba(69,235,165,0.2)" : "rgba(255,255,255,0.06)"}`,
-                          borderRadius:12,padding:"10px 12px",
-                          transition:"all 0.2s",
+                          borderRadius:12,padding:"10px 12px",transition:"all 0.2s",
                         }}>
-                          {/* Set number */}
                           <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"rgba(255,255,255,0.4)",flex:"0 0 28px"}}>{si+1}</span>
-                          {/* Weight */}
                           <div style={{flex:1,display:"flex",alignItems:"center",gap:4}}>
-                            <button onClick={()=>setWeight?.[1](w=>Math.max(0,+w-2.5))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>−</button>
-                            <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"#fff",minWidth:36,textAlign:"center"}}>{setWeight?.[0]??profile.weight??70}</span>
-                            <button onClick={()=>setWeight?.[1](w=>+w+2.5)} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>+</button>
+                            <button onClick={()=>setCS(p=>({...p,[wKey]:Math.max(0,+(p[wKey]??wVal)-2.5)}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                            <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"#fff",minWidth:36,textAlign:"center"}}>{wVal}</span>
+                            <button onClick={()=>setCS(p=>({...p,[wKey]:+(p[wKey]??wVal)+2.5}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
                           </div>
-                          {/* Reps */}
                           <div style={{flex:1,display:"flex",alignItems:"center",gap:4}}>
-                            <button onClick={()=>setRepsVal?.[1](r=>Math.max(1,+r-1))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>−</button>
-                            <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"#fff",minWidth:28,textAlign:"center"}}>{setRepsVal?.[0]??repsNum}</span>
-                            <button onClick={()=>setRepsVal?.[1](r=>+r+1)} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>+</button>
+                            <button onClick={()=>setCS(p=>({...p,[rKey]:Math.max(1,+(p[rKey]??rVal)-1)}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                            <span style={{fontSize:13,fontWeight:700,color:done?TEAL:"#fff",minWidth:28,textAlign:"center"}}>{rVal}</span>
+                            <button onClick={()=>setCS(p=>({...p,[rKey]:+(p[rKey]??rVal)+1}))} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:6,width:22,height:22,cursor:"pointer",color:"#fff",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
                           </div>
-                          {/* Checkmark */}
                           <button onClick={()=>toggleSet(key,ex.rest)} style={{
                             width:32,height:32,borderRadius:"50%",flexShrink:0,
                             background: done ? TEAL : "rgba(255,255,255,0.08)",
