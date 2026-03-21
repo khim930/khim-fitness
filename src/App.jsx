@@ -23,7 +23,7 @@ import { GOALS, SPIRIT_ANIMALS, AVATARS, DAYS, CATS, SPORT_FONT, BODY_FONT } fro
 // ── Utilities & Hooks ─────────────────────────────────────────────────────────
 import { fmt, fmtTime, calcCalGoal, calcLevel, getProfiles, setProfiles, getUserData, setUserData, getSession, setSession } from "./utils/helpers";
 import { useIsMobile, usePWAInstall, useToast } from "./hooks/index";
-
+ import { injectGlobalStyles } from "./styles/global";
 // TODAY constant - current date key used for daily logs (YYYY-MM-DD)
 const TODAY = new Date().toISOString().slice(0, 10);
 
