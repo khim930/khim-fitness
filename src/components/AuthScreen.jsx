@@ -177,7 +177,6 @@ function AuthScreen({ onAuth }) {
           Your data syncs across all your devices when signed in
         </div>
       </div>
-      </div>
     </div>
   );
 }
