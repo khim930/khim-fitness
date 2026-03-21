@@ -106,6 +106,62 @@ export default function JhimFitness() {
     if (accepted) toast_("JhimFit installed! 🎉", "#1a6e5a");
   };
 
+  // ── Push Notifications ────────────────────────────────────────────────────
+  const [notifPermission, setNotifPermission] = React.useState(
+    typeof Notification !== "undefined" ? Notification.permission : "default"
+  );
+  const [showNotifBanner, setShowNotifBanner] = React.useState(false);
+
+  // Show notification banner once after 30 seconds if not yet asked
+  useEffect(() => {
+    if (notifPermission === "default") {
+      const timer = setTimeout(() => setShowNotifBanner(true), 30000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const requestNotifications = async () => {
+    if (typeof Notification === "undefined") return;
+    const perm = await Notification.requestPermission();
+    setNotifPermission(perm);
+    setShowNotifBanner(false);
+    if (perm === "granted") {
+      toast_("🔔 Notifications enabled!", "#C9A84C");
+      scheduleReminders();
+    } else {
+      toast_("Notifications blocked", "#666");
+    }
+  };
+
+  const scheduleReminders = () => {
+    if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    // Show an immediate welcome notification
+    new Notification("JhimFit 💪", {
+      body: "Notifications on! We'll remind you to log meals and workouts.",
+      icon: "/icons/icon-192x192.png",
+    });
+    // Schedule daily reminders using setTimeout (works while tab is open)
+    const now = new Date();
+    const reminders = [
+      { hour: 8,  min: 0,  msg: "🍳 Good morning! Time to log breakfast and start strong." },
+      { hour: 13, min: 0,  msg: "🍽️ Lunchtime! Don't forget to log your meal." },
+      { hour: 18, min: 0,  msg: "💪 Evening workout time! Check your plan in JhimFit." },
+      { hour: 20, min: 0,  msg: "🍲 Log your dinner to complete today's nutrition." },
+      { hour: 21, min: 30, msg: "💧 Have you hit your water goal today? Check your tracker!" },
+    ];
+    reminders.forEach(({ hour, min, msg }) => {
+      const target = new Date();
+      target.setHours(hour, min, 0, 0);
+      if (target <= now) target.setDate(target.getDate() + 1);
+      const delay = target - now;
+      setTimeout(() => {
+        if (Notification.permission === "granted") {
+          new Notification("JhimFit 🇬🇭", { body: msg, icon: "/icons/icon-192x192.png" });
+        }
+      }, delay);
+    });
+  };
+
   // ── Back button / swipe-back navigation ──────────────────────────────────
   // Push a history state for each tab so the browser back button navigates
   // within the app instead of closing it or going to a previous URL.
@@ -696,6 +752,27 @@ Reply ONLY with a valid JSON array of exactly 3 objects. No explanation, no mark
         </div>
       </div>
 
+      {/* Notification Settings Card */}
+      {notifPermission !== "granted" && (
+        <div className="bento-card" onClick={requestNotifications} style={{background:"rgba(201,168,76,0.05)",borderLeft:"3px solid rgba(201,168,76,0.3)",borderRadius:16,padding:"12px 18px",marginBottom:10,cursor:"pointer",display:"flex",alignItems:"center",gap:12,animationDelay:"0.17s"}}>
+          <span style={{fontSize:20}}>🔔</span>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:SPORT_FONT,fontSize:12,letterSpacing:2,color:"rgba(201,168,76,0.7)"}}>ENABLE REMINDERS</div>
+            <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>Get daily meal & workout notifications</div>
+          </div>
+          <span style={{color:"#C9A84C",fontSize:16}}>→</span>
+        </div>
+      )}
+      {notifPermission === "granted" && (
+        <div className="bento-card" style={{background:"rgba(26,110,90,0.06)",borderLeft:"3px solid rgba(77,184,154,0.4)",borderRadius:16,padding:"12px 18px",marginBottom:10,display:"flex",alignItems:"center",gap:12,animationDelay:"0.17s"}}>
+          <span style={{fontSize:20}}>🔔</span>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:SPORT_FONT,fontSize:12,letterSpacing:2,color:"#4db89a"}}>REMINDERS ACTIVE</div>
+            <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>Daily meal & workout notifications on ✅</div>
+          </div>
+        </div>
+      )}
+
       {/* Today's Meals */}
       <div className="bento-card" style={{marginBottom:10,animationDelay:"0.18s"}}>
         <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"rgba(240,237,232,0.4)",marginBottom:10}}>TODAY'S MEALS</div>
@@ -1226,6 +1303,27 @@ Reply ONLY with a valid JSON array of exactly 3 objects. No explanation, no mark
               padding:"8px 14px",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",
               fontFamily:SPORT_FONT,letterSpacing:1}}>INSTALL</button>
             <button onClick={()=>setShowInstallBanner(false)} style={{background:"transparent",border:"none",
+              color:"rgba(240,237,232,0.35)",fontSize:10,cursor:"pointer",padding:"2px 0",textAlign:"center"}}>Not now</button>
+          </div>
+        </div>
+      )}
+      {/* Notification Permission Banner */}
+      {showNotifBanner && notifPermission === "default" && (
+        <div style={{position:"fixed",bottom:isMobile?80:24,left:"50%",transform:"translateX(-50%)",zIndex:9997,
+          background:"linear-gradient(135deg,#111827,#0d1320)",border:"1px solid rgba(201,168,76,0.35)",
+          borderRadius:20,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,
+          boxShadow:"0 12px 40px rgba(0,0,0,0.7)",maxWidth:380,width:"calc(100vw - 32px)"}}>
+          <div style={{width:46,height:46,borderRadius:13,background:"rgba(201,168,76,0.2)",border:"1px solid rgba(201,168,76,0.4)",
+            display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>🔔</div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:SPORT_FONT,fontSize:13,color:"#f0ede8",letterSpacing:1,lineHeight:1}}>STAY ON TRACK</div>
+            <div style={{fontSize:10,color:"rgba(240,237,232,0.45)",marginTop:4,lineHeight:1.4}}>Get meal & workout reminders every day</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:5,flexShrink:0}}>
+            <button onClick={requestNotifications} style={{background:"#C9A84C",border:"none",borderRadius:10,
+              padding:"8px 14px",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",
+              fontFamily:SPORT_FONT,letterSpacing:1}}>ENABLE</button>
+            <button onClick={()=>setShowNotifBanner(false)} style={{background:"transparent",border:"none",
               color:"rgba(240,237,232,0.35)",fontSize:10,cursor:"pointer",padding:"2px 0",textAlign:"center"}}>Not now</button>
           </div>
         </div>
