@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { GOALS, SPIRIT_ANIMALS, AVATARS } from "../data/constants";
-import { calcCalGoal, getProfiles, setProfiles } from "../utils/helpers";
+import { calcCalGoal, getProfiles, setProfiles, TODAY } from "../utils/helpers";
 import JhimFitLogo from "./JhimFitLogo";
 import SpiritAvatar from "./SpiritAvatar";
 import ShaderAnimation from "./ShaderAnimation";
