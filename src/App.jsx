@@ -21,7 +21,10 @@ import { QUICK_WORKOUTS, WORKOUT_PLANS } from "./data/workouts";
 import { GOALS, SPIRIT_ANIMALS, AVATARS, DAYS, CATS, SPORT_FONT, BODY_FONT } from "./data/constants";
 
 // ── Utilities & Hooks ─────────────────────────────────────────────────────────
-import { fmt, TODAY, fmtTime, calcCalGoal, calcLevel, getProfiles, setProfiles, getUserData, setUserData, getSession, setSession } from "./utils/helpers";
+import { fmt, fmtTime, calcCalGoal, calcLevel, getProfiles, setProfiles, getUserData, setUserData, getSession, setSession } from "./utils/helpers";
+
+// TODAY constant - current date key used for daily logs (YYYY-MM-DD)
+const TODAY = new Date().toISOString().slice(0, 10);
 import { useIsMobile, usePWAInstall, useToast } from "./hooks/index";
 import { injectGlobalStyles } from "./styles/global";
 
@@ -211,12 +214,7 @@ export default function JhimFitness() {
     else { setTimerSecs(0); setTimerRun(true); } // auto-start on session open
   }, [openSession]);
 
-  const fmtTime = (s) => {
-    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-    return h > 0
-      ? `${h}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`
-      : `${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
-  };
+  // fmtTime is imported from utils/helpers
 
   const startRest = (restStr) => {
     const secs = restStr==="--" ? 0 : parseInt(restStr)*( restStr.includes("min") ? 60 : 1 );
