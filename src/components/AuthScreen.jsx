@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { signUp, signIn } from "../supabase.js";
 import JhimFitLogo from "./JhimFitLogo";
+import ShaderAnimation from "./ShaderAnimation";
 
 // ── Rate limiting constants ────────────────────────────────────────────────
 const MAX_ATTEMPTS   = 5;    // max failed attempts before lockout
@@ -102,8 +103,12 @@ function AuthScreen({ onAuth }) {
   const canSubmit  = !loading && !isLocked && email && pass;
 
   return (
-    <div style={{minHeight:"100vh",background:"#0a0f1e",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"Georgia,serif"}}>
-      <div style={{width:"100%",maxWidth:420,color:"#f0ede8"}}>
+    <div style={{minHeight:"100vh",background:"#0a0f1e",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"Georgia,serif",position:"relative"}}>
+      {/* Shader background */}
+      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.15,pointerEvents:"none"}}>
+        <ShaderAnimation/>
+      </div>
+      <div style={{width:"100%",maxWidth:420,color:"#f0ede8",position:"relative",zIndex:1}}>
         <div style={{textAlign:"center",marginBottom:36}}>
           <JhimFitLogo size="lg"/>
           <div style={{fontSize:13,color:"rgba(240,237,232,0.4)",marginTop:12,letterSpacing:1}}>GHANA FITNESS TRACKER</div>
@@ -171,6 +176,7 @@ function AuthScreen({ onAuth }) {
         <div style={{textAlign:"center",fontSize:11,color:"rgba(240,237,232,0.2)",marginTop:12}}>
           Your data syncs across all your devices when signed in
         </div>
+      </div>
       </div>
     </div>
   );

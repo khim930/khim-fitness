@@ -3,6 +3,7 @@ import { GOALS, SPIRIT_ANIMALS, AVATARS } from "../data/constants";
 import { calcCalGoal, getProfiles, setProfiles } from "../utils/helpers";
 import JhimFitLogo from "./JhimFitLogo";
 import SpiritAvatar from "./SpiritAvatar";
+import ShaderAnimation from "./ShaderAnimation";
 
 function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
@@ -17,6 +18,11 @@ function Onboarding({ onComplete }) {
 
   const steps = [
     <div key="w" style={{textAlign:"center"}}>
+      {/* Shader animation background — only on welcome screen */}
+      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.18,pointerEvents:"none"}}>
+        <ShaderAnimation/>
+      </div>
+      <div style={{position:"relative",zIndex:1}}>
       <div style={{marginBottom:20,display:"flex",justifyContent:"center"}}>
         <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -49,6 +55,7 @@ function Onboarding({ onComplete }) {
         <div style={{color:"rgba(240,237,232,0.25)",fontSize:13,margin:"14px 0"}}>or create a new profile</div>
       </>}
       <button onClick={()=>setStep(1)} style={{width:"100%",background:"#C9A84C",border:"none",borderRadius:16,padding:"17px",color:"#fff",fontWeight:900,fontSize:17,cursor:"pointer"}}>{existing.length>0?"+ New Profile":"Get Started"}</button>
+      </div>
     </div>,
 
     <div key="n">
