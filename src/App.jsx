@@ -312,7 +312,6 @@ export default function JhimFitness() {
     {id:"diet",    icon:"🍽", label:"Diet"},
     {id:"workout", icon:"🏋", label:"Workout"},
     {id:"stats",   icon:"📊", label:"Stats"},
-    {id:"reviews", icon:"⭐", label:"Reviews"},
     {id:"contact", icon:"📞", label:"Contact"},
     {id:"help",    icon:"❓",  label:"Help"},
   ];
