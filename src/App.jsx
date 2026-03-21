@@ -22,15 +22,11 @@ import { GOALS, SPIRIT_ANIMALS, AVATARS, DAYS, CATS, SPORT_FONT, BODY_FONT } fro
 
 // ── Utilities & Hooks ─────────────────────────────────────────────────────────
 import { fmt, fmtTime, calcCalGoal, calcLevel, getProfiles, setProfiles, getUserData, setUserData, getSession, setSession } from "./utils/helpers";
-import { useIsMobile, usePWAInstall, useToast } from "./hooks/index";
- import { injectGlobalStyles } from "./styles/global";
+
 // TODAY constant - current date key used for daily logs (YYYY-MM-DD)
 const TODAY = new Date().toISOString().slice(0, 10);
-
-// ── Reviews helpers ───────────────────────────────────────────────────────────
-const REVIEWS_KEY = "jhimfit_reviews_v1";
-const getReviews  = () => { try { return JSON.parse(localStorage.getItem(REVIEWS_KEY) || "[]"); } catch { return []; } };
-const saveReviews = (r) => localStorage.setItem(REVIEWS_KEY, JSON.stringify(r));
+import { useIsMobile, usePWAInstall, useToast } from "./hooks/index";
+import { injectGlobalStyles } from "./styles/global";
 
 export default function JhimFitness() {
   const isMobile = useIsMobile();
@@ -470,6 +466,119 @@ export default function JhimFitness() {
     return s;
   })();
 
+
+  // ── AI Meal Recommendations Component ─────────────────────────────────────
+  const AIMealSuggestions = ({ calGoal, totCal, totPro, totCarb, totFat, burned, goal, onLog }) => {
+    const remaining = calGoal - totCal + burned;
+    const [loading, setLoading] = React.useState(false);
+    const [suggestions, setSuggestions] = React.useState(null);
+    const [error, setError] = React.useState(null);
+    const [expanded, setExpanded] = React.useState(false);
+
+    const getSuggestions = async () => {
+      setLoading(true); setError(null); setSuggestions(null); setExpanded(true);
+      try {
+        const prompt = `You are a Ghanaian nutrition assistant for JhimFit app. 
+The user has eaten ${totCal} kcal today out of a ${calGoal} kcal goal.
+They have ${remaining} calories remaining for the day.
+Macros so far: Protein ${totPro}g, Carbs ${totCarb}g, Fat ${totFat}g.
+Their goal is: ${goal === "lose" ? "Lose Weight" : goal === "gain" ? "Build Muscle" : "Stay Healthy"}.
+
+Suggest exactly 3 Ghanaian meals from this list that would fit their remaining calories:
+Oats & Banana (290 kcal, 9g protein), Boiled Eggs & Bread (310 kcal, 18g protein), Corn Porridge/Koko (200 kcal, 5g protein), Rice & Chicken Stew (480 kcal, 28g protein), Jollof Rice (420 kcal, 12g protein), Rice & Beans (380 kcal, 16g protein), Banku & Tilapia (510 kcal, 38g protein), Waakye (380 kcal, 14g protein), Fufu & Light Soup (460 kcal, 24g protein), Kontomire Stew & Rice (350 kcal, 18g protein), Grilled Chicken & Veggies (370 kcal, 38g protein), Beans Stew & Plantain (410 kcal, 14g protein), Boiled Groundnuts (160 kcal, 7g protein), Boiled Egg (78 kcal, 6g protein), Banana (90 kcal, 1g protein), Roasted Corn (130 kcal, 4g protein).
+
+Reply ONLY with a valid JSON array of exactly 3 objects. No explanation, no markdown, no backticks. Just the raw JSON array like this:
+[{"name":"Meal Name","calories":000,"protein":00,"reason":"One short sentence why this fits","emoji":"🍽"}]`;
+
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 500,
+            messages: [{ role: "user", content: prompt }]
+          })
+        });
+        const data = await res.json();
+        const text = data.content?.[0]?.text || "";
+        const clean = text.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(clean);
+        setSuggestions(parsed);
+      } catch(e) {
+        // Fallback to smart local suggestions if API fails
+        const rem = remaining;
+        const all = [
+          {name:"Boiled Egg",           calories:78,  protein:6,  emoji:"🥚", reason:"Low calorie, high protein snack perfect when calories are tight."},
+          {name:"Banana",               calories:90,  protein:1,  emoji:"🍌", reason:"Quick natural energy boost with minimal calories."},
+          {name:"Boiled Groundnuts",    calories:160, protein:7,  emoji:"🥜", reason:"Healthy fats and protein to keep you full."},
+          {name:"Roasted Corn",         calories:130, protein:4,  emoji:"🌽", reason:"Light fibrous snack great for weight management."},
+          {name:"Corn Porridge (Koko)", calories:200, protein:5,  emoji:"🌽", reason:"Light and easy on the stomach, perfect for remaining calories."},
+          {name:"Grilled Chicken & Veggies", calories:370, protein:38, emoji:"🍗", reason:"Very high protein, low carb - ideal for muscle building."},
+          {name:"Kontomire Stew & Rice",calories:350, protein:18, emoji:"🥬", reason:"Balanced iron-rich meal with moderate calories."},
+          {name:"Rice & Beans",         calories:380, protein:16, emoji:"🫘", reason:"Complete protein source with filling complex carbs."},
+          {name:"Waakye",               calories:380, protein:14, emoji:"🌿", reason:"Classic Ghanaian complete meal with great fibre."},
+          {name:"Fufu & Light Soup",    calories:460, protein:24, emoji:"🍲", reason:"Traditional filling meal with good protein from soup."},
+          {name:"Banku & Tilapia",      calories:510, protein:38, emoji:"🐟", reason:"Highest protein Ghanaian meal - perfect for muscle building."},
+          {name:"Jollof Rice",          calories:420, protein:12, emoji:"🍚", reason:"Classic energising meal to replenish carbs."},
+        ];
+        const fits = all.filter(m => m.calories <= rem + 100).slice(0, 3);
+        setSuggestions(fits.length >= 3 ? fits : all.slice(0, 3));
+      }
+      setLoading(false);
+    };
+
+    // Find meal from GHANAIAN_MEALS to log it
+    const logSuggestion = (s) => {
+      const meal = GHANAIAN_MEALS.find(m => m.name === s.name);
+      if (meal) { onLog(meal); toast_("🤖 " + meal.name + " added!", "#4db89a"); }
+      else toast_("Go to Diet tab to log this meal", "#C9A84C");
+    };
+
+    return (
+      <div className="bento-card" style={{background:"rgba(77,184,154,0.06)",borderLeft:"3px solid #4db89a",borderRadius:16,padding:"14px 18px",marginBottom:10,animationDelay:"0.19s"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:22}}>🤖</span>
+            <div>
+              <div style={{fontFamily:SPORT_FONT,fontSize:13,letterSpacing:2,color:"#4db89a"}}>AI MEAL SUGGESTIONS</div>
+              <div style={{fontSize:10,color:"rgba(240,237,232,0.4)",marginTop:1}}>{remaining > 0 ? remaining+" kcal remaining today" : "You've hit your calorie goal!"}</div>
+            </div>
+          </div>
+          <button onClick={getSuggestions} disabled={loading}
+            style={{background:loading?"rgba(255,255,255,0.06)":"rgba(77,184,154,0.2)",border:"1px solid rgba(77,184,154,0.4)",borderRadius:10,padding:"7px 14px",color:"#4db89a",fontSize:12,fontWeight:800,cursor:loading?"not-allowed":"pointer",fontFamily:SPORT_FONT,letterSpacing:1,flexShrink:0}}>
+            {loading ? "..." : expanded && suggestions ? "↺ REFRESH" : "SUGGEST"}
+          </button>
+        </div>
+
+        {expanded && (
+          <div style={{marginTop:14}}>
+            {loading && (
+              <div style={{textAlign:"center",padding:"16px 0",color:"rgba(240,237,232,0.4)",fontSize:13}}>
+                <div style={{fontSize:24,marginBottom:8,animation:"pulse 1s ease-in-out infinite"}}>🤖</div>
+                Analysing your nutrition and finding the best Ghanaian meals...
+              </div>
+            )}
+            {error && <div style={{color:"#ef4444",fontSize:12,padding:"8px 0"}}>{error}</div>}
+            {suggestions && suggestions.map((s,i) => (
+              <div key={i} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(77,184,154,0.2)",borderRadius:13,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:42,height:42,borderRadius:11,background:"rgba(77,184,154,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{s.emoji}</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:800,fontSize:14,color:"#f0ede8"}}>{s.name}</div>
+                  <div style={{fontSize:11,color:"#4db89a",marginTop:2}}>{s.calories} kcal · {s.protein}g protein</div>
+                  <div style={{fontSize:11,color:"rgba(240,237,232,0.45)",marginTop:3,lineHeight:1.4}}>{s.reason}</div>
+                </div>
+                <button onClick={()=>logSuggestion(s)}
+                  style={{background:"rgba(77,184,154,0.2)",border:"1px solid rgba(77,184,154,0.4)",borderRadius:9,padding:"6px 12px",color:"#4db89a",fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,fontFamily:SPORT_FONT}}>
+                  +LOG
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const HomeContent = (() => (
     <div style={{fontFamily:BODY_FONT}}>
       {/* Date + Streak row */}
@@ -605,6 +714,9 @@ export default function JhimFitness() {
             </div>
           ))}
       </div>
+
+      {/* AI Meal Recommendations */}
+      <AIMealSuggestions calGoal={calGoal} totCal={totCal} totPro={totPro} totCarb={totCarb} totFat={totFat} burned={burned} goal={profile.goal} onLog={addM}/>
 
       {/* Weight logger */}
       <div className="bento-card" style={{background:"rgba(79,195,161,0.06)",borderLeft:"3px solid #4db89a",borderRadius:16,padding:"14px 18px",animationDelay:"0.2s"}}>
@@ -1083,133 +1195,16 @@ export default function JhimFitness() {
     </div>
   );
 
-
-  // ── Reviews Content ────────────────────────────────────────────────────────
-  const ReviewsContent = () => {
-    const [reviews, setReviews] = React.useState(getReviews());
-    const [name, setName]       = React.useState(profile.name||"");
-    const [city, setCity]       = React.useState("");
-    const [rating, setRating]   = React.useState(5);
-    const [text, setText]       = React.useState("");
-    const [hover, setHover]     = React.useState(0);
-    const [submitted, setSubmitted] = React.useState(false);
-
-    const avgRating = reviews.length ? (reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1) : "0.0";
-
-    const submit = () => {
-      if (!text.trim() || !name.trim()) return;
-      const newReview = { id: Date.now(), name: name.trim(), city: city.trim()||"Ghana", rating, text: text.trim(), date: TODAY };
-      const updated = [newReview, ...reviews];
-      saveReviews(updated);
-      setReviews(updated);
-      setText(""); setCity(""); setRating(5); setSubmitted(true);
-      toast_("Thanks for your review! ⭐", "#C9A84C");
-      setTimeout(()=>setSubmitted(false), 3000);
-    };
-
-    const SEED_REVIEWS = [
-      { id:1, name:"Kwame Asante",   city:"Accra",  rating:5, text:"Best fitness app I've used! Finally tracks Ghanaian food like Jollof and Banku. Lost 4kg in 6 weeks!", date:"2025-03-01" },
-      { id:2, name:"Ama Owusu",      city:"Kumasi", rating:5, text:"The workout plans are amazing. Love that it has Ghanaian meals built in. Highly recommend!", date:"2025-03-05" },
-      { id:3, name:"Kofi Mensah",    city:"Accra",  rating:4, text:"Great app for tracking calories. The fufu and kontomire stew options are exactly what I needed.", date:"2025-03-10" },
-    ];
-
-    const displayReviews = reviews.length > 0 ? reviews : SEED_REVIEWS;
-    const displayAvg = reviews.length > 0 ? avgRating : "4.8";
-    const displayCount = reviews.length > 0 ? reviews.length : SEED_REVIEWS.length;
-
-    const inp = { width:"100%", background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:12, padding:"12px 15px", color:"#f0ede8", outline:"none", fontFamily:"Georgia,serif", boxSizing:"border-box", fontSize:14 };
-
-    return (
-      <div>
-        <div style={{background:"linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04))",borderLeft:"3px solid #C9A84C",borderRadius:18,padding:"20px 22px",marginBottom:22}}>
-          <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:8}}>
-            <div style={{fontSize:48}}>⭐</div>
-            <div>
-              <div style={{fontSize:36,fontWeight:900,color:"#C9A84C",lineHeight:1}}>{displayAvg}</div>
-              <div style={{fontSize:12,color:"rgba(240,237,232,0.5)",marginTop:2}}>{displayCount} review{displayCount!==1?"s":""} from JhimFit users</div>
-            </div>
-          </div>
-          <div style={{display:"flex",gap:3}}>
-            {[1,2,3,4,5].map(i=>(
-              <span key={i} style={{fontSize:20,color:i<=Math.round(parseFloat(displayAvg))?"#C9A84C":"rgba(255,255,255,0.15)"}}>★</span>
-            ))}
-          </div>
-        </div>
-
-        <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:18,padding:"20px 22px",marginBottom:22}}>
-          <div style={{fontSize:16,fontWeight:800,marginBottom:16,color:"#f0ede8"}}>✍️ Write a Review</div>
-          <div style={{display:"flex",gap:10,marginBottom:12}}>
-            <div style={{flex:1}}>
-              <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:6}}>Your Name</div>
-              <input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Kwame" style={inp}/>
-            </div>
-            <div style={{flex:1}}>
-              <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:6}}>City</div>
-              <input value={city} onChange={e=>setCity(e.target.value)} placeholder="e.g. Accra" style={inp}/>
-            </div>
-          </div>
-          <div style={{marginBottom:12}}>
-            <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:8}}>Rating</div>
-            <div style={{display:"flex",gap:6}}>
-              {[1,2,3,4,5].map(i=>(
-                <span key={i} onClick={()=>setRating(i)} onMouseEnter={()=>setHover(i)} onMouseLeave={()=>setHover(0)}
-                  style={{fontSize:28,cursor:"pointer",color:i<=(hover||rating)?"#C9A84C":"rgba(255,255,255,0.15)",transition:"all 0.15s"}}>★</span>
-              ))}
-            </div>
-          </div>
-          <div style={{marginBottom:14}}>
-            <div style={{fontSize:10,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:6}}>Your Review</div>
-            <textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Share your experience with JhimFit..." rows={3}
-              style={{...inp,resize:"vertical",minHeight:80,lineHeight:1.6}}/>
-          </div>
-          <button onClick={submit} disabled={!text.trim()||!name.trim()}
-            style={{width:"100%",background:text.trim()&&name.trim()?"#C9A84C":"rgba(255,255,255,0.08)",border:"none",borderRadius:12,padding:"13px",color:text.trim()&&name.trim()?"#0a0f1e":"rgba(255,255,255,0.25)",fontWeight:800,fontSize:15,cursor:text.trim()&&name.trim()?"pointer":"not-allowed",transition:"all 0.2s"}}>
-            {submitted ? "✅ Review Submitted!" : "Submit Review"}
-          </button>
-        </div>
-
-        <div style={{fontSize:11,letterSpacing:2,color:"rgba(240,237,232,0.4)",textTransform:"uppercase",marginBottom:14}}>
-          {reviews.length > 0 ? "User Reviews" : "Featured Reviews"}
-        </div>
-        {displayReviews.map((r,i)=>(
-          <div key={r.id} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:"18px 20px",marginBottom:12}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <div style={{width:40,height:40,borderRadius:"50%",background:"rgba(201,168,76,0.15)",border:"1px solid rgba(201,168,76,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#C9A84C",flexShrink:0}}>
-                  {r.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div style={{fontWeight:800,fontSize:14,color:"#f0ede8"}}>{r.name}</div>
-                  <div style={{fontSize:11,color:"rgba(240,237,232,0.4)",marginTop:2}}>📍 {r.city}</div>
-                </div>
-              </div>
-              <div style={{textAlign:"right"}}>
-                <div style={{display:"flex",gap:2,justifyContent:"flex-end"}}>
-                  {[1,2,3,4,5].map(s=><span key={s} style={{fontSize:13,color:s<=r.rating?"#C9A84C":"rgba(255,255,255,0.15)"}}>★</span>)}
-                </div>
-                <div style={{fontSize:10,color:"rgba(240,237,232,0.3)",marginTop:3}}>{r.date}</div>
-              </div>
-            </div>
-            <div style={{fontSize:13,color:"rgba(240,237,232,0.7)",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.05)",paddingTop:10}}>
-              "{r.text}"
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   const renderContent = () => {
     if (tab==="home")     return HomeContent;
     if (tab==="diet")     return <DietContent/>;
     if (tab==="workout")  return <WorkoutContent/>;
     if (tab==="stats")    return <StatsContent/>;
-    if (tab==="reviews")  return <ReviewsContent/>;
     if (tab==="contact")  return <ContactContent/>;
     if (tab==="help")     return <HelpContent/>;
     return null;
   };
-  const pageTitle  = { home:"Good "+(new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening")+", "+profile.name+" "+profile.avatar, diet:"Diet Guide", workout:"Workouts", stats:"Stats and Records", reviews:"Reviews ⭐", contact:"Contact Us", help:"Help and User Guide" };
+  const pageTitle  = { home:"Good "+(new Date().getHours()<12?"morning":new Date().getHours()<17?"afternoon":"evening")+", "+profile.name+" "+profile.avatar, diet:"Diet Guide", workout:"Workouts", stats:"Stats and Records", contact:"Contact Us", help:"Help and User Guide" };
 
   return (
     <div style={{minHeight:"100vh",background:"#0a0f1e",color:"#f0ede8",fontFamily:"Georgia,'Times New Roman',serif",display:"flex",position:"relative"}}>
