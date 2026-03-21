@@ -1,27 +1,16 @@
 {
-  "name": "JhimFit \u2014 Ghana Fitness Tracker",
+  "name": "JhimFit - Ghana Fitness & Nutrition Tracker",
   "short_name": "JhimFit",
-  "description": "Your personal fitness and nutrition tracker with Ghanaian meal plans, guided workout programmes, and daily progress tracking.",
+  "description": "Free fitness app for Ghana. Track Ghanaian meals like Jollof, Banku, Fufu. Log workouts, calories, water & weight. Works offline!",
   "start_url": "/",
-  "id": "/",
+  "scope": "/",
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone",
-    "minimal-ui",
-    "browser"
-  ],
   "background_color": "#0a0f1e",
   "theme_color": "#0a0f1e",
   "orientation": "any",
-  "scope": "/",
-  "lang": "en",
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "en-GH",
   "dir": "ltr",
-  "categories": [
-    "fitness",
-    "health",
-    "lifestyle"
-  ],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -90,26 +79,11 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "JhimFit Mobile Dashboard"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "JhimFit Desktop Dashboard"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Log a Meal",
-      "short_name": "Diet",
+      "name": "Log Meal",
+      "short_name": "Log Meal",
+      "description": "Quickly log a Ghanaian meal",
       "url": "/?tab=diet",
       "icons": [
         {
@@ -121,6 +95,7 @@
     {
       "name": "Start Workout",
       "short_name": "Workout",
+      "description": "Begin a workout session",
       "url": "/?tab=workout",
       "icons": [
         {
@@ -132,6 +107,7 @@
     {
       "name": "View Stats",
       "short_name": "Stats",
+      "description": "Check your progress",
       "url": "/?tab=stats",
       "icons": [
         {
@@ -141,8 +117,14 @@
       ]
     }
   ],
-  "prefer_related_applications": false,
-  "edge_side_panel": {
-    "preferred_width": 400
-  }
+  "screenshots": [
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

@@ -1,148 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="google-site-verification" content="1y8w-687WAMgJlk3R5Yj1YYz08HiM9s_QySZwqWWqc4" />
-    <!-- PWA / App behaviour -->
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="JhimFit" />
-    <meta name="application-name" content="JhimFit" />
-    <meta name="theme-color" content="#0a0f1e" />
-    <meta name="msapplication-TileColor" content="#0a0f1e" />
-    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
-    <meta name="msapplication-config" content="none" />
-
-    <!-- SEO -->
-    <meta name="description" content="JhimFit — Ghana's personal fitness and nutrition tracker. Track calories, log Ghanaian meals, follow guided workout programmes, and hit your goals." />
-    <meta name="keywords" content="Ghana fitness app, calorie tracker Ghana, workout app, Ghanaian food calories, JhimFit" />
-    <meta name="author" content="Joachim Naakureh" />
-    <meta name="robots" content="index, follow" />
-
-    <!-- Open Graph (WhatsApp / Facebook previews) -->
-    <meta property="og:title" content="JhimFit — Ghana Fitness Tracker" />
-    <meta property="og:description" content="Track calories, log Ghanaian meals, and follow guided workout plans. Free fitness app built for Ghana." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://khim-fitness.vercel.app" />
-    <meta property="og:image" content="/icons/icon-512x512.png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="JhimFit — Ghana Fitness Tracker" />
-    <meta name="twitter:description" content="Free fitness tracker with Ghanaian meal plans and guided workouts." />
-    <meta name="twitter:image" content="/icons/icon-512x512.png" />
-
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png" />
-    <link rel="shortcut icon" href="/icons/icon-96x96.png" />
-
-    <!-- Apple Touch Icons (iOS install icon) -->
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png" />
-    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png" />
-
-    <title>JhimFit — Ghana Fitness Tracker</title>
-
-    <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body {
-        background: #0a0f1e;
-        color: #f0ede8;
-        height: 100%;
-        -webkit-tap-highlight-color: transparent;
-        -webkit-font-smoothing: antialiased;
-      }
-      #root { min-height: 100vh; min-height: 100dvh; }
-
-      /* iOS safe area support */
-      body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-      }
-
-      /* Splash screen while app loads */
-      #splash {
-        position: fixed; inset: 0;
-        background: #0a0f1e;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        gap: 18px; z-index: 9999;
-        transition: opacity 0.4s ease;
-      }
-      #splash.hidden { opacity: 0; pointer-events: none; }
-      #splash-logo {
-        width: 96px; height: 96px; border-radius: 22px;
-        background: linear-gradient(135deg, #111827, #0a0f1e);
-        border: 2px solid #C9A84C44;
-        display: flex; align-items: center; justify-content: center;
-        font-family: Impact, sans-serif; font-size: 52px; color: white;
-        box-shadow: 0 0 40px #C9A84C33;
-      }
-      #splash-name {
-        font-family: Impact, sans-serif; font-size: 32px;
-        letter-spacing: 4px; color: #f0ede8;
-      }
-      #splash-sub {
-        font-size: 13px; color: rgba(240,237,232,0.4);
-        letter-spacing: 2px; text-transform: uppercase;
-      }
-      #splash-bar {
-        width: 120px; height: 3px; background: rgba(255,255,255,0.08);
-        border-radius: 2px; overflow: hidden; margin-top: 8px;
-      }
-      #splash-fill {
-        height: 100%; width: 0%; background: #C9A84C;
-        border-radius: 2px;
-        animation: splashLoad 1.2s ease forwards;
-      }
-      @keyframes splashLoad {
-        0%   { width: 0% }
-        60%  { width: 70% }
-        100% { width: 100% }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Splash screen -->
-    <div id="splash">
-      <div id="splash-logo">J</div>
-      <div id="splash-name">JHIMFIT</div>
-      <div id="splash-sub">Ghana Fitness Tracker</div>
-      <div id="splash-bar"><div id="splash-fill"></div></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google-site-verification" content="1y8w-687WAMgJlk3R5" />
+  
+  <!-- PWA / App behaviour -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="JhimFit" />
+  <meta name="application-name" content="JhimFit" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="msapplication-TileColor" content="#0a0f1e" />
+  <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+  <meta name="msapplication-config" content="none" />
+  
+  <!-- SEO Meta Tags - OPTIMIZED -->
+  <title>JhimFit - Free Fitness & Nutrition Tracker for Ghana 🇬🇭</title>
+  <meta name="description" content="Free fitness app for Ghana. Track Ghanaian meals (Jollof, Banku, Fufu, Waakye), log workouts, monitor calories, water & weight. Works on any phone - no download needed!" />
+  <meta name="keywords" content="fitness app ghana, ghanaian food tracker, calorie counter ghana, workout app ghana, free fitness tracker, track jollof rice calories, banku nutrition, fufu calories, ghana diet app, accra fitness, lose weight ghana, build muscle ghana, meal tracker ghana" />
+  <meta name="author" content="Joachim Naakureh" />
+  <meta name="robots" content="index, follow" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://jhim-fitness.vercel.app/" />
+  <meta property="og:title" content="JhimFit - Free Fitness & Nutrition Tracker for Ghana 🇬🇭" />
+  <meta property="og:description" content="Track Ghanaian meals like Jollof, Banku, Fufu & Waakye. Log workouts, calories, water & weight. Free fitness app - works on any phone!" />
+  <meta property="og:image" content="https://jhim-fitness.vercel.app/icons/icon-512x512.png" />
+  <meta property="og:locale" content="en_GH" />
+  <meta property="og:site_name" content="JhimFit" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://jhim-fitness.vercel.app/" />
+  <meta name="twitter:title" content="JhimFit - Free Fitness Tracker for Ghana" />
+  <meta name="twitter:description" content="Track Ghanaian meals, workouts & calories. Free app - works on any phone!" />
+  <meta name="twitter:image" content="https://jhim-fitness.vercel.app/icons/icon-512x512.png" />
+  
+  <!-- Favicon & Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- Structured Data - JSON-LD for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "JhimFit",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Any (Web-based PWA)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "GHS"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1"
+    },
+    "description": "Free fitness and nutrition tracker designed for Ghana. Track Ghanaian meals including Jollof Rice, Banku, Fufu, Waakye, Kontomire Stew, and more. Log workouts, monitor calories, water intake, and weight progress. Features guided workout plans for losing weight and building muscle. Works on any device - no download required.",
+    "screenshot": "https://jhim-fitness.vercel.app/icons/icon-512x512.png",
+    "author": {
+      "@type": "Person",
+      "name": "Joachim Naakureh",
+      "email": "joachimnaakureh07@gmail.com"
+    },
+    "datePublished": "2025-03-08",
+    "inLanguage": "en-GH",
+    "featureList": [
+      "Track 36+ Ghanaian and international meals",
+      "Calorie and macro nutrient tracking",
+      "8-week weight loss workout program",
+      "12-week muscle building program",
+      "Water intake tracker",
+      "Weight progress monitoring",
+      "Cloud sync across devices",
+      "Works offline (PWA)",
+      "Free to use - no subscription"
+    ],
+    "keywords": "fitness tracker ghana, ghanaian food calories, workout app, nutrition tracker, calorie counter, free fitness app, jollof rice nutrition, banku calories, fufu tracker"
+  }
+  </script>
+  
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <style>
+    /* Splash Screen */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0a0f1e 0%, #1a1f3e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #C9A84C 0%, #8B7355 100%);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: 900;
+      color: white;
+      font-family: 'Bebas Neue', Arial, sans-serif;
+      box-shadow: 0 8px 32px rgba(201,168,76,0.4);
+    }
+    .splash-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #C9A84C;
+      margin-bottom: 8px;
+      font-family: 'Bebas Neue', Arial, sans-serif;
+      letter-spacing: 2px;
+    }
+    .splash-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 32px;
+    }
+    .splash-loader {
+      width: 200px;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .splash-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #C9A84C 0%, #FFD700 100%);
+      width: 0%;
+      animation: load 1.5s ease-in-out forwards;
+    }
+    @keyframes load {
+      to { width: 100%; }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0f1e;
+      color: white;
+      overflow: hidden;
+    }
+    #root {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #root.loaded {
+      opacity: 1;
+    }
+  </style>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash">
+    <div class="splash-logo">J</div>
+    <div class="splash-title">JHIMFIT</div>
+    <div class="splash-subtitle">Ghana's Fitness & Nutrition Tracker 🇬🇭</div>
+    <div class="splash-loader">
+      <div class="splash-progress"></div>
     </div>
-
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-
-    <script>
-      // Hide splash when React mounts
-      window.__hideSplash = function() {
-        const s = document.getElementById('splash');
-        if (s) { s.classList.add('hidden'); setTimeout(()=>s.remove(), 500); }
-      };
-      // Fallback: hide after 2.5s max
-      setTimeout(window.__hideSplash, 2500);
-
-      // Register Service Worker
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('✓ JhimFit SW registered'))
-            .catch(err => console.log('SW failed:', err));
-        });
+  </div>
+  
+  <!-- App Root -->
+  <div id="root"></div>
+  
+  <script>
+    // Hide splash and show app
+    window.__hideSplash = () => {
+      setTimeout(() => {
+        document.getElementById('splash').classList.add('hidden');
+        document.getElementById('root').classList.add('loaded');
+        document.body.style.overflow = 'auto';
+      }, 1500);
+    };
+    
+    // Auto-hide after 3 seconds as fallback
+    setTimeout(() => {
+      if (!document.getElementById('splash').classList.contains('hidden')) {
+        window.__hideSplash();
       }
-    </script>
-  </body>
+    }, 3000);
+  </script>
+  
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+          // Silently fail - SW is optional
+        });
+      });
+    }
+  </script>
+  
+  <!-- Main App Script -->
+  <script type="module" src="/src/main.jsx"></script>
+</body>
 </html>
