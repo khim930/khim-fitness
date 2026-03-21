@@ -1177,3 +1177,4 @@ export default function JhimFitness() {
     </div>
   );
 }
+
