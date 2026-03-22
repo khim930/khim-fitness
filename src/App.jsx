@@ -101,6 +101,7 @@ export default function JhimFitness() {
   const [completedSets, setCS]  = useState({});
   const [workoutRecords, setWRec] = useState({});
   const { showBanner: showInstallBanner, isInstalled, triggerInstall } = usePWAInstall();
+  const [installDismissed, setInstallDismissed] = React.useState(false);
   const handleInstall = async () => {
     const accepted = await triggerInstall();
     if (accepted) toast_("JhimFit installed! 🎉", "#1a6e5a");
@@ -1287,7 +1288,7 @@ Reply ONLY with a valid JSON array of exactly 3 objects. No explanation, no mark
     <div style={{minHeight:"100vh",background:"#0a0f1e",color:"#f0ede8",fontFamily:"Georgia,'Times New Roman',serif",display:"flex",position:"relative"}}>
       <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none",background:"radial-gradient(ellipse at 15% 10%,rgba(201,168,76,0.1),transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(26,122,74,0.08),transparent 55%)"}}/>
       {/* PWA Install Banner */}
-      {showInstallBanner && !isInstalled && (
+      {showInstallBanner && !isInstalled && !installDismissed && (
         <div style={{position:"fixed",bottom:isMobile?80:24,left:"50%",transform:"translateX(-50%)",zIndex:9998,
           background:"linear-gradient(135deg,#111827,#0d1320)",border:"1px solid rgba(201,168,76,0.35)",
           borderRadius:20,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,
@@ -1302,7 +1303,7 @@ Reply ONLY with a valid JSON array of exactly 3 objects. No explanation, no mark
             <button onClick={handleInstall} style={{background:"#C9A84C",border:"none",borderRadius:10,
               padding:"8px 14px",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",
               fontFamily:SPORT_FONT,letterSpacing:1}}>INSTALL</button>
-            <button onClick={()=>setShowNotifBanner(false)} style={{background:"transparent",border:"none",
+            <button onClick={()=>setInstallDismissed(true)} style={{background:"transparent",border:"none",
               color:"rgba(240,237,232,0.35)",fontSize:10,cursor:"pointer",padding:"2px 0",textAlign:"center"}}>Not now</button>
           </div>
         </div>
