@@ -1302,7 +1302,7 @@ Reply ONLY with a valid JSON array of exactly 3 objects. No explanation, no mark
             <button onClick={handleInstall} style={{background:"#C9A84C",border:"none",borderRadius:10,
               padding:"8px 14px",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",
               fontFamily:SPORT_FONT,letterSpacing:1}}>INSTALL</button>
-            <button onClick={()=>setShowInstallBanner(false)} style={{background:"transparent",border:"none",
+            <button onClick={()=>setShowNotifBanner(false)} style={{background:"transparent",border:"none",
               color:"rgba(240,237,232,0.35)",fontSize:10,cursor:"pointer",padding:"2px 0",textAlign:"center"}}>Not now</button>
           </div>
         </div>
